@@ -1,54 +1,168 @@
 package com.example.unimate;
 
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    //private Button start;
+    private LinearLayout teacherLayout, crLayout, studentLayout, guestLayout, adminLayout;
+    private Button startButton;
+    private String selectedRole = null;  // Tracks which role is currently chosen
+
+    // We’ll also keep references to each role’s TextView
+    private TextView teacherText, crText, studentText, guestText, adminText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Find the ImageView
+        // ImageView with slide-down animation
         ImageView selectRoleTopImage = findViewById(R.id.selectRoleTopImage);
-
-        // Load the slide-down animation
         Animation slideDown = AnimationUtils.loadAnimation(this, R.anim.slide_down);
-
-        // Start the animation
         selectRoleTopImage.startAnimation(slideDown);
 
-        // Find the bottom layout
+        // Bottom layout with slide-up animation
         LinearLayout bottomLayout = findViewById(R.id.bottomLayout);
-
-        // Load the slide-up animation
         Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-
-        // Start the animation
         bottomLayout.startAnimation(slideUp);
-        Button start= findViewById(R.id.btnLetsStart);
-        start.setOnClickListener(v -> {
-            // Create an Intent to transition from MainActivity to RegisterActivity
-            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
-            // Start the RegisterActivity
-            startActivity(intent);
+
+        // Find role layouts
+        teacherLayout = findViewById(R.id.teacher);
+        crLayout = findViewById(R.id.cr);
+        studentLayout = findViewById(R.id.student);
+        guestLayout = findViewById(R.id.guest);
+        adminLayout = findViewById(R.id.admin);
+
+        // Find the "Let’s Start" button
+        startButton = findViewById(R.id.btnLetsStart);
+
+        // Find TextViews inside each role layout:
+        // The text is the second child in each layout (childAt(1)).
+        teacherText = (TextView) teacherLayout.getChildAt(1);
+        crText = (TextView) crLayout.getChildAt(1);
+        studentText = (TextView) studentLayout.getChildAt(1);
+        guestText = (TextView) guestLayout.getChildAt(1);
+        adminText = (TextView) adminLayout.getChildAt(1);
+
+        // Set click listeners for each role layout
+        teacherLayout.setOnClickListener(v -> selectRole("teacher"));
+        crLayout.setOnClickListener(v -> selectRole("cr"));
+        studentLayout.setOnClickListener(v -> selectRole("student"));
+        guestLayout.setOnClickListener(v -> selectRole("guest"));
+        adminLayout.setOnClickListener(v -> selectRole("admin"));
+
+        // "Let’s Start" button logic
+        startButton.setOnClickListener(v -> {
+            if (selectedRole == null) {
+                // Show a Toast if no role is selected
+                Toast.makeText(this, "Please select a role first", Toast.LENGTH_SHORT).show();
+            } else {
+                // Go to the chosen role’s login page
+                switch (selectedRole) {
+                    case "teacher":
+                        startActivity(new Intent(MainActivity.this, TeacherLoginActivity.class));
+                        break;
+                    case "cr":
+                        startActivity(new Intent(MainActivity.this, CrLoginActivity.class));
+                        break;
+                    case "student":
+                        startActivity(new Intent(MainActivity.this, StudentLoginActivity.class));
+                        break;
+                    case "guest":
+                        startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+                        break;
+                    case "admin":
+                        startActivity(new Intent(MainActivity.this, AdminLoginActivity.class));
+                        break;
+                }
+            }
         });
+    }
 
+    /**
+     * Called when a user taps a role. This highlights the chosen layout
+     * and updates 'selectedRole'.
+     */
+    private void selectRole(String role) {
+        selectedRole = role;
 
+        // Reset backgrounds and text colors first
+        resetAllBackgrounds();
+
+        // Highlight the layout that was tapped
+        switch (role) {
+            case "teacher":
+                highlightSelectedRole(teacherLayout, teacherText);
+                break;
+            case "cr":
+                highlightSelectedRole(crLayout, crText);
+                break;
+            case "student":
+                highlightSelectedRole(studentLayout, studentText);
+                break;
+            case "guest":
+                highlightSelectedRole(guestLayout, guestText);
+                break;
+            case "admin":
+                highlightSelectedRole(adminLayout, adminText);
+                break;
+        }
+    }
+
+    /**
+     * Applies a rounded green background to the layout
+     * and makes the text green to show it's selected.
+     */
+    private void highlightSelectedRole(LinearLayout layout, TextView textView) {
+        // Create a rounded drawable
+        GradientDrawable highlightDrawable = new GradientDrawable();
+        highlightDrawable.setShape(GradientDrawable.RECTANGLE);
+        highlightDrawable.setColor(ContextCompat.getColor(this, android.R.color.holo_green_light));
+        highlightDrawable.setCornerRadius(30f); // Adjust corner radius as desired
+
+        // Set the layout background
+        layout.setBackground(highlightDrawable);
+
+        // Change text color to green (holo_green_dark or a color of your choice)
+        textView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
+    }
+
+    /**
+     * Resets every role layout to a transparent background
+     * and its text color back to white.
+     */
+    private void resetAllBackgrounds() {
+        // Reset teacher
+        teacherLayout.setBackground(null);
+        teacherText.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+
+        // Reset CR
+        crLayout.setBackground(null);
+        crText.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+
+        // Reset Student
+        studentLayout.setBackground(null);
+        studentText.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+
+        // Reset Guest
+        guestLayout.setBackground(null);
+        guestText.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+
+        // Reset Admin
+        adminLayout.setBackground(null);
+        adminText.setTextColor(ContextCompat.getColor(this, android.R.color.white));
     }
 }
-
-

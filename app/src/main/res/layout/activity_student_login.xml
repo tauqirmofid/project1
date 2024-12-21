@@ -1,0 +1,177 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:background="@color/Layout_Background">
+
+
+
+    <!-- SVG Drawable positioned at the very top -->
+    <ImageView
+        android:id="@+id/selectRoleTopImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/lgn_loging_top"
+        android:contentDescription="@null" />
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/previous"
+        android:background="#006A00"
+        android:src="@drawable/back"
+        android:scaleType="centerInside" />
+
+    <!-- Content Layout with ScrollView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/selectRoleTopImage"
+        android:id="@+id/register_scroll"
+        android:layout_above="@+id/bottomLayout"
+        android:adjustViewBounds="true"
+        android:fillViewport="true"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Email -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Email"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/emailEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="enter email address"
+                android:background="@xml/edit_text_bg"
+                android:padding="12dp"
+                android:textColorHint="#808080"
+                android:inputType="textEmailAddress" />
+
+
+
+
+
+
+
+
+
+            <!-- Password -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Password"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/passwordEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="enter password"
+                android:background="@xml/edit_text_bg"
+                android:padding="12dp"
+                android:textColorHint="#808080"
+                android:inputType="textPassword" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/lgnButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Log IN"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/button"
+                android:padding="12dp"
+                android:textStyle="bold"
+                android:textSize="16sp" >
+            </androidx.appcompat.widget.AppCompatButton>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="Don't have an account? Please register."
+                android:textStyle="normal"
+                android:textSize="16sp"
+                android:layout_marginTop="-10dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/rgnButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Register Here"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="16dp"
+                android:textColor="@color/Layout_Background"
+                android:background="@color/green_button_color"
+                android:padding="5dp"
+                android:textStyle="bold"
+                android:textSize="16sp" >
+            </androidx.appcompat.widget.AppCompatButton>
+
+
+        </LinearLayout>
+
+
+
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/logo_unimate_pad"
+        android:layout_above="@+id/bottomLayout"
+
+
+        android:layout_marginBottom="-10dp"
+        android:layout_marginTop="-20dp"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        />
+
+    <LinearLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/rounded_bottom_with_side_padding"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

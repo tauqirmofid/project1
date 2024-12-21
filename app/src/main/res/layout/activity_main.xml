@@ -49,7 +49,7 @@
     <LinearLayout
         android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
-        android:layout_height="450dp"
+        android:layout_height="400dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/bottom_with_shadow"
         android:elevation="8dp"
@@ -98,6 +98,7 @@
 
                     <!-- Teacher -->
                     <LinearLayout
+                        android:id="@+id/teacher"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -105,8 +106,8 @@
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
                             android:src="@drawable/sample_image"
                             android:contentDescription="Teacher Icon" />
 
@@ -115,7 +116,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="TEACHER"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textColor="#FFFFFF"
                             android:gravity="center"
                             android:textStyle="bold" />
@@ -123,15 +124,17 @@
 
                     <!-- CR -->
                     <LinearLayout
+                        android:id="@+id/cr"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:padding="5px"
                         android:orientation="vertical"
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
                             android:src="@drawable/cr"
                             android:contentDescription="CR Icon" />
 
@@ -140,7 +143,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="CR"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textColor="#FFFFFF"
                             android:gravity="center"
                             android:textStyle="bold" />
@@ -148,6 +151,7 @@
 
                     <!-- Student -->
                     <LinearLayout
+                        android:id="@+id/student"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -155,8 +159,8 @@
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
                             android:src="@drawable/student_icon"
                             android:contentDescription="Student Icon" />
 
@@ -165,7 +169,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="STUDENT"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textColor="#FFFFFF"
                             android:gravity="center"
                             android:textStyle="bold" />
@@ -173,6 +177,7 @@
 
                     <!-- Guest -->
                     <LinearLayout
+                        android:id="@+id/guest"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -180,8 +185,8 @@
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
                             android:src="@drawable/guest"
                             android:contentDescription="Guest Icon" />
 
@@ -190,7 +195,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="GUEST"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textColor="#FFFFFF"
                             android:gravity="center"
                             android:textStyle="bold" />
@@ -199,6 +204,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+
                     android:id="@+id/verticalLayout"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -207,18 +213,20 @@
                     android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/admin"
 
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:padding="5px"
                     android:orientation="vertical"
                     android:gravity="center">
 
                     <!-- Admin Image -->
 
                     <ImageView
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
                         android:src="@drawable/admin_icon"
                         android:contentDescription="Admin Icon" />
 
@@ -228,7 +236,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="ADMIN"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:textColor="#FFFFFF"
                         android:gravity="center"
                         android:textStyle="bold" />
@@ -269,7 +277,7 @@
         </RelativeLayout>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnLetsStart"
-            android:layout_marginTop="-20dp"
+
             android:layout_width="250dp"
             android:layout_height="70dp"
             android:background="@drawable/green_button"
@@ -281,15 +289,7 @@
             android:gravity="center">
         </androidx.appcompat.widget.AppCompatButton>
 
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:buttonTint="@color/white"
-            android:layout_marginTop="10dp"
-            android:text="I agree to all terms and conditions"
-            android:textColor="@color/white"
-            android:layout_gravity="center"
-            />
+
 
     </LinearLayout>
 
