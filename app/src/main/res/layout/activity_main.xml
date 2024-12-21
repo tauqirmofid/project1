@@ -16,16 +16,7 @@
         android:contentDescription="@null" />
 
     <!-- Image positioned directly below the SVG -->
-    <ImageView
-        android:id="@+id/selectRoleMainIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:layout_below="@id/selectRoleTopImage"
-        android:layout_above="@+id/selectRolelogo"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/select_role_page_main_icon"
-        android:contentDescription="@null" />
+
 
     <ImageView
         android:id="@+id/selectRolelogo"
