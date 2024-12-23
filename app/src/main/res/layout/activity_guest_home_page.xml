@@ -1,304 +1,302 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/Layout_Background"
-    tools:context=".Guest_HomePage">
+    android:fillViewport="true">
 
-
-    <!-- Top card view start -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/topCardView"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/Theme_green"
-        app:cardPreventCornerOverlap="true"
-        app:cardElevation="8dp"
+        android:background="@color/Layout_Background"
+        tools:context=".Guest_HomePage">
 
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/CustomCardShape"
-        >
-
-        <ImageView
-            android:id="@+id/selectRoleTopImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:contentDescription="@null"
-            android:src="@drawable/homepagetop"
-            android:background="@color/Theme_green"
-            android:scaleX="0.8"
-            android:scaleY="0.8" />
-
-
-    </com.google.android.material.card.MaterialCardView>
-    <!-- Top card view Ends -->
-
-
-    <!-- Search bar Start -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/searchBar"
-        android:layout_width="0dp"
-        android:layout_height="45dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/topCardView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="@android:color/white">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_vertical">
-
-            <!-- Search icon -->
-            <ImageView
-                android:id="@+id/searchIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="18dp"
-                android:src="@drawable/ic_search"
-                android:contentDescription="Search Icon" />
-
-            <!-- Search text -->
-            <EditText
-                android:id="@+id/searchEditText"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:hint="Search"
-                android:textColorHint="#808080"
-                android:textColor="#000000"
-                android:background="@android:color/transparent"
-                android:padding="0dp"
-                android:gravity="center_vertical" />
-
-            <!-- Two dots icon -->
-            <ImageView
-                android:id="@+id/twoDotsIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/two_dots"
-                android:layout_marginEnd="18dp"
-                android:contentDescription="Two Dots Icon" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Search bar Ends -->
-
-    <ImageView
-        android:id="@+id/Divider"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        app:layout_constraintTop_toBottomOf="@id/searchBar"
-        android:layout_marginTop="10dp"
-
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/division"
-        android:contentDescription="@null"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- Horizontal layout for Hi, and User -->
-    <LinearLayout
-        android:id="@+id/hiUserLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/Divider"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"
-        android:paddingStart="16dp">
-
-        <!-- Hi, -->
-        <TextView
-            android:id="@+id/hiText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hi,"
-            android:textSize="24sp"
-            android:textColor="#006A00" />
-
-        <!-- User -->
-        <TextView
-            android:id="@+id/userText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:text="User"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#006A00" />
-    </LinearLayout>
-
-    <!-- Horizontal layout for Welcome to and Unimate -->
-    <LinearLayout
-        android:id="@+id/welcomeLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/hiUserLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="5dp"
-        android:paddingStart="16dp">
-
-        <!-- Welcome to -->
-        <TextView
-            android:id="@+id/welcomeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome to"
-            android:textSize="16sp"
-            android:textColor="#006A00" />
-
-        <!-- Unimate -->
-        <TextView
-            android:id="@+id/unimateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:text="Unimate"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#006A00" />
-    </LinearLayout>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/statusCardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/welcomeLayout"
-
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
-
-        app:cardUseCompatPadding="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardBackgroundColor="@color/white"
-        app:contentPadding="8dp"
-
-        app:strokeWidth="2dp">
-
-        <LinearLayout
+        <!-- Top card view start -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/topCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            app:cardBackgroundColor="@color/Theme_green"
+            app:cardPreventCornerOverlap="true"
+            app:cardElevation="8dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/CustomCardShape">
 
-            <!-- Icon on the left -->
             <ImageView
-                android:id="@+id/statusIcon"
-                android:layout_width="65dp"
-                android:layout_height="65dp"
-                android:src="@drawable/g_icon"
-                android:contentDescription="Status Icon"
-                android:layout_gravity="center_vertical" />
-
-            <!-- Middle content -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="start"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/unknownText1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" "
-                    android:textColor="#006A00"
-                    android:textSize="18sp"
-                    android:textStyle="normal" />
-
-                <!-- UNKNOWN -->
-                <TextView
-                    android:id="@+id/unknownText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="UNKNOWN"
-                    android:textColor="#006A00"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/unknownText2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" "
-                    android:textColor="#006A00"
-                    android:textSize="18sp"
-                    android:textStyle="normal" />
-            </LinearLayout>
-
-            <!-- Right side content -->
-            <LinearLayout
+                android:id="@+id/selectRoleTopImage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center_vertical"
-                android:gravity="end">
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null"
+                android:src="@drawable/homepagetop"
+                android:background="@color/Theme_green"
+                android:scaleX="0.8"
+                android:scaleY="0.8" />
 
-                <!-- Today -->
-                <TextView
-                    android:id="@+id/todayText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Today"
-                    android:textColor="#006A00"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="4dp" />
+        </com.google.android.material.card.MaterialCardView>
+        <!-- Top card view Ends -->
 
-                <!-- No class to show -->
-                <TextView
-                    android:id="@+id/noClassText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="NO class to show"
-                    android:textColor="#006A00"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="4dp" />
 
-                <!-- No task to show -->
-                <TextView
-                    android:id="@+id/noTaskText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="NO task to show"
-                    android:textColor="#006A00"
-                    android:textSize="16sp" />
+        <!-- Search bar Start -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/searchBar"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintTop_toBottomOf="@id/topCardView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical">
+
+                <!-- Search icon -->
+                <ImageView
+                    android:id="@+id/searchIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_search"
+                    android:contentDescription="Search Icon" />
+
+                <!-- Search text -->
+                <EditText
+                    android:id="@+id/searchEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Search"
+                    android:textColorHint="#808080"
+                    android:textColor="#000000"
+                    android:background="@android:color/transparent"
+                    android:padding="0dp"
+                    android:gravity="center_vertical" />
+
+                <!-- Two dots icon -->
+                <ImageView
+                    android:id="@+id/twoDotsIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/two_dots"
+                    android:contentDescription="Two Dots Icon" />
             </LinearLayout>
+        </androidx.cardview.widget.CardView>
+        <!-- Search bar Ends -->
+
+        <ImageView
+            android:id="@+id/Divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/division"
+            android:contentDescription="@null"
+            app:layout_constraintTop_toBottomOf="@id/searchBar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Horizontal layout for Hi, and User -->
+        <LinearLayout
+            android:id="@+id/hiUserLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:paddingStart="16dp"
+            app:layout_constraintTop_toBottomOf="@id/Divider"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- Hi, -->
+            <TextView
+                android:id="@+id/hiText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hi,"
+                android:textSize="24sp"
+                android:textColor="#006A00" />
+
+            <!-- User -->
+            <TextView
+                android:id="@+id/userText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="User"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#006A00" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
+        <!-- Horizontal layout for Welcome to and Unimate -->
+        <LinearLayout
+            android:id="@+id/welcomeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:paddingStart="16dp"
+            app:layout_constraintTop_toBottomOf="@id/hiUserLayout"
+            app:layout_constraintStart_toStartOf="parent">
 
+            <!-- Welcome to -->
+            <TextView
+                android:id="@+id/welcomeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome to"
+                android:textSize="16sp"
+                android:textColor="#006A00" />
 
+            <!-- Unimate -->
+            <TextView
+                android:id="@+id/unimateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="Unimate"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#006A00" />
+        </LinearLayout>
 
+        <androidx.cardview.widget.CardView
+            android:id="@+id/statusCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintTop_toBottomOf="@id/welcomeLayout"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="true"
+            app:cardBackgroundColor="@color/white"
+            app:contentPadding="8dp"
+            app:strokeWidth="2dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
 
+                <!-- Icon on the left -->
+                <ImageView
+                    android:id="@+id/statusIcon"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/g_icon"
+                    android:contentDescription="Status Icon" />
 
+                <!-- Middle content -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/unknownText1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="#006A00"
+                        android:textSize="18sp" />
 
+                    <!-- UNKNOWN -->
+                    <TextView
+                        android:id="@+id/unknownText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UNKNOWN"
+                        android:textColor="#006A00"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/unknownText2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="#006A00"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <!-- Right side content -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="end"
+                    android:layout_gravity="center_vertical">
+
+                    <!-- Today -->
+                    <TextView
+                        android:id="@+id/todayText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Today"
+                        android:textColor="#006A00"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+
+                    <!-- No class to show -->
+                    <TextView
+                        android:id="@+id/noClassText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NO class to show"
+                        android:textColor="#006A00"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <!-- No task to show -->
+                    <TextView
+                        android:id="@+id/noTaskText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NO task to show"
+                        android:textColor="#006A00"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/carouselRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingVertical="30dp"
+            android:foregroundGravity="center"
+            android:textAlignment="center"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintTop_toBottomOf="@id/statusCardView"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

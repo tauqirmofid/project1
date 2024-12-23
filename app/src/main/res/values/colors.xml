@@ -9,4 +9,7 @@
     <color name="Theme_green">#006A00</color>
     <color name="Theme_Lightgreen">#97C93C</color><!-- Dark Green -->
     <!-- Replace with your desired green -->
+    <color name="colorGreenDark">#006A00</color>
+    <color name="colorGreenLight">#97C93C</color>
+    <color name="colorWhite">#FFFFFF</color>
 </resources>
