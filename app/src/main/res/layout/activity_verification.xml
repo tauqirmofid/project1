@@ -37,6 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="Verification Code Sent To Your Email"
                 android:textSize="15sp"
+                android:fontFamily="@font/poppins_regular"
                 android:textColor="@color/white"
                 android:textAlignment="center" />
 
@@ -48,6 +49,8 @@
                 android:text="Enter Verification Code"
                 android:textSize="30sp"
                 android:textStyle="bold"
+                android:fontFamily="@font/poppins_regular"
+
                 android:textColor="@color/Theme_Lightgreen"
                 android:textAlignment="center" />
 
@@ -56,6 +59,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:fontFamily="@font/poppins_regular"
+
                 android:text="Make sure the code is correct"
                 android:textSize="14sp"
                 android:textColor="@color/Theme_Lightgreen"
@@ -84,6 +89,8 @@
             android:text="Verification Code"
             android:textColor="#000000"
             android:textSize="16sp"
+            android:fontFamily="@font/poppins_regular"
+
             app:layout_constraintTop_toBottomOf="@id/topCardView"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp" />
@@ -99,6 +106,8 @@
         android:background="@xml/edit_text_bg"
         android:padding="12dp"
         android:textColorHint="#808080"
+        android:fontFamily="@font/poppins_regular"
+
         android:inputType="number"
         android:adjustViewBounds="true"
         android:layout_marginLeft="20dp"
@@ -117,6 +126,8 @@
         android:background="@color/green_button_color"
         app:layout_constraintTop_toBottomOf="@id/et_vercode"
         android:layout_marginLeft="20dp"
+        android:fontFamily="@font/poppins_regular"
+
         android:layout_marginRight="20dp"
         android:textSize="16sp" >
     </androidx.appcompat.widget.AppCompatButton>
@@ -126,7 +137,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="100dp"
         android:src="@drawable/logo_unimate_pad"
         app:layout_constraintTop_toBottomOf="@id/submitButton"
         android:contentDescription="@null" />
