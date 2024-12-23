@@ -26,7 +26,7 @@ import java.util.List;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText emailEditText, studentIdEditText, passwordEditText, confirmPasswordEditText;
-    private Spinner departmentSpinner, sectionSpinner; // We'll keep these as actual spinners
+    private TextView departmentTextView, sectionTextView; // We'll keep these as actual spinners
     private Button registerButton;
 
     // Pseudo-spinner for batch
@@ -42,17 +42,17 @@ public class RegisterActivity extends AppCompatActivity {
         // Initialize views
         emailEditText = findViewById(R.id.emailEditText);
         studentIdEditText = findViewById(R.id.studentIdEditText);
-        passwordEditText = findViewById(R.id.passwordEditText);
-        confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
+        passwordEditText = findViewById(R.id.editTextPassword);
+        confirmPasswordEditText = findViewById(R.id.editTextConPassword);
 
         // Department & Section are still spinners
-        departmentSpinner = findViewById(R.id.departmentSpinner);
-        sectionSpinner = findViewById(R.id.sectionSpinner);
+        departmentTextView = findViewById(R.id.depTextView);
+        sectionTextView = findViewById(R.id.sectionTextView);
 
         registerButton = findViewById(R.id.registerButton);
 
         // 1) Populate the department and section spinners
-        populateSpinners();
+
 
         // 2) Setup pseudo-spinner TextView for batch
         batchTextView = findViewById(R.id.batchTextView);
@@ -129,21 +129,7 @@ public class RegisterActivity extends AppCompatActivity {
      * Populate department & section spinners as normal.
      * We no longer use a batchSpinner.
      */
-    private void populateSpinners() {
-        // Department dropdown
-        ArrayAdapter<String> departmentAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item,
-                new String[]{"Select Department", "CSE", "EEE", "CEE"});
-        departmentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        departmentSpinner.setAdapter(departmentAdapter);
 
-        // Section dropdown
-        ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item,
-                new String[]{"Select Section", "A", "B", "C", "D", "E"});
-        sectionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sectionSpinner.setAdapter(sectionAdapter);
-    }
 
     private void validateInputs() {
         boolean isValid = true; // Flag to track if all inputs are valid
@@ -196,7 +182,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // Department spinner validation
-        if (departmentSpinner.getSelectedItemPosition() == 0) {
+        if ("Select Department".equals(selectedBatch)) {
             isValid = false;
             Toast.makeText(this, "Please select a department!", Toast.LENGTH_SHORT).show();
         }
@@ -208,7 +194,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // Section spinner validation
-        if (sectionSpinner.getSelectedItemPosition() == 0) {
+        if ("Select Section".equals(selectedBatch)){
             isValid = false;
             Toast.makeText(this, "Please select a section!", Toast.LENGTH_SHORT).show();
         }
