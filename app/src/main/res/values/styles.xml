@@ -10,5 +10,14 @@
         <item name="cornerSizeBottomLeft">20dp</item>
         <item name="cornerSizeBottomRight">20dp</item>
     </style>
+    <style name="CustomCardShape2" parent="Base.Theme.MaterialComponents">
+        <!-- We set top corners to 0dp -->
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+
+        <!-- Bottom corners to 16dp (adjust as you like) -->
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
 
 </resources>

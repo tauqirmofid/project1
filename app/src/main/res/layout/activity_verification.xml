@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Layout_Background"
+    tools:context=".Guest_HomePage">
+
+    <!-- Top card view start -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/topCardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/Theme_green"
+        app:cardPreventCornerOverlap="true"
+        app:cardElevation="8dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/CustomCardShape">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="15dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/veri_t_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Verification Code Sent To Your Email"
+                android:textSize="15sp"
+                android:textColor="@color/white"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/veri_t_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:text="Enter Verification Code"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:textColor="@color/Theme_Lightgreen"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/veri_t_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Make sure the code is correct"
+                android:textSize="14sp"
+                android:textColor="@color/Theme_Lightgreen"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <!-- Top card view Ends -->
+
+    <!-- LinearLayout for Verification Code -->
+    <LinearLayout
+        android:id="@+id/verificationLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintTop_toBottomOf="@id/topCardView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/verificationCodeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Verification Code"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/topCardView"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <!-- Divider -->
+    <EditText
+        android:id="@+id/et_vercode"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="enter verification code"
+        android:background="@xml/edit_text_bg"
+        android:padding="12dp"
+        android:textColorHint="#808080"
+        android:inputType="number"
+        android:adjustViewBounds="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/verificationLayout"
+
+        />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/submitButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:layout_marginTop="24dp"
+        android:textColor="@android:color/white"
+        android:background="@color/green_button_color"
+        app:layout_constraintTop_toBottomOf="@id/et_vercode"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textSize="16sp" >
+    </androidx.appcompat.widget.AppCompatButton>
+    <ImageView
+        android:id="@+id/unimate_biglogo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="150dp"
+        android:src="@drawable/logo_unimate_pad"
+        app:layout_constraintTop_toBottomOf="@id/submitButton"
+        android:contentDescription="@null" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottomCardView"
+        android:layout_width="match_parent"
+        android:layout_height="450dp"
+        app:cardBackgroundColor="@color/Theme_green"
+        app:cardPreventCornerOverlap="true"
+        app:cardElevation="8dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/unimate_biglogo"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:shapeAppearanceOverlay="@style/CustomCardShape2"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

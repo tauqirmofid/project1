@@ -6,15 +6,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
-import android.view.Window;
 import android.view.Gravity;
+import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,13 +24,13 @@ import java.util.List;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText emailEditText, studentIdEditText, passwordEditText, confirmPasswordEditText;
-    private TextView departmentTextView, sectionTextView; // We'll keep these as actual spinners
+    private TextView departmentTextView, sectionTextView, batchTextView;
     private Button registerButton;
 
-    // Pseudo-spinner for batch
-    private TextView batchTextView;
-    // The custom batch list items
-    private List<String> batchList = Arrays.asList("53","54","55","56","58","59", "60", "61", "62", "63", "64", "65");
+    // Lists for pseudo-spinners
+    private List<String> batchList = Arrays.asList("53", "54", "55", "56", "58", "59", "60", "61", "62", "63", "64", "65");
+    private List<String> departmentList = Arrays.asList("CSE");
+    private List<String> sectionList = Arrays.asList("A", "B", "C", "D", "E", "F", "I");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,100 +43,85 @@ public class RegisterActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.editTextPassword);
         confirmPasswordEditText = findViewById(R.id.editTextConPassword);
 
-        // Department & Section are still spinners
         departmentTextView = findViewById(R.id.depTextView);
         sectionTextView = findViewById(R.id.sectionTextView);
-
+        batchTextView = findViewById(R.id.batchTextView);
         registerButton = findViewById(R.id.registerButton);
 
-        // 1) Populate the department and section spinners
-
-
-        // 2) Setup pseudo-spinner TextView for batch
-        batchTextView = findViewById(R.id.batchTextView);
-        // Set initial text so user knows to click
+        // Set initial text
         batchTextView.setText("Select Batch");
-        // When tapped, show our custom dialog
-        batchTextView.setOnClickListener(v -> showBatchDialog());
+        departmentTextView.setText("Select Department");
+        sectionTextView.setText("Select Section");
 
-        // Register button
+        // Set click listeners for dialogs
+        batchTextView.setOnClickListener(v -> showCustomDialog("Select Batch", batchList, batchTextView));
+        departmentTextView.setOnClickListener(v -> showCustomDialog("Select Department", departmentList, departmentTextView));
+        sectionTextView.setOnClickListener(v -> showCustomDialog("Select Section", sectionList, sectionTextView));
+
+        // Register button click
         registerButton.setOnClickListener(v -> validateInputs());
     }
 
     /**
-     * Shows a custom dialog with a ListView of batch items.
-     * The user can pick one, or tap the X to close.
+     * Shows a custom dialog with a ListView for selection.
+     *
+     * @param title        Dialog title (e.g., Select Batch)
+     * @param items        List of items to display
+     * @param targetView   TextView to update with selected value
      */
-    private void showBatchDialog() {
-        // Create a custom dialog without the full-screen black overlay
+    private void showCustomDialog(String title, List<String> items, TextView targetView) {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_custom_list);
 
-        // Make the dialog background transparent so we can style it ourselves
+        // Make the dialog background transparent
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            // Make sure we DO NOT remove dim behind
-            // dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); // Remove this line
-
-            // Instead, ensure the window uses the dim background
             dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-
-            // 60% dim overlay
             dialog.getWindow().setDimAmount(0.6f);
-
             dialog.getWindow().setGravity(Gravity.CENTER);
             dialog.getWindow().setLayout(900, WindowManager.LayoutParams.WRAP_CONTENT);
         }
 
+        // Set dialog title
+        TextView dialogTitle = dialog.findViewById(R.id.dialogTitle);
+        dialogTitle.setText(title);
 
         // Find views in dialog
         ListView listView = dialog.findViewById(R.id.listViewItems);
         ImageView closeDialog = dialog.findViewById(R.id.closeDialog);
 
         // Create and set adapter
-        BatchListAdapter adapter = new BatchListAdapter(this, batchList);
+        BatchListAdapter adapter = new BatchListAdapter(this, items);
         listView.setAdapter(adapter);
-
-        // Remove all default dividers
-        //listView.setDivider(new ColorDrawable(Color.WHITE));
-        //listView.setDividerHeight(10);
 
         // On item click
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            // Mark item as selected in the adapter
             adapter.setSelectedPosition(position);
-
-            // Close dialog
             dialog.dismiss();
-
-            // Update the pseudo-spinner text
-            String selectedBatch = batchList.get(position);
-            batchTextView.setText(selectedBatch);
+            String selectedItem = items.get(position);
+            targetView.setText(selectedItem);
         });
 
-        // Close (X) button
+        // Close button
         closeDialog.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
     }
 
-
     /**
-     * Populate department & section spinners as normal.
-     * We no longer use a batchSpinner.
+     * Validates all input fields and displays appropriate error messages.
      */
-
-
     private void validateInputs() {
-        boolean isValid = true; // Flag to track if all inputs are valid
+        boolean isValid = true;
 
         String email = emailEditText.getText().toString().trim();
         String studentId = studentIdEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString();
         String confirmPassword = confirmPasswordEditText.getText().toString();
         String selectedBatch = batchTextView.getText().toString();
+        String selectedDepartment = departmentTextView.getText().toString();
+        String selectedSection = sectionTextView.getText().toString();
 
         // Email validation
         if (TextUtils.isEmpty(email)) {
@@ -148,7 +131,7 @@ public class RegisterActivity extends AppCompatActivity {
             emailEditText.setError("Enter a valid email address!");
             isValid = false;
         } else {
-            emailEditText.setError(null); // Clear previous error
+            emailEditText.setError(null);
         }
 
         // Student ID validation
@@ -181,20 +164,20 @@ public class RegisterActivity extends AppCompatActivity {
             confirmPasswordEditText.setError(null);
         }
 
-        // Department spinner validation
-        if ("Select Department".equals(selectedBatch)) {
+        // Department validation
+        if ("Select Department".equals(selectedDepartment)) {
             isValid = false;
             Toast.makeText(this, "Please select a department!", Toast.LENGTH_SHORT).show();
         }
 
-        // Batch TextView validation (since we replaced the spinner)
+        // Batch validation
         if ("Select Batch".equals(selectedBatch)) {
             isValid = false;
             Toast.makeText(this, "Please select a batch!", Toast.LENGTH_SHORT).show();
         }
 
-        // Section spinner validation
-        if ("Select Section".equals(selectedBatch)){
+        // Section validation
+        if ("Select Section".equals(selectedSection)) {
             isValid = false;
             Toast.makeText(this, "Please select a section!", Toast.LENGTH_SHORT).show();
         }

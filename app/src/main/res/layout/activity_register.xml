@@ -69,7 +69,7 @@
                 android:background="@xml/edit_text_bg"
                 android:padding="12dp"
                 android:textColorHint="#808080"
-                android:inputType="text" />
+                android:inputType="number" />
 
             <!-- Department -->
             <TextView
