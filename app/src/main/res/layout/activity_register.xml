@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/Layout_Background">
 
     <!-- SVG Drawable positioned at the very top -->
@@ -74,19 +75,29 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Department"
+                android:text="Select Department"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:textColor="#000000" />
 
-            <Spinner
-                android:id="@+id/departmentSpinner"
+            <TextView
+                android:id="@+id/depTextView"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:textColorHint="#808080"
+
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:hint="Select Department"
+                android:textSize="16sp"
+                android:textColor="#000000"
                 android:background="@xml/edit_text_bg"
-                android:padding="12dp" />
+                android:drawableRight="@drawable/dropdown_icon"
+                android:clickable="true"
+                android:focusable="true" />
+
 
             <!-- Batch and Section -->
             <LinearLayout
@@ -111,23 +122,17 @@
                         android:textSize="16sp"
                         android:layout_marginBottom="8dp"
                         android:textColor="#000000" />
-                    <!--
-                    <Spinner
-                        android:id="@+id/batchSpinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="@xml/edit_text_bg"
-                        android:padding="12dp" />
-                    -->
+
 
                     <TextView
                         android:id="@+id/batchTextView"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
+                        android:textColorHint="#808080"
 
                         android:gravity="center_vertical"
                         android:padding="12dp"
-                        android:text="Select Batch"
+                        android:hint="Select Batch"
                         android:textSize="16sp"
                         android:textColor="#000000"
                         android:background="@xml/edit_text_bg"
@@ -154,12 +159,22 @@
                         android:layout_marginBottom="8dp"
                         android:textColor="#000000" />
 
-                    <Spinner
-                        android:id="@+id/sectionSpinner"
+
+                    <TextView
+                        android:id="@+id/sectionTextView"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
+                        android:textColorHint="#808080"
+
+                        android:gravity="center_vertical"
+                        android:padding="12dp"
+                        android:hint="Select Section"
+                        android:textSize="16sp"
+                        android:textColor="#000000"
                         android:background="@xml/edit_text_bg"
-                        android:padding="12dp" />
+                        android:drawableRight="@drawable/dropdown_icon"
+                        android:clickable="true"
+                        android:focusable="true" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -171,18 +186,30 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="0dp"
                 android:textColor="#000000" />
 
-            <EditText
-                android:id="@+id/passwordEditText"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputPassword"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:hint="enter password"
-                android:background="@xml/edit_text_bg"
-                android:padding="12dp"
-                android:textColorHint="#808080"
-                android:inputType="textPassword" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:passwordToggleEnabled="true"
+                app:hintTextColor="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:textColor="@color/black"
+                    android:background="@xml/edit_text_bg"
+                    android:textSize="16sp" />
+
+
+            </com.google.android.material.textfield.TextInputLayout>
+
 
             <!-- Confirm Password -->
             <TextView
@@ -195,15 +222,25 @@
                 android:layout_marginBottom="8dp"
                 android:textColor="#000000" />
 
-            <EditText
-                android:id="@+id/confirmPasswordEditText"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputConPassword"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:hint="enter confirm password"
-                android:background="@xml/edit_text_bg"
-                android:padding="12dp"
-                android:textColorHint="#808080"
-                android:inputType="textPassword" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:passwordToggleEnabled="true"
+                app:hintTextColor="@color/black">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextConPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@xml/edit_text_bg"
+                    android:hint="Confirm Password"
+                    android:inputType="textPassword"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/registerButton"
                 android:layout_width="match_parent"
