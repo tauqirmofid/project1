@@ -6,6 +6,13 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="default_user_name">default_user_name</string>
+    <string name="default_email">default_email</string>
+
+    <string name="default_student_id">default_student_id</string>
+    <string name="default_department">default_department</string>
+    <string name="default_batch">default_batch</string>
+    <string name="default_section">default_section</string>
 
     <string name="hi_user"><![CDATA[Hi, <b>User</b>]]></string>
     <string name="welcome_unimate"><![CDATA[Welcome to <b>Unimate</b>]]></string>

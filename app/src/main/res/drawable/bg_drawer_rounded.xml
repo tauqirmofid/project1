@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Rounded corners -->
+    <corners android:radius="16dp" />
+
+    <!-- Background color of the drawer panel -->
+    <solid android:color="#97C93C" />
+
+    <!--
+         If you want an outline or stroke, uncomment:
+         <stroke android:width="2dp" android:color="#006A00" />
+    -->
+</shape>
