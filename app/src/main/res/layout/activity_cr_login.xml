@@ -50,7 +50,7 @@
                 android:textColor="#000000" />
 
             <EditText
-                android:id="@+id/emailEditText"
+                android:id="@+id/CRemailEditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:hint="enter email address"
@@ -58,13 +58,6 @@
                 android:padding="12dp"
                 android:textColorHint="#808080"
                 android:inputType="textEmailAddress" />
-
-
-
-
-
-
-
 
 
             <!-- Password -->
@@ -79,7 +72,7 @@
                 android:textColor="#000000" />
 
             <EditText
-                android:id="@+id/passwordEditText"
+                android:id="@+id/CRpasswordEditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:hint="enter password"
@@ -90,14 +83,26 @@
 
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/lgnButton"
+                android:id="@+id/CRlgnButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Log IN"
                 android:layout_marginTop="24dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="10dp"
                 android:textColor="@android:color/white"
                 android:background="@drawable/button"
+                android:padding="12dp"
+                android:textStyle="bold"
+                android:textSize="16sp" >
+            </androidx.appcompat.widget.AppCompatButton>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/CRregButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Register"
+                android:layout_marginBottom="16dp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/card_bg_row"
                 android:padding="12dp"
                 android:textStyle="bold"
                 android:textSize="16sp" >
@@ -127,7 +132,7 @@
     <LinearLayout
         android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:layout_height="20dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/rounded_bottom_with_side_padding"
         android:layout_alignParentBottom="true"

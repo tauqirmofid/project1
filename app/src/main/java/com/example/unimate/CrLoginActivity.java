@@ -1,6 +1,8 @@
 package com.example.unimate;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
@@ -10,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class CrLoginActivity extends AppCompatActivity {
+    private Button CR_reg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +22,12 @@ public class CrLoginActivity extends AppCompatActivity {
         // Floating back button
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> onBackPressed());
+        CR_reg= findViewById(R.id.CRregButton);
+        CR_reg.setOnClickListener(v->{
+            Intent intent = new Intent(CrLoginActivity.this, CR_Registertration.class);
+            startActivity(intent);
+
+        });
     }
 
 }

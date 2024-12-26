@@ -1,0 +1,211 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/Layout_Background">
+
+    <!-- SVG Drawable positioned at the very top -->
+    <ImageView
+        android:id="@+id/selectRoleTopImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/rgr_registerpage_top"
+        android:contentDescription="@null" />
+
+
+
+    <!-- Content Layout with ScrollView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectRoleTopImage"
+        android:id="@+id/teacher_register_scroll"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Email -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Email"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/teacheremailEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="enter email address"
+                android:background="@xml/edit_text_bg"
+                android:padding="12dp"
+                android:textColorHint="#808080"
+                android:inputType="textEmailAddress" />
+
+            <!-- Student ID -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Teacher ID"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/teacherIdEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="enter teacher id"
+                android:background="@xml/edit_text_bg"
+                android:padding="12dp"
+                android:textColorHint="#808080"
+                android:inputType="number" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone Number"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/teacherPhoneEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="enter phone number"
+                android:background="@xml/edit_text_bg"
+                android:padding="12dp"
+                android:textColorHint="#808080"
+                android:inputType="number" />
+
+            <!-- Department -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Department"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/teacherdepTextView"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:textColorHint="#808080"
+
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:hint="Select Department"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="@xml/edit_text_bg"
+                android:drawableRight="@drawable/dropdown_icon"
+                android:clickable="true"
+                android:focusable="true" />
+
+
+
+            <!-- Password -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Password"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="0dp"
+                android:textColor="#000000" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/teachertextInputPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:passwordToggleEnabled="true"
+                app:hintTextColor="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:textColor="@color/black"
+                    android:background="@xml/edit_text_bg"
+                    android:textSize="16sp" />
+
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <!-- Confirm Password -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirm Password"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/teachertextInputConPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:passwordToggleEnabled="true"
+                app:hintTextColor="@color/black">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextConPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@xml/edit_text_bg"
+                    android:hint="Confirm Password"
+                    android:inputType="textPassword"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/Teacher_register_Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Register"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
+                android:textColor="@android:color/white"
+                android:background="@color/green_button_color"
+                android:padding="12dp"
+                android:textStyle="bold"
+                android:textSize="16sp" >
+            </androidx.appcompat.widget.AppCompatButton>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/rounded_bottom"
+                >
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

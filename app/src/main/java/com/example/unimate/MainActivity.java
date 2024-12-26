@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(new Intent(MainActivity.this, StudentLoginActivity.class));
                         break;
                     case "guest":
-                        startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+                        startActivity(new Intent(MainActivity.this, Guest_HomePage.class));
                         break;
                     case "admin":
                         startActivity(new Intent(MainActivity.this, AdminLoginActivity.class));

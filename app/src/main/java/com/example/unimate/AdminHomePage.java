@@ -1,14 +1,14 @@
 package com.example.unimate;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Guest_HomePage extends AppCompatActivity {
-
+public class AdminHomePage extends AppCompatActivity {
     private RecyclerView carouselRecyclerView;
     private DayAdapter dayAdapter;
     private List<DayModel> dayList;
@@ -16,7 +16,7 @@ public class Guest_HomePage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_guest_home_page);
+        setContentView(R.layout.activity_admin_home_page);
 
         // Find the RecyclerView
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);

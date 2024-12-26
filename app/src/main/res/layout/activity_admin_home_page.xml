@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Layout_Background"
+        tools:context=".Guest_HomePage">
+
+        <!-- Top card view start -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/topCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/Theme_green"
+            app:cardPreventCornerOverlap="true"
+            app:cardElevation="8dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/CustomCardShape">
+
+            <ImageView
+                android:id="@+id/selectRoleTopImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null"
+                android:src="@drawable/homepagetop"
+                android:background="@color/Theme_green"
+                android:scaleX="0.8"
+                android:scaleY="0.8" />
+
+        </com.google.android.material.card.MaterialCardView>
+        <!-- Top card view Ends -->
+
+
+        <!-- Search bar Start -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/searchBar"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintTop_toBottomOf="@id/topCardView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical">
+
+                <!-- Search icon -->
+                <ImageView
+                    android:id="@+id/searchIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_search"
+                    android:contentDescription="Search Icon" />
+
+                <!-- Search text -->
+                <EditText
+                    android:id="@+id/searchEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Search"
+                    android:textColorHint="#808080"
+                    android:textColor="#000000"
+                    android:background="@android:color/transparent"
+                    android:padding="0dp"
+                    android:gravity="center_vertical" />
+
+                <!-- Two dots icon -->
+                <ImageView
+                    android:id="@+id/twoDotsIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/two_dots"
+                    android:contentDescription="Two Dots Icon" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+        <!-- Search bar Ends -->
+
+        <ImageView
+            android:id="@+id/Divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/division"
+            android:contentDescription="@null"
+            app:layout_constraintTop_toBottomOf="@id/searchBar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Horizontal layout for Hi, and User -->
+        <LinearLayout
+            android:id="@+id/hiUserLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:paddingStart="16dp"
+            app:layout_constraintTop_toBottomOf="@id/Divider"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- Hi, -->
+            <TextView
+                android:id="@+id/hiText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hi,"
+                android:textSize="24sp"
+                android:textColor="#006A00" />
+
+            <!-- User -->
+            <TextView
+                android:id="@+id/adminText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="Admin"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#006A00" />
+        </LinearLayout>
+
+        <!-- Horizontal layout for Welcome to and Unimate -->
+        <LinearLayout
+            android:id="@+id/welcomeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:paddingStart="16dp"
+            app:layout_constraintTop_toBottomOf="@id/hiUserLayout"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- Welcome to -->
+            <TextView
+                android:id="@+id/welcomeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome to"
+                android:textSize="16sp"
+                android:textColor="#006A00" />
+
+            <!-- Unimate -->
+            <TextView
+                android:id="@+id/unimateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="Unimate"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#006A00" />
+        </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/statusCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintTop_toBottomOf="@id/welcomeLayout"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="true"
+            app:cardBackgroundColor="@color/white"
+            app:contentPadding="8dp"
+            app:strokeWidth="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <!-- Icon on the left -->
+                <ImageView
+                    android:id="@+id/statusIcon"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/admin_icon"
+                    android:contentDescription="Status Icon" />
+
+                <!-- Middle content -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:layout_marginLeft="5dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/unknownText1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="#006A00"
+                        android:textSize="18sp" />
+
+                    <!-- UNKNOWN -->
+                    <TextView
+                        android:id="@+id/unknownText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ADMIN"
+                        android:textColor="#006A00"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/unknownText2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="#006A00"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <!-- Right side content -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="end"
+                    android:layout_gravity="center_vertical">
+
+                    <!-- Today -->
+                    <TextView
+                        android:id="@+id/aprovalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Approval Request"
+                        android:textColor="#006A00"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+
+
+                    <!-- No task to show -->
+                    <TextView
+                        android:id="@+id/approvalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NO Approval Request"
+                        android:textColor="#006A00"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+        <ImageView
+            android:id="@+id/Divider2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/division"
+            android:contentDescription="@null"
+            app:layout_constraintTop_toBottomOf="@id/statusCardView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <LinearLayout
+            android:id="@+id/routineRoomLayout"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="0dp"
+            app:layout_constraintTop_toBottomOf="@id/Divider2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Routine Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/routineCardView"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_bg_row"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/routineIcon"
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:src="@drawable/routine"
+                        android:contentDescription="Routine Icon"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/routineText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Routine"
+                        android:textSize="30sp"
+                        android:textColor="@color/Theme_green"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Rooms Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/roomsCardView"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:background="@color/Theme_green"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/roomsIcon"
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:src="@drawable/rooms"
+                        android:contentDescription="Rooms Icon"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/roomsText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rooms"
+                        android:textSize="30sp"
+                        android:textColor="@color/Theme_Lightgreen"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/Divider3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/division"
+            android:contentDescription="@null"
+            app:layout_constraintTop_toBottomOf="@id/routineRoomLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <LinearLayout
+            android:id="@+id/othersLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            app:layout_constraintTop_toBottomOf="@id/routineRoomLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Title for Others Section -->
+            <TextView
+                android:id="@+id/othersTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Others"
+                android:textSize="18sp"
+                android:textColor="@color/Theme_green"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Row 1: Teachers Info and Others Routine -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginBottom="20dp"
+
+                android:orientation="horizontal">
+
+                <!-- Teachers Info Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/teachersInfoCard"
+                    android:layout_width="100dp"
+                    android:layout_height="150dp"
+                    android:layout_weight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:background="@drawable/card_bg_row"
+
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/teachersInfoIcon"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginLeft="10dp"
+                            android:src="@drawable/teacher_info"
+                            android:contentDescription="Teachers Info Icon"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:id="@+id/teachersInfoText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Teachers Info"
+                            android:textSize="20sp"
+                            android:textAlignment="center"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/Theme_green"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Others Routine Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/othersRoutineCard"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    android:layout_weight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:background="@color/Theme_green"
+
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/othersRoutineIcon"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/others_routine"
+                            android:contentDescription="Others Routine Icon"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:id="@+id/othersRoutineText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Others Routine"
+                            android:textSize="16sp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- Row 2: University Map and Upcoming Task -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:orientation="horizontal">
+
+                <!-- University Map Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/universityMapCard"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    android:layout_weight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:background="@color/Theme_green"
+
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/universityMapIcon"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/map_icon"
+                            android:contentDescription="University Map Icon"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:id="@+id/universityMapText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="University Map"
+                            android:textSize="16sp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Upcoming Task Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/upcomingTaskCard"
+                    android:layout_width="100dp"
+                    android:layout_height="150dp"
+                    android:layout_weight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:background="@drawable/card_bg_row"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/upcomingTaskIcon"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginLeft="15dp"
+                            android:src="@drawable/task_icon"
+                            android:contentDescription="Upcoming Task Icon"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:id="@+id/upcomingTaskText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Upcoming Task"
+                            android:textSize="20sp"
+                            android:textAlignment="center"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/Theme_green"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/Divider4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/division"
+            android:contentDescription="@null"
+            app:layout_constraintTop_toBottomOf="@id/othersLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/carouselRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingVertical="30dp"
+            android:foregroundGravity="center"
+            android:textAlignment="center"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintTop_toBottomOf="@id/Divider4"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</androidx.core.widget.NestedScrollView>
