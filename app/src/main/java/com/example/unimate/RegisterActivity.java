@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.Gravity;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -112,9 +113,23 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * Validates all input fields and displays appropriate error messages.
      */
-    private void validateInputs() {
-        boolean isValid = true;
+    private void scrollToView(View view) {
+        view.requestFocus(); // Request focus for the view
+        view.getParent().requestChildFocus(view, view); // Ensure the view gets focused in ScrollView
+    }
+    private void showError(View view, String errorMessage) {
+        if (view instanceof EditText) {
+            ((EditText) view).setError(errorMessage); // Inline error for EditText
+        } else if (view instanceof TextView) {
+            TextView textView = (TextView) view;
+            textView.setTextColor(Color.RED); // Change TextView text color to red
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show(); // Show Toast message
+        }
+        scrollToView(view); // Scroll to the view
+    }
 
+
+    private void validateInputs() {
         String email = emailEditText.getText().toString().trim();
         String studentId = studentIdEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString();
@@ -125,66 +140,74 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Email validation
         if (TextUtils.isEmpty(email)) {
-            emailEditText.setError("Email is required!");
-            isValid = false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailEditText.setError("Enter a valid email address!");
-            isValid = false;
-        } else {
-            emailEditText.setError(null);
+            showError(emailEditText, "Email is required!");
+            return;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            showError(emailEditText, "Enter a valid email address!");
+            return;
         }
 
         // Student ID validation
         if (TextUtils.isEmpty(studentId)) {
-            studentIdEditText.setError("Student ID is required!");
-            isValid = false;
-        } else if (!studentId.matches("\\d+")) {
-            studentIdEditText.setError("Student ID must contain only numbers!");
-            isValid = false;
-        } else {
-            studentIdEditText.setError(null);
+            showError(studentIdEditText, "Student ID is required!");
+            return;
+        }
+        if (!studentId.matches("\\d+")) {
+            showError(studentIdEditText, "Student ID must contain only numbers!");
+            return;
         }
 
         // Password validation
         if (TextUtils.isEmpty(password)) {
-            passwordEditText.setError("Password is required!");
-            isValid = false;
-        } else {
-            passwordEditText.setError(null);
+            showError(passwordEditText, "Password is required!");
+            return;
         }
 
         // Confirm Password validation
         if (TextUtils.isEmpty(confirmPassword)) {
-            confirmPasswordEditText.setError("Confirm Password is required!");
-            isValid = false;
-        } else if (!password.equals(confirmPassword)) {
-            confirmPasswordEditText.setError("Passwords do not match!");
-            isValid = false;
-        } else {
-            confirmPasswordEditText.setError(null);
+            showError(confirmPasswordEditText, "Confirm Password is required!");
+            return;
+        }
+        if (!password.equals(confirmPassword)) {
+            showError(confirmPasswordEditText, "Passwords do not match!");
+            return;
         }
 
         // Department validation
         if ("Select Department".equals(selectedDepartment)) {
-            isValid = false;
-            Toast.makeText(this, "Please select a department!", Toast.LENGTH_SHORT).show();
+            showError(departmentTextView, "Please select a department!");
+            return;
+        } else {
+            departmentTextView.setTextColor(Color.BLACK); // Reset to default color
         }
+
 
         // Batch validation
         if ("Select Batch".equals(selectedBatch)) {
-            isValid = false;
-            Toast.makeText(this, "Please select a batch!", Toast.LENGTH_SHORT).show();
+            showError(batchTextView, "Please select a batch!");
+            return;
+        } else {
+            batchTextView.setTextColor(Color.BLACK); // Reset to default color
         }
+
 
         // Section validation
         if ("Select Section".equals(selectedSection)) {
-            isValid = false;
-            Toast.makeText(this, "Please select a section!", Toast.LENGTH_SHORT).show();
+            showError(sectionTextView, "Please select a section!");
+            return;
+        } else {
+            sectionTextView.setTextColor(Color.BLACK); // Reset to default color
         }
 
+
         // If all validations pass
-        if (isValid) {
-            Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show();
+        // Proceed with registration logic (e.g., saving data, navigating to another activity)
     }
+
+
+
+
+
 }

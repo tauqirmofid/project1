@@ -1,18 +1,21 @@
 package com.example.unimate;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class StudentLoginActivity extends AppCompatActivity {
+    private Button std_reg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +27,14 @@ public class StudentLoginActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> onBackPressed());
         // Move this line inside onCreate
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+        //register button clicked
+        std_reg= findViewById(R.id.RegButton);
+        std_reg.setOnClickListener(v->{
+            Intent intent = new Intent(StudentLoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+
+        });
     }
 
 
