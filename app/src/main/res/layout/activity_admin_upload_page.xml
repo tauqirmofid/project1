@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Upload"
-    android:background="@color/Layout_Background">
+    android:background="@color/colorGreenLight">
 
     <!-- CardView to hold the icon and the button -->
     <androidx.cardview.widget.CardView

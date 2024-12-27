@@ -122,7 +122,6 @@ public class RegisterActivity extends AppCompatActivity {
             ((EditText) view).setError(errorMessage); // Inline error for EditText
         } else if (view instanceof TextView) {
             TextView textView = (TextView) view;
-            textView.setTextColor(Color.RED); // Change TextView text color to red
             Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show(); // Show Toast message
         }
         scrollToView(view); // Scroll to the view
@@ -158,22 +157,6 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // Password validation
-        if (TextUtils.isEmpty(password)) {
-            showError(passwordEditText, "Password is required!");
-            return;
-        }
-
-        // Confirm Password validation
-        if (TextUtils.isEmpty(confirmPassword)) {
-            showError(confirmPasswordEditText, "Confirm Password is required!");
-            return;
-        }
-        if (!password.equals(confirmPassword)) {
-            showError(confirmPasswordEditText, "Passwords do not match!");
-            return;
-        }
-
         // Department validation
         if ("Select Department".equals(selectedDepartment)) {
             showError(departmentTextView, "Please select a department!");
@@ -198,6 +181,21 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         } else {
             sectionTextView.setTextColor(Color.BLACK); // Reset to default color
+        }
+        // Password validation
+        if (TextUtils.isEmpty(password)) {
+            showError(passwordEditText, "Password is required!");
+            return;
+        }
+
+        // Confirm Password validation
+        if (TextUtils.isEmpty(confirmPassword)) {
+            showError(confirmPasswordEditText, "Confirm Password is required!");
+            return;
+        }
+        if (!password.equals(confirmPassword)) {
+            showError(confirmPasswordEditText, "Passwords do not match!");
+            return;
         }
 
 
