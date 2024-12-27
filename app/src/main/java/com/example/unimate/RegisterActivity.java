@@ -19,6 +19,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,10 +38,18 @@ public class RegisterActivity extends AppCompatActivity {
     private List<String> departmentList = Arrays.asList("CSE");
     private List<String> sectionList = Arrays.asList("A", "B", "C", "D", "E", "F", "I");
 
+    // Firebase references
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        // Initialize Firebase Auth and Database
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference("Students");
 
         // Initialize views
         emailEditText = findViewById(R.id.emailEditText);
@@ -66,9 +79,9 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * Shows a custom dialog with a ListView for selection.
      *
-     * @param title        Dialog title (e.g., Select Batch)
-     * @param items        List of items to display
-     * @param targetView   TextView to update with selected value
+     * @param title      Dialog title (e.g., Select Batch)
+     * @param items      List of items to display
+     * @param targetView TextView to update with selected value
      */
     private void showCustomDialog(String title, List<String> items, TextView targetView) {
         Dialog dialog = new Dialog(this);
@@ -111,23 +124,28 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     /**
-     * Validates all input fields and displays appropriate error messages.
+     * Scroll helper for focusing on invalid fields.
      */
     private void scrollToView(View view) {
-        view.requestFocus(); // Request focus for the view
-        view.getParent().requestChildFocus(view, view); // Ensure the view gets focused in ScrollView
+        view.requestFocus();
+        view.getParent().requestChildFocus(view, view);
     }
+
+    /**
+     * Shows inline error or toast on invalid fields.
+     */
     private void showError(View view, String errorMessage) {
         if (view instanceof EditText) {
-            ((EditText) view).setError(errorMessage); // Inline error for EditText
+            ((EditText) view).setError(errorMessage);
         } else if (view instanceof TextView) {
-            TextView textView = (TextView) view;
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show(); // Show Toast message
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
         }
-        scrollToView(view); // Scroll to the view
+        scrollToView(view);
     }
 
-
+    /**
+     * Validates all input fields and performs registration with Firebase.
+     */
     private void validateInputs() {
         String email = emailEditText.getText().toString().trim();
         String studentId = studentIdEditText.getText().toString().trim();
@@ -162,26 +180,25 @@ public class RegisterActivity extends AppCompatActivity {
             showError(departmentTextView, "Please select a department!");
             return;
         } else {
-            departmentTextView.setTextColor(Color.BLACK); // Reset to default color
+            departmentTextView.setTextColor(Color.BLACK);
         }
-
 
         // Batch validation
         if ("Select Batch".equals(selectedBatch)) {
             showError(batchTextView, "Please select a batch!");
             return;
         } else {
-            batchTextView.setTextColor(Color.BLACK); // Reset to default color
+            batchTextView.setTextColor(Color.BLACK);
         }
-
 
         // Section validation
         if ("Select Section".equals(selectedSection)) {
             showError(sectionTextView, "Please select a section!");
             return;
         } else {
-            sectionTextView.setTextColor(Color.BLACK); // Reset to default color
+            sectionTextView.setTextColor(Color.BLACK);
         }
+
         // Password validation
         if (TextUtils.isEmpty(password)) {
             showError(passwordEditText, "Password is required!");
@@ -198,14 +215,62 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
+        // All validations passed: Create user in Firebase
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Send verification email
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            user.sendEmailVerification()
+                                    .addOnCompleteListener(emailTask -> {
+                                        if (emailTask.isSuccessful()) {
+                                            // Store user data in Realtime Database
+                                            StudentModel newStudent = new StudentModel(
+                                                    email,
+                                                    studentId,
+                                                    selectedDepartment,
+                                                    selectedBatch,
+                                                    selectedSection
+                                            );
+                                            mDatabase.child(studentId).setValue(newStudent)
+                                                    .addOnCompleteListener(dbTask -> {
+                                                        if (dbTask.isSuccessful()) {
+                                                            // Show toast and go back to login
+                                                            Toast.makeText(
+                                                                    RegisterActivity.this,
+                                                                    "Verification email sent. Please log in.",
+                                                                    Toast.LENGTH_LONG
+                                                            ).show();
 
-        // If all validations pass
-        Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show();
-        // Proceed with registration logic (e.g., saving data, navigating to another activity)
+                                                            // Close Registration page and return to login page
+                                                            finish();
+                                                        } else {
+                                                            Toast.makeText(
+                                                                    RegisterActivity.this,
+                                                                    "Failed to save data: " + dbTask.getException().getMessage(),
+                                                                    Toast.LENGTH_SHORT
+                                                            ).show();
+                                                        }
+                                                    });
+                                        } else {
+                                            Toast.makeText(RegisterActivity.this,
+                                                    "Failed to send verification email: " +
+                                                            (emailTask.getException() != null
+                                                                    ? emailTask.getException().getMessage()
+                                                                    : ""),
+                                                    Toast.LENGTH_SHORT
+                                            ).show();
+                                        }
+                                    });
+                        }
+                    } else {
+                        Toast.makeText(RegisterActivity.this,
+                                "Registration failed: " +
+                                        (task.getException() != null ? task.getException().getMessage() : ""),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
     }
-
-
-
-
-
 }
