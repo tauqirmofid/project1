@@ -246,6 +246,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                             // Close Registration page and return to login page
                                                             finish();
                                                         } else {
+
                                                             Toast.makeText(
                                                                     RegisterActivity.this,
                                                                     "Failed to save data: " + dbTask.getException().getMessage(),
