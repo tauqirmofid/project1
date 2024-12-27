@@ -15,8 +15,10 @@ subsamplingScaleImageView = "3.10.0"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.1.0"
 firebaseDatabase = "21.0.0"
+sunAndroidMail = "1.6.7"
 
 [libraries]
+android-activation = { module = "com.sun.mail:android-activation", version.ref = "sunAndroidMail" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -31,6 +33,7 @@ lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-view
 subsampling-scale-image-view = { module = "com.github.davemorrissey.labs:subsampling-scale-image-view", version.ref = "subsamplingScaleImageView" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+sun-android-mail = { module = "com.sun.mail:android-mail", version.ref = "sunAndroidMail" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

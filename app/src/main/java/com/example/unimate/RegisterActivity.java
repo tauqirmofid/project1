@@ -1,5 +1,6 @@
 package com.example.unimate;
 
+import android.content.Intent;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,12 +21,23 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
+import java.util.Random;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -47,7 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Initialize Firebase Auth and Database
+        // Firebase references
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference("Students");
 
@@ -76,19 +88,11 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setOnClickListener(v -> validateInputs());
     }
 
-    /**
-     * Shows a custom dialog with a ListView for selection.
-     *
-     * @param title      Dialog title (e.g., Select Batch)
-     * @param items      List of items to display
-     * @param targetView TextView to update with selected value
-     */
     private void showCustomDialog(String title, List<String> items, TextView targetView) {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_custom_list);
 
-        // Make the dialog background transparent
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -97,19 +101,15 @@ public class RegisterActivity extends AppCompatActivity {
             dialog.getWindow().setLayout(900, WindowManager.LayoutParams.WRAP_CONTENT);
         }
 
-        // Set dialog title
         TextView dialogTitle = dialog.findViewById(R.id.dialogTitle);
         dialogTitle.setText(title);
 
-        // Find views in dialog
         ListView listView = dialog.findViewById(R.id.listViewItems);
         ImageView closeDialog = dialog.findViewById(R.id.closeDialog);
 
-        // Create and set adapter
         BatchListAdapter adapter = new BatchListAdapter(this, items);
         listView.setAdapter(adapter);
 
-        // On item click
         listView.setOnItemClickListener((parent, view, position, id) -> {
             adapter.setSelectedPosition(position);
             dialog.dismiss();
@@ -117,23 +117,15 @@ public class RegisterActivity extends AppCompatActivity {
             targetView.setText(selectedItem);
         });
 
-        // Close button
         closeDialog.setOnClickListener(v -> dialog.dismiss());
-
         dialog.show();
     }
 
-    /**
-     * Scroll helper for focusing on invalid fields.
-     */
     private void scrollToView(View view) {
         view.requestFocus();
         view.getParent().requestChildFocus(view, view);
     }
 
-    /**
-     * Shows inline error or toast on invalid fields.
-     */
     private void showError(View view, String errorMessage) {
         if (view instanceof EditText) {
             ((EditText) view).setError(errorMessage);
@@ -143,9 +135,6 @@ public class RegisterActivity extends AppCompatActivity {
         scrollToView(view);
     }
 
-    /**
-     * Validates all input fields and performs registration with Firebase.
-     */
     private void validateInputs() {
         String email = emailEditText.getText().toString().trim();
         String studentId = studentIdEditText.getText().toString().trim();
@@ -155,7 +144,6 @@ public class RegisterActivity extends AppCompatActivity {
         String selectedDepartment = departmentTextView.getText().toString();
         String selectedSection = sectionTextView.getText().toString();
 
-        // Email validation
         if (TextUtils.isEmpty(email)) {
             showError(emailEditText, "Email is required!");
             return;
@@ -164,8 +152,6 @@ public class RegisterActivity extends AppCompatActivity {
             showError(emailEditText, "Enter a valid email address!");
             return;
         }
-
-        // Student ID validation
         if (TextUtils.isEmpty(studentId)) {
             showError(studentIdEditText, "Student ID is required!");
             return;
@@ -174,38 +160,22 @@ public class RegisterActivity extends AppCompatActivity {
             showError(studentIdEditText, "Student ID must contain only numbers!");
             return;
         }
-
-        // Department validation
         if ("Select Department".equals(selectedDepartment)) {
             showError(departmentTextView, "Please select a department!");
             return;
-        } else {
-            departmentTextView.setTextColor(Color.BLACK);
         }
-
-        // Batch validation
         if ("Select Batch".equals(selectedBatch)) {
             showError(batchTextView, "Please select a batch!");
             return;
-        } else {
-            batchTextView.setTextColor(Color.BLACK);
         }
-
-        // Section validation
         if ("Select Section".equals(selectedSection)) {
             showError(sectionTextView, "Please select a section!");
             return;
-        } else {
-            sectionTextView.setTextColor(Color.BLACK);
         }
-
-        // Password validation
         if (TextUtils.isEmpty(password)) {
             showError(passwordEditText, "Password is required!");
             return;
         }
-
-        // Confirm Password validation
         if (TextUtils.isEmpty(confirmPassword)) {
             showError(confirmPasswordEditText, "Confirm Password is required!");
             return;
@@ -215,63 +185,74 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // All validations passed: Create user in Firebase
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+        String verificationCode = String.valueOf(new Random().nextInt(900000) + 100000);
+
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(authTask -> {
+            if (authTask.isSuccessful()) {
+                // Add user data to Realtime Database
+                StudentModel newStudent = new StudentModel(email, studentId, selectedDepartment, selectedBatch, selectedSection, verificationCode, false);
+                mDatabase.child(studentId).setValue(newStudent).addOnCompleteListener(dbTask -> {
+                    if (dbTask.isSuccessful()) {
                         // Send verification email
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            user.sendEmailVerification()
-                                    .addOnCompleteListener(emailTask -> {
-                                        if (emailTask.isSuccessful()) {
-                                            // Store user data in Realtime Database
-                                            StudentModel newStudent = new StudentModel(
-                                                    email,
-                                                    studentId,
-                                                    selectedDepartment,
-                                                    selectedBatch,
-                                                    selectedSection
-                                            );
-                                            mDatabase.child(studentId).setValue(newStudent)
-                                                    .addOnCompleteListener(dbTask -> {
-                                                        if (dbTask.isSuccessful()) {
-                                                            // Show toast and go back to login
-                                                            Toast.makeText(
-                                                                    RegisterActivity.this,
-                                                                    "Verification email sent. Please log in.",
-                                                                    Toast.LENGTH_LONG
-                                                            ).show();
+                        sendVerificationEmail(email, verificationCode);
 
-                                                            // Close Registration page and return to login page
-                                                            finish();
-                                                        } else {
-
-                                                            Toast.makeText(
-                                                                    RegisterActivity.this,
-                                                                    "Failed to save data: " + dbTask.getException().getMessage(),
-                                                                    Toast.LENGTH_SHORT
-                                                            ).show();
-                                                        }
-                                                    });
-                                        } else {
-                                            Toast.makeText(RegisterActivity.this,
-                                                    "Failed to send verification email: " +
-                                                            (emailTask.getException() != null
-                                                                    ? emailTask.getException().getMessage()
-                                                                    : ""),
-                                                    Toast.LENGTH_SHORT
-                                            ).show();
-                                        }
-                                    });
-                        }
+                        // Navigate to VerificationActivity
+                        Intent intent = new Intent(RegisterActivity.this, VerificationActivity.class);
+                        intent.putExtra("email", email);
+                        intent.putExtra("studentId", studentId);
+                        intent.putExtra("verificationCode", verificationCode);
+                        intent.putExtra("password", password);
+                        startActivity(intent);
+                        finish();
                     } else {
-                        Toast.makeText(RegisterActivity.this,
-                                "Registration failed: " +
-                                        (task.getException() != null ? task.getException().getMessage() : ""),
-                                Toast.LENGTH_SHORT
-                        ).show();
+                        Toast.makeText(this, "Failed to save user data: " + dbTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+            } else {
+                if (authTask.getException() instanceof FirebaseAuthUserCollisionException) {
+                    // User already exists
+                    Toast.makeText(this, "User already exists. Please log in.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Registration failed: " + authTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    /**
+     * Sends the verification code via email using JavaMail.
+     */
+    private void sendVerificationEmail(String email, String verificationCode) {
+        new Thread(() -> {
+            try {
+                String fromEmail = "info.teamunimate@gmail.com";
+                String fromPassword = "zojc tfga rhrj cxvk";
+
+                Properties properties = new Properties();
+                properties.put("mail.smtp.auth", "true");
+                properties.put("mail.smtp.starttls.enable", "true");
+                properties.put("mail.smtp.host", "smtp.gmail.com");
+                properties.put("mail.smtp.port", "587");
+
+                Session session = Session.getInstance(properties, new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(fromEmail, fromPassword);
+                    }
+                });
+
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(fromEmail));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+                message.setSubject("Verification Code");
+                message.setText("Your verification code is: " + verificationCode);
+
+                Transport.send(message);
+                runOnUiThread(() -> Toast.makeText(this, "Verification code sent to email.", Toast.LENGTH_SHORT).show());
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
     }
 }

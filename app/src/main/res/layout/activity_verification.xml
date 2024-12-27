@@ -98,24 +98,111 @@
     </LinearLayout>
 
     <!-- Divider -->
-    <EditText
+    <LinearLayout
         android:id="@+id/et_vercode"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:hint="enter verification code"
-        android:background="@xml/edit_text_bg"
-        android:padding="12dp"
-        android:textColorHint="#808080"
-        android:fontFamily="@font/poppins_regular"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginLeft="00dp"
+        android:layout_marginRight="00dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toBottomOf="@id/verificationLayout">
 
-        android:inputType="number"
-        android:adjustViewBounds="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/verificationLayout"
+        <!-- EditText for the 1st digit -->
+        <EditText
+            android:id="@+id/et_digit1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:background="@xml/edit_text_bg"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textAlignment="center"
+            android:fontFamily="@font/poppins_regular"
+            android:textSize="18sp"
+            android:textColorHint="#808080" />
 
-        />
+        <!-- EditText for the 2nd digit -->
+        <EditText
+            android:id="@+id/et_digit2"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:background="@xml/edit_text_bg"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textAlignment="center"
+            android:fontFamily="@font/poppins_regular"
+            android:textSize="18sp"
+            android:textColorHint="#808080" />
+
+        <!-- EditText for the 3rd digit -->
+        <EditText
+            android:id="@+id/et_digit3"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:background="@xml/edit_text_bg"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textAlignment="center"
+            android:fontFamily="@font/poppins_regular"
+            android:textSize="18sp"
+            android:textColorHint="#808080" />
+
+        <!-- EditText for the 4th digit -->
+        <EditText
+            android:id="@+id/et_digit4"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:background="@xml/edit_text_bg"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textAlignment="center"
+            android:fontFamily="@font/poppins_regular"
+            android:textSize="18sp"
+            android:textColorHint="#808080" />
+
+        <!-- EditText for the 5th digit -->
+        <EditText
+            android:id="@+id/et_digit5"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:background="@xml/edit_text_bg"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textAlignment="center"
+            android:fontFamily="@font/poppins_regular"
+            android:textSize="18sp"
+            android:textColorHint="#808080" />
+
+        <!-- EditText for the 6th digit -->
+        <EditText
+            android:id="@+id/et_digit6"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:background="@xml/edit_text_bg"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textAlignment="center"
+            android:fontFamily="@font/poppins_regular"
+            android:textSize="18sp"
+            android:textColorHint="#808080" />
+
+    </LinearLayout>
+
+
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/submitButton"
         android:layout_width="match_parent"

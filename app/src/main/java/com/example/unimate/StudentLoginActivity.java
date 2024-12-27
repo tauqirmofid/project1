@@ -13,29 +13,37 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class StudentLoginActivity extends AppCompatActivity {
     private Button std_reg;
     private Button lgnButton;
 
-    // Add references for login fields
+    // Login fields
     private EditText emailEditText;
     private EditText passwordEditText;
 
-    // Firebase Auth
+    // Firebase references
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_login);
 
-        // Initialize Firebase Auth
+        // Initialize Firebase Auth and Database
         mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference("Students");
 
         // Floating back button
         ImageButton backButton = findViewById(R.id.backButton);
@@ -51,16 +59,13 @@ public class StudentLoginActivity extends AppCompatActivity {
         lgnButton.setOnClickListener(v -> attemptLogin());
 
         // Register button
-        std_reg= findViewById(R.id.RegButton);
+        std_reg = findViewById(R.id.RegButton);
         std_reg.setOnClickListener(v -> {
             Intent intent = new Intent(StudentLoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
     }
 
-    /**
-     * Tries to sign in the user and checks if email is verified.
-     */
     private void attemptLogin() {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
@@ -81,19 +86,9 @@ public class StudentLoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            if (user.isEmailVerified()) {
-                                // If verified, go to StudentHomePage
-                                Toast.makeText(StudentLoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(StudentLoginActivity.this, StudentHomePage.class);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                // Email not verified
-                                Toast.makeText(StudentLoginActivity.this, "Please verify your email first.", Toast.LENGTH_LONG).show();
-                            }
+                            checkVerificationInDatabase(user);
                         }
                     } else {
-                        // If sign-in fails
                         Toast.makeText(StudentLoginActivity.this,
                                 "Login failed: " + (task.getException() != null ? task.getException().getMessage() : ""),
                                 Toast.LENGTH_SHORT).show();
@@ -101,7 +96,41 @@ public class StudentLoginActivity extends AppCompatActivity {
                 });
     }
 
-    // Code for keyboard collapse when tapped elsewhere
+    private void checkVerificationInDatabase(FirebaseUser user) {
+        String userId = user.getUid();
+        mDatabase.orderByChild("email").equalTo(user.getEmail())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                                Boolean isVerified = childSnapshot.child("isVerified").getValue(Boolean.class);
+                                if (Boolean.TRUE.equals(isVerified)) {
+                                    navigateToHomePage();
+                                } else {
+                                    Toast.makeText(StudentLoginActivity.this, "Please verify your account first.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        } else {
+                            Toast.makeText(StudentLoginActivity.this, "User data not found in the database.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(StudentLoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void navigateToHomePage() {
+        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(StudentLoginActivity.this, StudentHomePage.class);
+        startActivity(intent);
+        finish();
+    }
+
+    // Collapse keyboard when tapped elsewhere
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
