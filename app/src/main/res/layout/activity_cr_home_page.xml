@@ -173,11 +173,11 @@
                         android:textColor="#006A00" />
 
                     <TextView
-                        android:id="@+id/adminText"
+                        android:id="@+id/CRText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:text="Admin"
+                        android:text="CR"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:textColor="#006A00" />
@@ -214,7 +214,7 @@
                 </LinearLayout>
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/statusCardView"
+                    android:id="@+id/cr_statusCardView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
@@ -240,7 +240,7 @@
                             android:layout_width="65dp"
                             android:layout_height="65dp"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/admin_icon"
+                            android:src="@drawable/cr"
                             android:contentDescription="Status Icon" />
 
                         <LinearLayout
@@ -260,10 +260,10 @@
                                 android:textSize="18sp" />
 
                             <TextView
-                                android:id="@+id/unknownText"
+                                android:id="@+id/CR_nameText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="ADMIN"
+                                android:text="CR"
                                 android:textColor="#006A00"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -285,20 +285,20 @@
                             android:layout_gravity="center_vertical">
 
                             <TextView
-                                android:id="@+id/aprovalText"
+                                android:id="@+id/taskbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Approval Request"
+                                android:text="Today"
                                 android:textColor="#006A00"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
                                 android:layout_marginBottom="4dp" />
 
                             <TextView
-                                android:id="@+id/approvalText"
+                                android:id="@+id/taskText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="NO Approval Request"
+                                android:text="No task today"
                                 android:textColor="#006A00"
                                 android:textSize="16sp" />
                         </LinearLayout>
@@ -312,7 +312,7 @@
                     android:adjustViewBounds="true"
                     android:src="@drawable/division"
                     android:contentDescription="@null"
-                    app:layout_constraintTop_toBottomOf="@id/statusCardView"
+                    app:layout_constraintTop_toBottomOf="@id/cr_statusCardView"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -328,7 +328,7 @@
                     app:layout_constraintEnd_toEndOf="parent">
 
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/routineCardView"
+                        android:id="@+id/cr_routineCardView"
                         android:layout_width="0dp"
                         android:layout_height="150dp"
                         android:layout_weight="1"
@@ -363,7 +363,7 @@
                     </androidx.cardview.widget.CardView>
 
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/roomsCardView"
+                        android:id="@+id/CR_roomsCardView"
                         android:layout_width="0dp"
                         android:layout_height="150dp"
                         android:layout_weight="1"
@@ -621,11 +621,8 @@
 
     </FrameLayout>
 
-    <!--
-         2) Navigation Drawer Panel
-         Slides in from the left (80% width), with rounded corners
-         and shadow (via elevation).
-    -->
+
+
     <LinearLayout
         android:id="@+id/navDrawerContainer"
         android:layout_width="300dp"

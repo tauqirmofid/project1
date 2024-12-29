@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class CrLoginActivity extends AppCompatActivity {
-    private Button CR_reg;
+    private Button CR_reg,CR_login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +28,12 @@ public class CrLoginActivity extends AppCompatActivity {
             startActivity(intent);
 
         });
+//        CR_login= findViewById(R.id.CRlgnButton);
+//        CR_login.setOnClickListener(v->{
+//            Intent intent = new Intent(CrLoginActivity.this, CR_HomePage.class);
+//            startActivity(intent);
+//
+//        });
     }
 
 }
