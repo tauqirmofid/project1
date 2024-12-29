@@ -16,14 +16,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class TeacherRegistrationActivity extends AppCompatActivity {
 
-    private EditText emailEditText, teacherIdEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
+    private EditText nameEditText, emailEditText, teacherIdEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
     private TextView departmentTextView, designationTextView;
 
     private List<String> departmentList = Arrays.asList("CSE");
@@ -35,6 +41,7 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_teacher_registration);
 
         // Initialize Views
+        nameEditText = findViewById(R.id.teachernameEditText);
         emailEditText = findViewById(R.id.teacheremailEditText);
         teacherIdEditText = findViewById(R.id.teacherIdEditText);
         phoneEditText = findViewById(R.id.teacherPhoneEditText);
@@ -55,7 +62,7 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
     }
 
     private void validateAndRegister() {
-        // Get input values
+        String name = nameEditText.getText().toString().trim();
         String email = emailEditText.getText().toString().trim();
         String teacherId = teacherIdEditText.getText().toString().trim();
         String phone = phoneEditText.getText().toString().trim();
@@ -64,7 +71,11 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString();
         String confirmPassword = confirmPasswordEditText.getText().toString();
 
-        // Check for empty fields and focus on the first invalid field
+        if (TextUtils.isEmpty(name)) {
+            showError(nameEditText, "Name is required");
+            scrollToView(nameEditText);
+            return;
+        }
         if (TextUtils.isEmpty(email)) {
             showError(emailEditText, "Email is required");
             scrollToView(emailEditText);
@@ -106,13 +117,53 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
             return;
         }
 
-        // Successful registration
-        Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show();
+        // Hash the password
+        String hashedPassword = hashPassword(password);
 
-        // Navigate to TeacherHomepage activity
-        Intent intent = new Intent(TeacherRegistrationActivity.this, TeacherHomepage.class);
-        startActivity(intent);
-        finish(); // Finish the current activity
+        // Check for duplicate email or teacher ID
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        rootRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean isDuplicate = false;
+
+                // Check in Teachers
+                for (DataSnapshot deptSnapshot : snapshot.child("Teachers").getChildren()) {
+                    for (DataSnapshot desigSnapshot : deptSnapshot.getChildren()) {
+                        for (DataSnapshot teacherSnapshot : desigSnapshot.getChildren()) {
+                            TeacherData existingTeacher = teacherSnapshot.getValue(TeacherData.class);
+                            if (existingTeacher != null &&
+                                    (existingTeacher.email.equalsIgnoreCase(email) || existingTeacher.teacherId.equalsIgnoreCase(teacherId))) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (isDuplicate) break;
+                }
+
+                if (isDuplicate) {
+                    Toast.makeText(TeacherRegistrationActivity.this, "Duplicate registration detected: Email or Teacher ID already exists", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Save data to Firebase
+                    DatabaseReference teacherRef = rootRef.child("Teachers").child(department).child(designation).child(teacherId);
+                    TeacherData teacherData = new TeacherData(name, email, teacherId, phone, department, designation, hashedPassword, false);
+
+                    teacherRef.setValue(teacherData).addOnSuccessListener(aVoid -> {
+                        Toast.makeText(TeacherRegistrationActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(TeacherRegistrationActivity.this, TeacherHomepage.class));
+                        finish();
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(TeacherRegistrationActivity.this, "Registration Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(TeacherRegistrationActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showError(View view, String errorMessage) {
@@ -124,8 +175,8 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
     }
 
     private void scrollToView(View view) {
-        view.requestFocus(); // Request focus for the view
-        view.getParent().requestChildFocus(view, view); // Ensure the view gets focused in ScrollView
+        view.requestFocus();
+        view.getParent().requestChildFocus(view, view);
     }
 
     private void showCustomDialog(String title, List<String> items, TextView targetView) {
@@ -133,7 +184,6 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_custom_list);
 
-        // Make the dialog background transparent
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -142,19 +192,13 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
             dialog.getWindow().setLayout(900, WindowManager.LayoutParams.WRAP_CONTENT);
         }
 
-        // Set dialog title
         TextView dialogTitle = dialog.findViewById(R.id.dialogTitle);
         dialogTitle.setText(title);
 
-        // Find views in dialog
         ListView listView = dialog.findViewById(R.id.listViewItems);
-        ImageView closeDialog = dialog.findViewById(R.id.closeDialog);
-
-        // Create and set adapter
         BatchListAdapter adapter = new BatchListAdapter(this, items);
         listView.setAdapter(adapter);
 
-        // On item click
         listView.setOnItemClickListener((parent, view, position, id) -> {
             adapter.setSelectedPosition(position);
             dialog.dismiss();
@@ -162,9 +206,25 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
             targetView.setText(selectedItem);
         });
 
-        // Close button
+        ImageView closeDialog = dialog.findViewById(R.id.closeDialog);
         closeDialog.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
+    }
+
+    private String hashPassword(String password) {
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

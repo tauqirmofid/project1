@@ -50,6 +50,27 @@
                 android:textColorHint="#808080"
                 android:inputType="textEmailAddress" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/teachernameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="enter teacher name"
+                android:background="@xml/edit_text_bg"
+                android:padding="12dp"
+                android:textColorHint="#808080"
+               />
+
+
             <!-- Student ID -->
             <TextView
                 android:layout_width="wrap_content"
@@ -92,7 +113,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select Department"
+                android:text="Select Designation"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:layout_marginTop="16dp"

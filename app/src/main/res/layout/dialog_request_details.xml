@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/emailTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email" />
+
+    <TextView
+        android:id="@+id/idTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ID" />
+
+    <TextView
+        android:id="@+id/phoneTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phone" />
+
+    <TextView
+        android:id="@+id/extraDetailsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Additional Details" />
+
+    <Button
+        android:id="@+id/acceptButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Accept"
+        android:backgroundTint="@color/Theme_green" />
+
+    <Button
+        android:id="@+id/rejectButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reject"
+        android:backgroundTint="@android:color/holo_red_dark" />
+</LinearLayout>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/item_req_background"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/emailTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email: example@example.com"
+        android:textSize="16sp"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/idTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ID: 123456"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/phoneTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Role: CR"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="4dp" />
+
+    <Button
+        android:id="@+id/viewDetailsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Details"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/Theme_green"
+        android:textColor="@android:color/white" />
+</LinearLayout>
