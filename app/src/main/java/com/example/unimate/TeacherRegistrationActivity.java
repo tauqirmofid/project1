@@ -24,8 +24,10 @@ import java.util.List;
 public class TeacherRegistrationActivity extends AppCompatActivity {
 
     private EditText emailEditText, teacherIdEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
-    private TextView departmentTextView;
+    private TextView departmentTextView, designationTextView;
+
     private List<String> departmentList = Arrays.asList("CSE");
+    private List<String> designationList = Arrays.asList("Adjunct Lecturer", "Lecturer", "Assistant Professor", "Associate Professor");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +39,17 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         teacherIdEditText = findViewById(R.id.teacherIdEditText);
         phoneEditText = findViewById(R.id.teacherPhoneEditText);
         departmentTextView = findViewById(R.id.teacherdepTextView);
+        designationTextView = findViewById(R.id.teacherdesignation);
         passwordEditText = findViewById(R.id.editTextPassword);
         confirmPasswordEditText = findViewById(R.id.editTextConPassword);
 
         // Set initial text
         departmentTextView.setText("Select Department");
+        designationTextView.setText("Select Designation");
 
-        // Set click listener for department TextView
+        // Set click listeners for department and designation TextViews
         departmentTextView.setOnClickListener(v -> showCustomDialog("Select Department", departmentList, departmentTextView));
+        designationTextView.setOnClickListener(v -> showCustomDialog("Select Designation", designationList, designationTextView));
 
         findViewById(R.id.Teacher_register_Button).setOnClickListener(v -> validateAndRegister());
     }
@@ -55,6 +60,7 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         String teacherId = teacherIdEditText.getText().toString().trim();
         String phone = phoneEditText.getText().toString().trim();
         String department = departmentTextView.getText().toString().trim();
+        String designation = designationTextView.getText().toString().trim();
         String password = passwordEditText.getText().toString();
         String confirmPassword = confirmPasswordEditText.getText().toString();
 
@@ -77,6 +83,11 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(department) || department.equals("Select Department")) {
             showError(departmentTextView, "Department is required");
             scrollToView(departmentTextView);
+            return;
+        }
+        if (TextUtils.isEmpty(designation) || designation.equals("Select Designation")) {
+            showError(designationTextView, "Designation is required");
+            scrollToView(designationTextView);
             return;
         }
         if (TextUtils.isEmpty(password)) {
@@ -111,12 +122,11 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
             Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
         }
     }
+
     private void scrollToView(View view) {
         view.requestFocus(); // Request focus for the view
         view.getParent().requestChildFocus(view, view); // Ensure the view gets focused in ScrollView
     }
-
-
 
     private void showCustomDialog(String title, List<String> items, TextView targetView) {
         Dialog dialog = new Dialog(this);
