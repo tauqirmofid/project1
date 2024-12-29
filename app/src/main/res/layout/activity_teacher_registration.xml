@@ -89,6 +89,30 @@
                 android:padding="12dp"
                 android:textColorHint="#808080"
                 android:inputType="number" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Department"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/teacherdesignation"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:textColorHint="#808080"
+
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:hint="Select Designation"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="@xml/edit_text_bg"
+                android:drawableRight="@drawable/dropdown_icon"
+                android:clickable="true"
+                android:focusable="true" />
 
             <!-- Department -->
             <TextView
