@@ -13,7 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class TeacherLoginActivity extends AppCompatActivity {
 
-    private Button teacher_reg;
+    private Button teacher_reg, teacher_login;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,5 +30,11 @@ public class TeacherLoginActivity extends AppCompatActivity {
             startActivity(intent);
 
         });
+//        teacher_login= findViewById(R.id.TealgnButton);
+//        teacher_login.setOnClickListener(v->{
+//            Intent intent = new Intent(TeacherLoginActivity.this, TeacherHomepage.class);
+//            startActivity(intent);
+//
+//        });
     }
 }
