@@ -3,6 +3,7 @@ package com.example.unimate;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -69,7 +70,7 @@ public class TeacherLoginActivity extends AppCompatActivity {
     private void validateLogin(String email, String hashedPassword) {
         DatabaseReference acceptedRequestsRef = FirebaseDatabase.getInstance()
                 .getReference("AcceptedRequests")
-                .child("Teacher");
+                .child("Teachers");
 
         acceptedRequestsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -84,7 +85,9 @@ public class TeacherLoginActivity extends AppCompatActivity {
                             storedEmail.equals(email) && storedPassword.equals(hashedPassword)) {
                         isValidUser = true;
                         break;
+
                     }
+
                 }
 
                 if (isValidUser) {

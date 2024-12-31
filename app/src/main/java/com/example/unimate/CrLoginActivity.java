@@ -93,7 +93,7 @@ public class CrLoginActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(CrLoginActivity.this, "Invalid Email or Password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CrLoginActivity.this, "Invalid Email or Password",  Toast.LENGTH_SHORT).show();
                 }
             }
 
