@@ -11,11 +11,13 @@ navigationUi = "2.6.0"
 activity = "1.9.3"
 lifecycleLivedataKtx = "2.8.7"
 lifecycleViewmodelKtx = "2.8.7"
+opencsv = "5.7.1"
 subsamplingScaleImageView = "3.10.0"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.1.0"
 firebaseDatabase = "21.0.0"
 sunAndroidMail = "1.6.7"
+firebaseFirestore = "25.1.1"
 
 [libraries]
 android-activation = { module = "com.sun.mail:android-activation", version.ref = "sunAndroidMail" }
@@ -30,10 +32,12 @@ navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
 subsampling-scale-image-view = { module = "com.github.davemorrissey.labs:subsampling-scale-image-view", version.ref = "subsamplingScaleImageView" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 sun-android-mail = { module = "com.sun.mail:android-mail", version.ref = "sunAndroidMail" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
