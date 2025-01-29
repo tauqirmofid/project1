@@ -21,15 +21,7 @@ public class Guest_HomePage extends AppCompatActivity {
         // Find the RecyclerView
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
 
-        // Create your 7-day items with dummy tasks
-        dayList = new ArrayList<>();
-        dayList.add(new DayModel("Monday", "Task A, Task B, Task C"));
-        dayList.add(new DayModel("Tuesday", "Task D, Task E"));
-        dayList.add(new DayModel("Wednesday", "Task F, Task G, Task H"));
-        dayList.add(new DayModel("Thursday", "Task I"));
-        dayList.add(new DayModel("Friday", "Task J, Task K, Task L"));
-        dayList.add(new DayModel("Saturday", "Task M, Task N"));
-        dayList.add(new DayModel("Sunday", "Task O, Task P, Task Q"));
+
 
         // Create and set the adapter
         dayAdapter = new DayAdapter(dayList);
