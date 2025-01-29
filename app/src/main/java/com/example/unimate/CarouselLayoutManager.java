@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class CarouselLayoutManager extends LinearLayoutManager {
@@ -14,6 +15,8 @@ public class CarouselLayoutManager extends LinearLayoutManager {
     // The minimum alpha for non-center cards
     private final float minAlpha = 0.7f;
 
+    private boolean isInitialCenteringDone = false; // Flag to track initial centering
+
     public CarouselLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
     }
@@ -22,6 +25,16 @@ public class CarouselLayoutManager extends LinearLayoutManager {
     public void onLayoutChildren(@NonNull RecyclerView.Recycler recycler,
                                  @NonNull RecyclerView.State state) {
         super.onLayoutChildren(recycler, state);
+
+        // Run initial centering only once
+        if (!isInitialCenteringDone && getChildCount() > 0) {
+            View firstChild = getChildAt(0);
+            int itemWidth = firstChild.getWidth();
+            int centerOffset = (getWidth() / 2) - (itemWidth / 2);
+            scrollToPositionWithOffset(0, centerOffset);
+            isInitialCenteringDone = true; // Prevent re-triggering
+        }
+
         scaleAndAlphaChildren();
     }
 
@@ -31,6 +44,17 @@ public class CarouselLayoutManager extends LinearLayoutManager {
         int scrolled = super.scrollHorizontallyBy(dx, recycler, state);
         scaleAndAlphaChildren();
         return scrolled;
+    }
+    @Override
+    public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
+        LinearSmoothScroller smoothScroller = new LinearSmoothScroller(recyclerView.getContext()) {
+            @Override
+            public int calculateDtToFit(int viewStart, int viewEnd, int boxStart, int boxEnd, int snapPreference) {
+                return (boxStart + (boxEnd - boxStart) / 2) - (viewStart + (viewEnd - viewStart) / 2);
+            }
+        };
+        smoothScroller.setTargetPosition(position);
+        startSmoothScroll(smoothScroller);
     }
 
     private void scaleAndAlphaChildren() {
@@ -84,5 +108,7 @@ public class CarouselLayoutManager extends LinearLayoutManager {
                 child.setAlpha(alpha);
             }
         }
+
+
     }
 }

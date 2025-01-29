@@ -11,5 +11,7 @@
     <!-- Replace with your desired green -->
     <color name="colorGreenDark">#006A00</color>
     <color name="colorGreenLight">#97C93C</color>
+    <color name="primaryDark">#2E7D32</color>
+    <color name="cardBackground">#FFFFFF</color>
     <color name="colorWhite">#FFFFFF</color>
 </resources>

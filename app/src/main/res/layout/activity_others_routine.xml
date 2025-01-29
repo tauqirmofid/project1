@@ -3,65 +3,279 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OthersRoutine"
-    android:padding="16dp">
 
-    <!-- Label for Batch Spinner -->
+    tools:context=".OthersRoutine">
+
+    <!-- AppBarLayout holds the top card so it can remain pinned. -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
+
+        <!-- Top card view start (now inside AppBarLayout) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/topCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:cardBackgroundColor="@color/Theme_green"
+            app:cardElevation="8dp"
+            app:cardPreventCornerOverlap="true"
+            app:shapeAppearanceOverlay="@style/CustomCardShape">
+
+            <!-- ConstraintLayout for your two images (left nav_bar and center new_home_top) -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- ImageView for nav_bar on the left -->
+                <ImageView
+                    android:id="@+id/leftNavBarImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@null"
+                    android:src="@drawable/nev_bar"
+                    android:scaleX="1.5"
+                    android:scaleY="1.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <!-- ImageView for new_home_top in the center -->
+                <ImageView
+                    android:id="@+id/selectRoleTopImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="-60dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@null"
+                    android:src="@drawable/new_home_top"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    app:layout_constraintStart_toEndOf="@id/leftNavBarImage"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <!-- Top card view ends -->
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Batch and Section Selection Row -->
+    <LinearLayout
+        android:id="@+id/selectionRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tvBatchLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Batch:"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <Spinner
+            android:id="@+id/spinnerBatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"/>
+
+        <TextView
+            android:id="@+id/tvSectionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Section:"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <Spinner
+            android:id="@+id/spinnerSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="90dp"
+        app:layout_constraintTop_toBottomOf="@id/selectionRow">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        app:layout_constraintTop_toBottomOf="@id/selectionRow"
+        android:padding="16dp"
+        >
+
+
+
+    <!-- Current Class Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/currentClassCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="5dp"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp"
+
+
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Current Class"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primaryDark"/>
+
+            <TextView
+                android:id="@+id/tvCurrentClass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                android:lineSpacingExtra="4sp"
+                android:text="No ongoing class"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Next & Previous Class Container -->
+    <LinearLayout
+        android:id="@+id/nextPrevContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintTop_toBottomOf="@id/currentClassCard">
+
+        <!-- Next Class Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginVertical="5dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Next Class"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primaryDark"/>
+
+                <TextView
+                    android:id="@+id/tvNextClass"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4sp"
+                    android:text="No upcoming class"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Previous Class Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginVertical="5dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Previous Class"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primaryDark"/>
+
+                <TextView
+                    android:id="@+id/tvPreviousClass"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4sp"
+                    android:text="No previous class"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- Carousel Title -->
     <TextView
-        android:id="@+id/tvBatchLabel"
-        android:layout_width="wrap_content"
+        android:id="@+id/carouselTitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Batch:"
-        android:textSize="16sp"
+        android:layout_marginTop="24dp"
+        android:text="Weekly Schedule"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/nextPrevContainer"/>
 
-    <!-- Spinner for Batch (56–65) -->
-    <Spinner
-        android:id="@+id/spinnerBatch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBaseline_toBaselineOf="@id/tvBatchLabel"
-        app:layout_constraintStart_toEndOf="@id/tvBatchLabel" />
-
-    <!-- Label for Section Spinner -->
-    <TextView
-        android:id="@+id/tvSectionLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Section:"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginStart="24dp"
-        app:layout_constraintBaseline_toBaselineOf="@id/tvBatchLabel"
-        app:layout_constraintStart_toEndOf="@id/spinnerBatch" />
-
-    <!-- Spinner for Section (A–I) -->
-    <Spinner
-        android:id="@+id/spinnerSection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBaseline_toBaselineOf="@id/tvBatchLabel"
-        app:layout_constraintStart_toEndOf="@id/tvSectionLabel" />
-
-    <!-- RecyclerView for the carousel -->
+    <!-- RecyclerView Carousel -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/carouselRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:paddingVertical="30dp"
-        android:foregroundGravity="center"
-        android:textAlignment="center"
-        android:nestedScrollingEnabled="false"
-        app:layout_constraintTop_toBottomOf="@id/tvBatchLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints" />
+        android:layout_marginTop="8dp"
+        android:paddingVertical="16dp"
+        app:layout_constraintTop_toBottomOf="@id/carouselTitle"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
