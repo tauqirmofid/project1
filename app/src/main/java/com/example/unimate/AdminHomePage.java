@@ -9,12 +9,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,6 +32,7 @@ public class AdminHomePage extends AppCompatActivity {
     private RecyclerView requestsRecyclerView;
     private RequestAdapter requestAdapter;
     private List<RequestModel> requestList;
+    private CardView roomCardView, routineCardView;
 
     // Drawer references
     private DrawerLayout drawerLayout;
@@ -48,6 +47,26 @@ public class AdminHomePage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_home_page);
+
+        roomCardView = findViewById(R.id.roomsCardView);
+        roomCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate to Upload Activity
+                Intent intent = new Intent(AdminHomePage.this, RoomUpload.class);
+                startActivity(intent);
+            }
+        });
+
+        routineCardView = findViewById(R.id.routineCardView);
+        routineCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate to Upload Activity
+                Intent intent = new Intent(AdminHomePage.this, RoutineUpload.class);
+                startActivity(intent);
+            }
+        });
 
         // Drawer setup
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -107,7 +126,7 @@ public class AdminHomePage extends AppCompatActivity {
         if (navProfileButton != null) {
             navProfileButton.setOnClickListener(v -> {
                 drawerLayout.closeDrawer(GravityCompat.START);
-                Intent intent = new Intent(AdminHomePage.this, Upload.class);
+                Intent intent = new Intent(AdminHomePage.this, RoutineUpload.class);
                 startActivity(intent);
             });
         }
