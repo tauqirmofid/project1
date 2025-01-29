@@ -13,7 +13,7 @@
         android:theme="@style/Theme.Unimate"
         tools:targetApi="31">
         <activity
-            android:name=".RoutineUpload"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".CR_HomePage"
@@ -25,7 +25,7 @@
             android:name=".StudentHomePage"
             android:exported="false" />
         <activity
-            android:name=".RoomUpload"
+            android:name=".Upload"
             android:exported="false" />
         <activity
             android:name=".StudentProfile"
@@ -67,7 +67,7 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".UploadCsvActivity"
             android:exported="true"
             android:theme="@style/Theme.Unimate">
             <intent-filter>

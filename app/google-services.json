@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "414467805920",
+    "project_id": "unimateproject",
+    "storage_bucket": "unimateproject.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414467805920:android:4d07ff7a66673f8e45b685",
+        "android_client_info": {
+          "package_name": "com.example.unimate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDG_v3eFa2u4eQEjHzyX37w1nAau6xE8E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

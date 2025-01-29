@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".UploadCsvActivity">
+
+    <!-- Spinner to select day -->
+    <Spinner
+        android:id="@+id/spinnerDays"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <!-- Button to manually check data -->
+    <Button
+        android:id="@+id/btnCheckData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Check Data"
+        app:layout_constraintTop_toBottomOf="@id/spinnerDays"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- Button to upload CSV -->
+    <Button
+        android:id="@+id/btnUploadCsv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload CSV File"
+        app:layout_constraintTop_toBottomOf="@id/spinnerDays"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- Status message -->
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Status..."
+        app:layout_constraintTop_toBottomOf="@id/btnCheckData"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvStatus"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- TWO-LEVEL ExpandableListView -->
+    <ExpandableListView
+        android:id="@+id/lvData"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/progressBar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:dividerHeight="2dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -65,6 +65,9 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
+    implementation (libs.opencsv)
+
+
     // JavaMail dependencies
     implementation(libs.sun.android.mail)
     implementation(libs.android.activation)
