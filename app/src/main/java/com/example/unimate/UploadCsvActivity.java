@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UploadCsvActivity extends AppCompatActivity {
@@ -25,7 +28,9 @@ public class UploadCsvActivity extends AppCompatActivity {
     private TextView tvStatus;
     private ProgressBar progressBar;
     private Button btnCheckData, btnUploadCsv;
-    private ListView lvData;
+
+    // Now an ExpandableListView, not a ListView
+    private ExpandableListView lvData;
 
     private FirebaseFirestore db;
 
@@ -44,6 +49,7 @@ public class UploadCsvActivity extends AppCompatActivity {
             "2:50-4:10PM",    // Column 8
             "7:00-8:20PM"     // Column 9
     };
+
     // Matching columns for each slot
     private final int[] timeColumns = {3, 4, 5, 7, 8, 9};
 
@@ -59,6 +65,8 @@ public class UploadCsvActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         btnCheckData = findViewById(R.id.btnCheckData);
         btnUploadCsv = findViewById(R.id.btnUploadCsv);
+
+        // Note: now we cast lvData as ExpandableListView
         lvData = findViewById(R.id.lvData);
 
         // Set up spinner
@@ -75,9 +83,8 @@ public class UploadCsvActivity extends AppCompatActivity {
                 // Once day is selected, automatically check if data exists
                 checkIfDataExistsForDay();
                 tvStatus.setText("Selected day: " + daysOfWeek[position]);
+                // Also fetch data to display in the ExpandableListView
                 fetchAndDisplayDataForDay();
-
-
             }
 
             @Override
@@ -104,12 +111,10 @@ public class UploadCsvActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(docSnapshot -> {
                     progressBar.setVisibility(View.GONE);
-                    if (docSnapshot.exists() && !docSnapshot.getData().isEmpty()) {
-                        // Positive vibe
+                    if (docSnapshot.exists() && docSnapshot.getData() != null && !docSnapshot.getData().isEmpty()) {
                         tvStatus.setText("Data already exists for " + selectedDay
                                 + ". Uploading a new CSV will overwrite it.");
                     } else {
-                        // Negative vibe
                         tvStatus.setText("No data found for " + selectedDay
                                 + ". Please upload a CSV.");
                     }
@@ -120,7 +125,7 @@ public class UploadCsvActivity extends AppCompatActivity {
                 });
     }
 
-    /** 2) "View Stored Data" button fetches the doc from Firestore and displays it in a ListView */
+    /** 2) "View Stored Data" or auto fetching -> now sets ExpandableListView instead of ListView */
     private void fetchAndDisplayDataForDay() {
         String selectedDay = getSelectedDayDocName();
         progressBar.setVisibility(View.VISIBLE);
@@ -132,34 +137,17 @@ public class UploadCsvActivity extends AppCompatActivity {
                 .addOnSuccessListener(docSnapshot -> {
                     progressBar.setVisibility(View.GONE);
 
-                    if (!docSnapshot.exists() || docSnapshot.getData() == null ||
-                            docSnapshot.getData().isEmpty()) {
+                    if (!docSnapshot.exists() || docSnapshot.getData() == null
+                            || docSnapshot.getData().isEmpty()) {
                         tvStatus.setText("No data found for " + selectedDay);
-                        lvData.setAdapter(null);
+                        lvData.setAdapter((ExpandableListAdapter) null);
                         return;
                     }
 
-                    // We expect a structure like:
-                    // {
-                    //   "batch_64": {
-                    //       "A": {
-                    //           "09:00-10:20AM": { "course":"CSE-1151","instructor":"STA","room":"RAB-306"},
-                    //           ...
-                    //       },
-                    //       ...
-                    //   },
-                    //   "batch_65": { ... }
-                    // }
                     Map<String, Object> topLevel = docSnapshot.getData();
+                    // Populate the ExpandableListView
+                    populateExpandableData(topLevel);
 
-                    // Convert map to list of strings
-                    ArrayList<String> displayList = parseScheduleData(topLevel);
-
-                    // Show the data in the ListView
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                            this, android.R.layout.simple_list_item_1, displayList
-                    );
-                    lvData.setAdapter(arrayAdapter);
                     tvStatus.setText("Data fetched for " + selectedDay);
                 })
                 .addOnFailureListener(e -> {
@@ -169,58 +157,84 @@ public class UploadCsvActivity extends AppCompatActivity {
     }
 
     /**
-     * Recursively or iteratively parse the nested structure and produce strings.
-     * The doc shape is:
-     *   "batch_XX" -> { "Section" -> { "TimeSlot" -> { "course", "instructor", "room" } } }
+     * Instead of building a single list of strings, we build a two-level structure:
+     *   Groups (batches) -> Children (multiline section data).
      */
-    private ArrayList<String> parseScheduleData(Map<String, Object> topLevel) {
-        ArrayList<String> result = new ArrayList<>();
+    private void populateExpandableData(Map<String, Object> topLevel) {
+        // We'll store the group names (batches) and a map to each batch's list of section strings
+        List<String> batchList = new ArrayList<>();
+        Map<String, List<String>> batchToSectionsMap = new HashMap<>();
 
-        // topLevel keys: "batch_64", "batch_65", ...
+        // Example topLevel:
+        //   "batch_64" -> {
+        //     "A" -> {"09:00-10:20AM" -> {...}, ... },
+        //     "B" -> {...}
+        //   },
+        //   "batch_65" -> {...}
+
         for (Map.Entry<String, Object> batchEntry : topLevel.entrySet()) {
-            String batchKey = batchEntry.getKey(); // "batch_64"
+            String batchKey = batchEntry.getKey(); // e.g. "batch_64"
             Object batchVal = batchEntry.getValue();
+            if (!(batchVal instanceof Map)) {
+                continue; // skip if not a map
+            }
 
-            if (!(batchVal instanceof Map)) continue;  // skip if not a map
+            batchList.add(batchKey);
+
+            // For each batch, we build a list of multiline strings (one per section)
             Map<String, Object> sectionMap = (Map<String, Object>) batchVal;
+            List<String> sectionStrings = new ArrayList<>();
 
-            // sectionMap keys: "A", "B", "C", ...
+            // sectionMap example:
+            //   "A" -> { "09:00-10:20AM" -> {course=..., instructor=..., room=...}, ...}
+            //   "B" -> { ... }
             for (Map.Entry<String, Object> sectionEntry : sectionMap.entrySet()) {
-                String sectionKey = sectionEntry.getKey(); // e.g. "A"
-                Object sectionVal = sectionEntry.getValue();
+                String sectionName = sectionEntry.getKey(); // e.g. "A"
+                Object timeslotVal = sectionEntry.getValue();
+                if (!(timeslotVal instanceof Map)) {
+                    continue;
+                }
 
-                if (!(sectionVal instanceof Map)) continue;
-                Map<String, Object> timeMap = (Map<String, Object>) sectionVal;
+                // Build a multiline string for this section
+                Map<String, Object> timeslotMap = (Map<String, Object>) timeslotVal;
+                StringBuilder sb = new StringBuilder();
+                sb.append("Section ").append(sectionName).append(":\n");
 
-                // timeMap keys: "09:00-10:20AM", "10:20-11:40AM", ...
-                for (Map.Entry<String, Object> timeEntry : timeMap.entrySet()) {
-                    String timeSlot = timeEntry.getKey();
-                    Object classVal = timeEntry.getValue();
+                // timeslotMap: "09:00-10:20AM" -> {course=..., instructor=..., room=...}
+                for (Map.Entry<String, Object> tEntry : timeslotMap.entrySet()) {
+                    String timeSlot = tEntry.getKey();
+                    Object classVal = tEntry.getValue();
+                    if (!(classVal instanceof Map)) {
+                        continue;
+                    }
 
-                    if (!(classVal instanceof Map)) continue;
                     Map<String, Object> classInfo = (Map<String, Object>) classVal;
-
-                    // Example: {course=CSE-1151, instructor=STA, room=RAB-306}
                     String course = safeGetString(classInfo, "course");
                     String instructor = safeGetString(classInfo, "instructor");
                     String room = safeGetString(classInfo, "room");
 
-                    // Build a string for ListView
-                    String itemStr = batchKey + " | Section " + sectionKey
-                            + " | " + timeSlot
-                            + " => [course=" + course + ", instructor=" + instructor + ", room=" + room + "]";
-
-                    result.add(itemStr);
+                    sb.append("   ")
+                            .append(timeSlot).append(" -> ")
+                            .append(course).append(" ")
+                            .append(instructor).append(" ")
+                            .append(room).append("\n");
                 }
+
+                sectionStrings.add(sb.toString().trim());
             }
+
+            batchToSectionsMap.put(batchKey, sectionStrings);
         }
-        return result;
+
+        // Now create and set an ExpandableListAdapter
+        MyExpandableListAdapter adapter = new MyExpandableListAdapter(this, batchList, batchToSectionsMap);
+        lvData.setAdapter(adapter);
     }
 
-    // Helper to safely get string from map
+    // A helper to safely get strings from classInfo
     private String safeGetString(Map<String, Object> map, String key) {
         Object val = map.get(key);
-        return val == null ? "N/A" : val.toString();
+        return (val == null) ? "N/A" : val.toString();
     }
 
     /** 3) "Upload CSV File" button triggers the file picker */
@@ -370,5 +384,98 @@ public class UploadCsvActivity extends AppCompatActivity {
     private String getSelectedDayDocName() {
         String selectedDay = spinnerDays.getSelectedItem().toString(); // e.g. "Sunday"
         return selectedDay.toLowerCase();                              // -> "sunday"
+    }
+
+    // -------------------------------------------------------------
+    // INTERNAL ExpandableListAdapter for 2-level display:
+    //  1) Group = batch_64, batch_65, ...
+    //  2) Child = multiline string showing "Section A" and timeslots
+    // -------------------------------------------------------------
+    private static class MyExpandableListAdapter extends BaseExpandableListAdapter {
+
+        private final LayoutInflater inflater;
+        private final List<String> batchList;  // Group list
+        private final Map<String, List<String>> batchToSectionsMap; // Child map
+
+        public MyExpandableListAdapter(
+                android.content.Context context,
+                List<String> batchList,
+                Map<String, List<String>> batchToSectionsMap
+        ) {
+            this.inflater = LayoutInflater.from(context);
+            this.batchList = batchList;
+            this.batchToSectionsMap = batchToSectionsMap;
+        }
+
+        @Override
+        public int getGroupCount() {
+            return batchList.size();
+        }
+
+        @Override
+        public int getChildrenCount(int groupPosition) {
+            String batchName = batchList.get(groupPosition);
+            List<String> sections = batchToSectionsMap.get(batchName);
+            return (sections == null) ? 0 : sections.size();
+        }
+
+        @Override
+        public Object getGroup(int groupPosition) {
+            return batchList.get(groupPosition);
+        }
+
+        @Override
+        public Object getChild(int groupPosition, int childPosition) {
+            String batchName = batchList.get(groupPosition);
+            return batchToSectionsMap.get(batchName).get(childPosition);
+        }
+
+        @Override
+        public long getGroupId(int groupPosition) {
+            return groupPosition;
+        }
+
+        @Override
+        public long getChildId(int groupPosition, int childPosition) {
+            return childPosition;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
+
+        // Display the batch (group)
+        @Override
+        public View getGroupView(int groupPosition, boolean isExpanded,
+                                 View convertView, ViewGroup parent) {
+            String batchName = (String) getGroup(groupPosition);
+            if (convertView == null) {
+                convertView = inflater.inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
+            }
+            TextView textGroup = convertView.findViewById(android.R.id.text1);
+            textGroup.setText(batchName); // e.g. "batch_64"
+            return convertView;
+        }
+
+        // Display the multiline section info (child)
+        @Override
+        public View getChildView(int groupPosition, int childPosition,
+                                 boolean isLastChild, View convertView, ViewGroup parent) {
+            String sectionInfo = (String) getChild(groupPosition, childPosition);
+            if (convertView == null) {
+                convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            }
+            TextView textChild = convertView.findViewById(android.R.id.text1);
+            // e.g. "Section A:\n   09:00-10:20AM -> CSE-1151 STA RAB-306\n   ..."
+            textChild.setText(sectionInfo);
+
+            return convertView;
+        }
+
+        @Override
+        public boolean isChildSelectable(int groupPosition, int childPosition) {
+            return true;
+        }
     }
 }
