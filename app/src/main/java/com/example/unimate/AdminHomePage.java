@@ -122,7 +122,6 @@ public class AdminHomePage extends AppCompatActivity {
         if (navHomeButton != null) {
             navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
         }
-
         if (navProfileButton != null) {
             navProfileButton.setOnClickListener(v -> {
                 drawerLayout.closeDrawer(GravityCompat.START);

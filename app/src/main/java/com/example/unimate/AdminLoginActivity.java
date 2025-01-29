@@ -19,7 +19,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class AdminLoginActivity extends AppCompatActivity {
-
     private EditText emailEditText, passwordEditText;
     private Button loginButton;
 

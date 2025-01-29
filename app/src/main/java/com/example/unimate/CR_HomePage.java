@@ -51,6 +51,5 @@ public class CR_HomePage extends AppCompatActivity {
         OverlapDecoration decoration = new OverlapDecoration(300);
         //try with 150 on right
         carouselRecyclerView.addItemDecoration(decoration);
-
     }
 }

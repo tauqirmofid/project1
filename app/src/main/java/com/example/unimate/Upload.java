@@ -22,7 +22,6 @@ import java.util.Map;
 public class Upload extends AppCompatActivity {
 
     private static final int PICK_CSV_FILE = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
