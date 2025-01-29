@@ -53,7 +53,7 @@ public class AdminHomePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Navigate to Upload Activity
-                Intent intent = new Intent(AdminHomePage.this, RoomUpload.class);
+                Intent intent = new Intent(AdminHomePage.this, Upload.class);
                 startActivity(intent);
             }
         });
@@ -63,7 +63,7 @@ public class AdminHomePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Navigate to Upload Activity
-                Intent intent = new Intent(AdminHomePage.this, RoutineUpload.class);
+                Intent intent = new Intent(AdminHomePage.this, UploadCsvActivity.class);
                 startActivity(intent);
             }
         });
@@ -126,7 +126,7 @@ public class AdminHomePage extends AppCompatActivity {
         if (navProfileButton != null) {
             navProfileButton.setOnClickListener(v -> {
                 drawerLayout.closeDrawer(GravityCompat.START);
-                Intent intent = new Intent(AdminHomePage.this, RoutineUpload.class);
+                Intent intent = new Intent(AdminHomePage.this, Upload.class);
                 startActivity(intent);
             });
         }

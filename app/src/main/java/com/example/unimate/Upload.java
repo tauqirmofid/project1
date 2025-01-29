@@ -19,7 +19,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RoomUpload extends AppCompatActivity {
+public class Upload extends AppCompatActivity {
 
     private static final int PICK_CSV_FILE = 1;
 
