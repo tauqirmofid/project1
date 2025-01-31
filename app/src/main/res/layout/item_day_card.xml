@@ -38,6 +38,7 @@
 
         <!-- Row 1 -->
         <LinearLayout
+            android:id="@+id/class_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -68,6 +69,8 @@
 
         <!-- Row 2 -->
         <LinearLayout
+            android:id="@+id/class_2"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -98,6 +101,7 @@
 
         <!-- Row 3 -->
         <LinearLayout
+            android:id="@+id/class_3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -128,6 +132,7 @@
 
         <!-- Row 4 -->
         <LinearLayout
+            android:id="@+id/class_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -157,6 +162,7 @@
 
         <!-- Row 5 -->
         <LinearLayout
+            android:id="@+id/class_5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -187,6 +193,7 @@
 
         <!-- Row 6 -->
         <LinearLayout
+            android:id="@+id/class_6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -217,6 +224,7 @@
 
         <!-- Row 7 -->
         <LinearLayout
+            android:id="@+id/class_7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
