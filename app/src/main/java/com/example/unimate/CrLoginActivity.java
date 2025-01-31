@@ -75,6 +75,9 @@ public class CrLoginActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 boolean isValidUser = false;
+                String crName = "Unknown CR";  // Default value to prevent null
+                String crBatch = "N/A";
+                String crSection = "N/A";
 
                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                     String storedEmail = userSnapshot.child("email").getValue(String.class);
@@ -83,6 +86,14 @@ public class CrLoginActivity extends AppCompatActivity {
                     if (storedEmail != null && storedPassword != null &&
                             storedEmail.equals(email) && storedPassword.equals(hashedPassword)) {
                         isValidUser = true;
+                        crName = userSnapshot.child("name").getValue(String.class);
+                        crBatch = userSnapshot.child("batch").getValue(String.class);
+                        crSection = userSnapshot.child("section").getValue(String.class);
+
+                        // Ensure no null values
+                        crName = (crName != null) ? crName : "Unknown CR";
+                        crBatch = (crBatch != null) ? crBatch : "N/A";
+                        crSection = (crSection != null) ? crSection : "N/A";
                         break;
                     }
                 }
@@ -90,10 +101,13 @@ public class CrLoginActivity extends AppCompatActivity {
                 if (isValidUser) {
                     Toast.makeText(CrLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(CrLoginActivity.this, CR_HomePage.class);
+                    intent.putExtra("CR_NAME", crName);
+                    intent.putExtra("CR_BATCH", crBatch);
+                    intent.putExtra("CR_SECTION", crSection);
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(CrLoginActivity.this, "Invalid Email or Password",  Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CrLoginActivity.this, "Invalid Email or Password", Toast.LENGTH_SHORT).show();
                 }
             }
 

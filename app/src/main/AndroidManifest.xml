@@ -59,7 +59,7 @@
             android:name=".StudentLoginActivity"
             android:exported="false" />
         <activity
-            android:name=".CrLoginActivity"
+            android:name=".OthersRoutine"
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />
         <activity
@@ -70,7 +70,7 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".OthersRoutine"
+            android:name=".CrLoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Unimate">
             <intent-filter>
