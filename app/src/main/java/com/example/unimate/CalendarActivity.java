@@ -1,6 +1,7 @@
 package com.example.unimate;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -8,8 +9,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +28,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +43,16 @@ public class CalendarActivity extends AppCompatActivity {
     private CalendarView calendarView;
     private RecyclerView classRecycler;
     private Spinner batchSpinner, sectionSpinner;
+    private LinearLayout loadingLayout;
+    private ProgressBar loadingProgressBar;
+    private TextView loadingText;
+
+    private Button button;
+
+
+    private TextView loadingPercentage;
+
+
 
     private FirebaseFirestore db;
     private String selectedBatch = "64";   // default
@@ -46,10 +63,18 @@ public class CalendarActivity extends AppCompatActivity {
     private final Map<Date, List<ClassWithTasks>> classTaskMap = new HashMap<>();
     private Date currentSelectedDate;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
+
+        button = findViewById(R.id.btn1);
+        button.setOnClickListener(v -> {
+            Intent intent = new Intent(CalendarActivity.this, OthersRoutine.class);
+            startActivity(intent);
+        });
+
 
         db = FirebaseFirestore.getInstance();
 
@@ -61,13 +86,20 @@ public class CalendarActivity extends AppCompatActivity {
         batchSpinner = findViewById(R.id.batchSpinner);
         sectionSpinner = findViewById(R.id.sectionSpinner);
 
+        // ✅ Initialize loading views
+        loadingLayout = findViewById(R.id.loadingLayout);
+        loadingProgressBar = findViewById(R.id.loadingProgressBar);
+        loadingPercentage = findViewById(R.id.loadingPercentage);
+        loadingText = findViewById(R.id.loadingText);
+
         setupSpinners();
         setupCalendar();
 
         // Load schedules/tasks when we first open
         loadAllDataForRange();
-
     }
+
+
 
 
     private Date stripTime(Date date) {
@@ -96,11 +128,19 @@ public class CalendarActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedBatch = parent.getItemAtPosition(position).toString();
+                // ✅ Clear previously selected date to avoid old batch's data
+                currentSelectedDate = null;
+
+                // ✅ Clear RecyclerView to avoid showing previous batch's data
+                classRecycler.setAdapter(null);
                 // Reload schedules/tasks whenever batch changes
                 loadAllDataForRange();
             }
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+
+
+            }
         });
 
         // Section Spinner
@@ -115,12 +155,24 @@ public class CalendarActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedSection = parent.getItemAtPosition(position).toString();
+
+                // ✅ Clear previously selected date to avoid old section's data
+                currentSelectedDate = null;
+
+                // ✅ Clear RecyclerView to avoid showing previous section's data
+                classRecycler.setAdapter(null);
                 // Reload schedules/tasks whenever section changes
                 loadAllDataForRange();
+
+
             }
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
         });
+
+
     }
 
     /**
@@ -145,13 +197,17 @@ public class CalendarActivity extends AppCompatActivity {
      * plus all tasks for that same range.
      */
     private void loadAllDataForRange() {
+        // ✅ Show loading UI
+        showLoading();
+
         // Step 1: Clear old data
         classTaskMap.clear();
         currentSelectedDate = null;
+        classRecycler.setAdapter(null);
 
-        // Step 2: Build a list of all dates from today up to 30 days in the future
+        // Step 2: Build a list of all dates (Next 30 Days)
         List<Date> dateList = new ArrayList<>();
-        Calendar cal = Calendar.getInstance(); // start at "today"
+        Calendar cal = Calendar.getInstance();
 
         for (int i = 0; i < 60; i++) {
             Date dayDate = stripTime(cal.getTime());
@@ -159,14 +215,37 @@ public class CalendarActivity extends AppCompatActivity {
             cal.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        // Step 3: For each date, load the schedule doc named "sunday", "monday", etc.,
-        //         then store the classes in classTaskMap keyed by that date.
-        //         We'll do it asynchronously, but we won't wait for each one to finish
-        //         to keep it simpler. Instead, we collect them all and update after.
+        // ✅ Step 3: Start loading classes first, then tasks
+        loadClassSchedules(dateList, () -> loadTasksForRange(dateList));
+    }
+
+
+    /**
+     * Show the loading layout while data is being fetched.
+     */
+    private void showLoading() {
+        loadingLayout.setVisibility(View.VISIBLE);
+        classRecycler.setVisibility(View.GONE);
+    }
+
+    /**
+     * Hide the loading layout and show the RecyclerView once data is ready.
+     */
+    private void hideLoading() {
+        loadingLayout.setVisibility(View.GONE);
+        classRecycler.setVisibility(View.VISIBLE);
+    }
+
+
+    /**
+     * Load class schedules first, then trigger task loading.
+     */
+    private void loadClassSchedules(List<Date> dateList, Runnable onComplete) {
+        int totalDays = dateList.size();
+        final int[] completedRequests = {0}; // Track loaded items
 
         for (Date dayDate : dateList) {
             String dayName = getDayName(dayDate).toLowerCase();
-            // e.g. "sunday", "monday", etc.
 
             db.collection("schedules")
                     .document(dayName)
@@ -177,22 +256,38 @@ public class CalendarActivity extends AppCompatActivity {
                             parseClassData(doc.getData(), normalized);
                         } else {
                             classTaskMap.put(normalized, new ArrayList<>());
-                            updateCalendarAppearance();
+                        }
+
+                        // ✅ Update Progress
+                        updateLoadingProgress(++completedRequests[0], totalDays);
+
+                        // ✅ If all schedules are loaded, move to tasks
+                        if (completedRequests[0] == totalDays) {
+                            onComplete.run();
                         }
                     })
                     .addOnFailureListener(e -> {
                         Log.e(TAG, "Error loading schedule for " + dayName, e);
                         classTaskMap.put(dayDate, new ArrayList<>());
-                        updateCalendarAppearance();
+
+                        // ✅ Update Progress
+                        updateLoadingProgress(++completedRequests[0], totalDays);
+
+                        if (completedRequests[0] == totalDays) {
+                            onComplete.run();
+                        }
                     });
         }
+    }
 
-        // Step 4: Load tasks for the entire 30-day range. Because these are Firestore async,
-        //         it might arrive at any time. We'll do it once, not 30 times.
 
-        Date startDate = dateList.get(0);                   // today
+
+    /**
+     * Load all tasks **after** schedules have been loaded.
+     */
+    private void loadTasksForRange(List<Date> dateList) {
+        Date startDate = dateList.get(0);
         Date endDate = dateList.get(dateList.size() - 1);
-        Log.d(TAG, "Querying tasks from " + startDate + " to " + endDate);// 30 days from now
 
         db.collection("tasks")
                 .whereEqualTo("batch", selectedBatch)
@@ -201,19 +296,44 @@ public class CalendarActivity extends AppCompatActivity {
                 .whereLessThanOrEqualTo("date", endDate)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    Log.d(TAG, "Found " + querySnapshot.size() + " task(s).");
+                    int totalTasks = querySnapshot.size();
+                    final int[] completedTasks = {0};
+
+                    Log.d(TAG, "Found " + totalTasks + " task(s).");
+
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         UniTask task = doc.toObject(UniTask.class);
-                        Log.d(TAG, "Task date=" + task.getDate() + ", title=" + task.getTaskTitle());
-
                         attachTaskToClass(task);
+
+                        // ✅ Update Progress
+                        updateLoadingProgress(++completedTasks[0], totalTasks);
                     }
+
+                    // ✅ Hide loading screen after tasks are loaded
+                    hideLoading();
                     updateCalendarAppearance();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error loading tasks", e);
+                    hideLoading();
                 });
     }
+
+
+
+    private void updateLoadingProgress(int completed, int total) {
+        if (total == 0) return;
+
+        int percentage = (int) ((completed / (float) total) * 100);
+        loadingProgressBar.setProgress(percentage);
+        loadingPercentage.setText(percentage + "%");
+        loadingText.setText("Loading " + completed + " of " + total);
+
+
+    }
+
+
+
 
     /**
      * Convert the Firestore data (nested map) into ClassWithTasks for a specific date
@@ -348,6 +468,26 @@ public class CalendarActivity extends AppCompatActivity {
             showToast("No classes for selected date");
         }
 
+
+        // ✅ Define the correct order of time slots
+        List<String> timeSlotOrder = Arrays.asList(
+                "9:00-10:20AM",
+                "10:20-11:40AM",
+                "11:40-1:00PM",
+                "1:00-1:30PM",
+                "1:30-2:50PM",
+                "2:50-4:10PM",
+                "7:00-8:20PM"
+        );
+
+        // ✅ Sort classes based on their position in the predefined order
+        classes.sort((class1, class2) -> {
+            int index1 = timeSlotOrder.indexOf(class1.getTimeSlot().trim());
+            int index2 = timeSlotOrder.indexOf(class2.getTimeSlot().trim());
+
+            return Integer.compare(index1, index2);
+        });
+
         // This adapter is for CLASSES, not tasks
         ClassAdapter classAdapter = new ClassAdapter(classes, classItem -> {
             if (classItem.hasTasks()) {
@@ -379,14 +519,27 @@ public class CalendarActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_show_tasks, null);
 
-
-
         RecyclerView tasksRecycler = dialogView.findViewById(R.id.tasksRecycler);
         View closeIcon = dialogView.findViewById(R.id.closeIcon);
         View addTaskButton = dialogView.findViewById(R.id.addTaskButton);
 
-        // ✅ Store tasksAdapter globally to update inside removeTaskFromFirestore
-        tasksAdapter = new TasksAdapter(classItem.getTasks(), taskToRemove -> {
+        // ✅ Remove duplicate tasks before displaying them
+        List<UniTask> uniqueTasks = new ArrayList<>();
+        for (UniTask task : classItem.getTasks()) {
+            boolean alreadyExists = false;
+            for (UniTask existingTask : uniqueTasks) {
+                if (existingTask.getTaskId().equals(task.getTaskId())) {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+            if (!alreadyExists) {
+                uniqueTasks.add(task);
+            }
+        }
+
+        // ✅ Use unique tasks for the RecyclerView
+        tasksAdapter = new TasksAdapter(uniqueTasks, taskToRemove -> {
             removeTaskFromFirestore(taskToRemove, classItem);
         });
 
@@ -411,6 +564,7 @@ public class CalendarActivity extends AppCompatActivity {
 
 
 
+
     private void removeTaskFromFirestore(UniTask task, ClassWithTasks classItem) {
         String docId = task.getTaskId();
         if (docId == null || docId.isEmpty()) {
@@ -424,25 +578,28 @@ public class CalendarActivity extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Task removed", Toast.LENGTH_SHORT).show();
 
-                    // ✅ Remove from local list
-                    classItem.getTasks().remove(task);
+                    // ✅ Step 1: Remove from local memory (classTaskMap)
+                    classItem.getTasks().removeIf(t -> t.getTaskId().equals(task.getTaskId()));
 
-                    // ✅ Ensure UI updates instantly inside dialog
-                    runOnUiThread(() -> {
-                        if (tasksAdapter != null) {
+                    // ✅ Step 2: Update the RecyclerView (Task List)
+                    if (tasksAdapter != null) {
+                        runOnUiThread(() -> {
                             tasksAdapter.removeTask(task);
                             tasksAdapter.notifyDataSetChanged();
-                        }
-                    });
+                        });
+                    }
 
-                    // ✅ Refresh calendar to reflect changes
+                    // ✅ Step 3: Refresh Calendar View and RecyclerView
                     updateCalendarAppearance();
+                    displayClassesForDate(currentSelectedDate); // Force RecyclerView refresh
+
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error removing task", e);
                     Toast.makeText(this, "Failed to remove task", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
 
@@ -461,8 +618,21 @@ public class CalendarActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task, null);
 
+        // Get views
+        TextView taskDateView = dialogView.findViewById(R.id.taskDate);
+        TextView taskTimeSlotView = dialogView.findViewById(R.id.taskTimeSlot);
+        TextView taskCourseView = dialogView.findViewById(R.id.taskCourse);
         EditText taskTitle = dialogView.findViewById(R.id.taskTitle);
         EditText taskDetails = dialogView.findViewById(R.id.taskDetails);
+
+        // ✅ Format and set the selected date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault());
+        String formattedDate = dateFormat.format(currentSelectedDate);
+        taskDateView.setText("Date: " + formattedDate);
+
+        // ✅ Set time slot and course name
+        taskTimeSlotView.setText("Time Slot: " + classItem.getTimeSlot());
+        taskCourseView.setText("Course: " + classItem.getCourse());
 
         builder.setView(dialogView)
                 .setPositiveButton("Add Task", (dialog, which) -> {
@@ -476,26 +646,27 @@ public class CalendarActivity extends AppCompatActivity {
 
                     newTask.setDate(stripTime(currentSelectedDate));
 
-                    // First, add the task to Firestore
+                    // ✅ First, add the task to Firestore
                     db.collection("tasks")
                             .add(newTask)  // Firestore generates a document ID
                             .addOnSuccessListener(docRef -> {
-                                // Get the Firestore document ID and update the taskId field
+                                // ✅ Get the Firestore document ID and update the taskId field
                                 newTask.setTaskId(docRef.getId());
 
-                                // Update Firestore with the correct taskId
+                                // ✅ Update Firestore with the correct taskId
                                 db.collection("tasks")
                                         .document(newTask.getTaskId())
-                                        .update("taskId", newTask.getTaskId())  // Update Firestore with taskId
+                                        .update("taskId", newTask.getTaskId())
                                         .addOnSuccessListener(aVoid -> Log.d(TAG, "Task ID updated in Firestore"))
                                         .addOnFailureListener(e -> Log.e(TAG, "Failed to update taskId", e));
 
-                                // Attach to class in memory
+                                // ✅ Attach to class in memory
                                 classItem.addTask(newTask);
 
-                                // Refresh adapter UI
+                                // ✅ Refresh adapter UI
                                 adapter.notifyDataSetChanged();
 
+                                // ✅ Refresh calendar
                                 updateCalendarAppearance();
                             })
                             .addOnFailureListener(e -> {

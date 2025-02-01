@@ -1,13 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
+    android:layout_width="match_parent"
+    android:backgroundTint="@color/Layout_Background"
+    android:background="@color/Layout_Background"
+
+    android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Fixed Header: Spinners Always Visible -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/Layout_Background"
+        app:cardElevation="8dp">
+
+
 
     <!-- CardView for Batch & Section Selection -->
     <androidx.cardview.widget.CardView
@@ -30,7 +40,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="10dp"
-
                 android:layout_marginEnd="8dp"/>
 
             <Spinner
@@ -38,111 +47,205 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="10dp"
-                />
+                android:padding="10dp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- CardView for Calendar -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="6dp"
-        android:layout_margin="8dp"
-        android:background="@color/white">
 
-        <com.applandeo.materialcalendarview.CalendarView
-            android:id="@+id/calendarView"
+        <Button
+            android:id="@+id/btn1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:headerColor="@color/white"
-            app:headerLabelColor="@color/primaryDark"
-            app:selectionColor="#81C784"
-            android:padding="2dp"
-            tools:ignore="MissingClass"/>
-    </androidx.cardview.widget.CardView>
+            android:text="See routine carousel"
+            android:textColor="@color/primaryDark"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:backgroundTint="@color/Theme_Lightgreen"/>
+        <!-- 🟠 🟢 Color Legend (Tasks & Classes) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
 
-    <!-- 🟠 🟢 Color Legend (Tasks & Classes) -->
-    <LinearLayout
+
+            android:layout_marginTop="12dp">
+
+            <!-- Have Task Indicator -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="4dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/Layout_Background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:layout_gravity="center"
+                android:radius="20dp">
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/taskOrange"
+                    android:layout_marginEnd="8dp"
+                    android:radius="50dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Have Task"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <!-- Have Class Indicator -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="4dp"
+                android:background="@color/Layout_Background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:layout_gravity="center"
+                android:radius="20dp">
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/green_button_color"
+                    android:layout_marginEnd="8dp"
+                    android:radius="50dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Have Class"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+        </LinearLayout>
+</LinearLayout>
+
+
+
+    <!-- Scrollable Content Below the Fixed Header -->
+<androidx.core.widget.NestedScrollView
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:layout_marginTop="182dp"
+android:fillViewport="true">
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical"
+    android:layout_marginTop="10dp"
+android:padding="16dp">
+
+
+
+<!-- CardView for Calendar -->
+<androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="6dp"
+
+
+    android:layout_margin="8dp"
+    android:background="@color/white">
+
+    <com.applandeo.materialcalendarview.CalendarView
+        android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="right"
+        app:headerColor="@color/white"
+        app:headerLabelColor="@color/primaryDark"
+        app:selectionColor="#81C784"
+        android:padding="2dp"
+        tools:ignore="MissingClass"/>
+</androidx.cardview.widget.CardView>
 
-        android:layout_marginTop="12dp">
-
-        <!-- Have Task Indicator -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp"
-            android:layout_marginEnd="16dp"
-            android:background="@color/Layout_Background"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:layout_gravity="center"
-            android:radius="20dp">
-
-            <View
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_gravity="center_vertical"
-                android:background="@color/taskOrange"
-                android:layout_marginEnd="8dp"
-                android:radius="50dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Have Task"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
-
-        <!-- Have Class Indicator -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp"
-            android:background="@color/Layout_Background"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:layout_gravity="center"
-            android:radius="20dp">
-
-            <View
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_gravity="center_vertical"
-                android:background="@color/green_button_color"
-                android:layout_marginEnd="8dp"
-                android:radius="50dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Have Class"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
-
-    </LinearLayout>
-
-
-
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/classRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="10dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-
+<!-- RecyclerView for Classes -->
+<androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/classRecycler"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:nestedScrollingEnabled="true"
+    android:padding="10dp"
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
 </LinearLayout>
+
+
+
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Semi-Transparent Loading Overlay -->
+    <LinearLayout
+        android:id="@+id/loadingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_marginTop="120dp"
+        android:layout_gravity="center"
+        android:background="@color/Theme_green"
+        android:visibility="visible"
+        android:orientation="vertical">
+
+        <!-- Circular Progress Indicator -->
+        <ProgressBar
+            android:id="@+id/loadingProgressBar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/custom_progress_bar"
+            android:max="100"
+            android:progress="0"/>
+
+        <!-- Percentage Loaded -->
+        <TextView
+            android:id="@+id/loadingPercentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0%"
+            android:textSize="22sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:paddingTop="10dp"/>
+
+        <!-- Loaded Items Count -->
+        <TextView
+            android:id="@+id/loadingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loading..."
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:paddingTop="5dp"/>
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/logo_white"
+            android:layout_marginBottom="-30dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="One Stop Solution For your Uni Life"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:paddingTop="5dp"/>
+    </LinearLayout>
+
+    </FrameLayout>

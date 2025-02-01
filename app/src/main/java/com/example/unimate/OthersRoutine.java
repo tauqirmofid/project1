@@ -1,8 +1,10 @@
 package com.example.unimate;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.AdapterView;
 import android.widget.TextView;
@@ -74,11 +76,21 @@ public class OthersRoutine extends AppCompatActivity {
             "08:20PM"
     };
 
+
+    private Button button;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_others_routine);
+
+
+        button = findViewById(R.id.btn1);
+        button.setOnClickListener(v -> {
+            Intent intent = new Intent(OthersRoutine.this, CalendarActivity.class);
+            startActivity(intent);
+        });
 
         db = FirebaseFirestore.getInstance();
 

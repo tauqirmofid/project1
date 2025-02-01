@@ -75,6 +75,10 @@ dependencies {
     implementation (libs.opencsv)
 
     implementation (libs.applandeo.material.calendar.view)
+    implementation (libs.material.calendar.view.v160)
+
+
+
 
 
     // JavaMail dependencies
