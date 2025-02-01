@@ -614,6 +614,8 @@ public class CalendarActivity extends AppCompatActivity {
     /**
      * Show a dialog that lets the user add a new task for this class/time.
      */
+
+    //need to make auth for cr to add tasks
     private void showAddTaskDialog(ClassWithTasks classItem, TasksAdapter adapter) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task, null);
