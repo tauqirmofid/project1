@@ -14,4 +14,10 @@
     <color name="primaryDark">#2E7D32</color>
     <color name="cardBackground">#FFFFFF</color>
     <color name="colorWhite">#FFFFFF</color>
+
+    <color name="limeGreen">#00FF00</color>
+    <color name="taskOrange">#FFA500</color>
+
+    <color name="primaryLight">#81C784</color>
+    <color name="background">#FAFAFA</color>
 </resources>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#00FFFFFF">
+
+    <!-- 📌 CardView: Full Dialog Box -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="12dp"
+        app:cardUseCompatPadding="true"
+
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <!-- 📌 Top Bar with Title & Close Icon -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/dialogTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Task List"
+                    android:padding="10dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:background="@drawable/card_bg_row"
+                    android:elevation="4dp"
+                    android:gravity="center"
+                    />
+
+                <ImageView
+                    android:id="@+id/closeIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/back"
+                    android:contentDescription="Close"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp"
+                    />
+            </RelativeLayout>
+
+            <!-- 📌 RecyclerView for tasks -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tasksRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:overScrollMode="never"
+                android:scrollbars="vertical"
+                android:paddingTop="8dp"
+                android:layout_marginTop="8dp"
+                />
+
+            <!-- 📌 Add New Task Button -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="8dp"
+                android:backgroundTint="@color/Theme_green"
+                app:cardUseCompatPadding="true">
+
+                <Button
+                    android:id="@+id/addTaskButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="➕ Add New Task"
+                    android:backgroundTint="@color/Theme_green"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:padding="12dp"
+                    />
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

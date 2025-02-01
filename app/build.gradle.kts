@@ -58,14 +58,23 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
+
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation (libs.firebase.firestore.v2491)
+    implementation (libs.play.services.auth)
+
+    implementation (libs.play.services.base)
+
+    implementation (libs.firebase.bom)
 
     implementation (libs.opencsv)
+
+    implementation (libs.applandeo.material.calendar.view)
 
 
     // JavaMail dependencies

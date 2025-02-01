@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="CoarseFineLocation">
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <application
         android:allowBackup="true"
@@ -12,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Unimate"
         tools:targetApi="31">
+        <activity
+            android:name=".OthersRoutine"
+            android:exported="false" />
         <activity
             android:name=".UploadCsvActivity"
             android:exported="false" />
@@ -59,7 +65,7 @@
             android:name=".StudentLoginActivity"
             android:exported="false" />
         <activity
-            android:name=".OthersRoutine"
+            android:name=".CrLoginActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />
         <activity
@@ -70,7 +76,7 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".CrLoginActivity"
+            android:name=".CalendarActivity"
             android:exported="true"
             android:theme="@style/Theme.Unimate">
             <intent-filter>
@@ -79,6 +85,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>
