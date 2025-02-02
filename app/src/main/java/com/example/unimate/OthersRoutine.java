@@ -45,7 +45,7 @@ public class OthersRoutine extends AppCompatActivity {
     // Timeslot keys in Firestore vs. row order in item_day_card.xml
     // We assume these EXACT strings exist in Firestore:
     private final String[] timeKeys = {
-            "9:00-10:20AM",
+            "09:00-10:20AM",
             "10:20-11:40AM",
             "11:40-1:00PM",
             "1:00-1:30PM",

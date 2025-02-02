@@ -12,7 +12,7 @@ public class CarouselSnapHelper extends PagerSnapHelper {
     private OrientationHelper orientationHelper;
 
     // Customize this to shift cards left/right after snapping
-    private final int offsetAdjustmentPx = 0; // positive = shift right, negative = shift left
+    private final int offsetAdjustmentPx = -180; // positive = shift right, negative = shift left
 
     @Override
     public int[] calculateDistanceToFinalSnap(
