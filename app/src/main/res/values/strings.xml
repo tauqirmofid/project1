@@ -58,4 +58,13 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string-array name="time_slots">
+        <item>09:00-10:20AM</item>
+        <item>10:20-11:40AM</item>
+        <item>11:40-1:00PM</item>
+        <item>1:30-2:50PM</item>
+        <item>2:50-4:10PM</item>
+        <item>7:00-8:20PM</item>
+    </string-array>
 </resources>

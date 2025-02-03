@@ -20,4 +20,14 @@
 
     <color name="primaryLight">#81C784</color>
     <color name="background">#FAFAFA</color>
+
+
+        <color name="primaryColor">#2196F3</color>
+        <color name="secondaryColor">#4CAF50</color>
+        <color name="colorError">#F44336</color>
+        <color name="primaryText">#212121</color>
+        <color name="secondaryText">#757575</color>
+        <color name="surfaceColor">#FFFFFF</color>
+        <color name="backgroundColor">#F5F5F5</color>
+
 </resources>

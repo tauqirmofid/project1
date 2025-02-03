@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:srcCompat="@drawable/ic_warning"
+        app:tint="@color/colorError"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Class?"
+        android:textSize="18sp"
+        android:textColor="@color/primaryText"
+        android:textAlignment="center"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="This will permanently remove the class from the schedule."
+        android:textColor="@color/secondaryText"
+        android:textAlignment="center"
+        android:layout_marginTop="8dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:startIconDrawable="@drawable/ic_delete_forever"
+        app:startIconTint="@color/colorError">
+
+        <EditText
+            android:id="@+id/confirmEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Type DELETE to confirm"
+            android:inputType="textCapCharacters"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancelButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cancel"
+            android:textColor="@color/primaryText"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/deleteButton"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Delete"
+            android:enabled="false"
+            app:backgroundTint="@color/colorError"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+</LinearLayout>

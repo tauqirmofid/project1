@@ -5,46 +5,56 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardElevation="4dp"
-    app:cardCornerRadius="8dp">
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:padding="16dp">
 
-        <View
-            android:id="@+id/taskIndicator"
-            android:layout_width="8dp"
-            android:layout_height="match_parent"
-            android:background="@color/taskOrange"
+        <!-- Class Time -->
+        <TextView
+            android:id="@+id/classTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+
+            android:textSize="14sp"
+            android:textColor="@color/primaryText"/>
+
+        <!-- Class Name -->
+        <TextView
+            android:id="@+id/className"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/classTime"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="25dp"
+            android:textSize="16sp"
+            android:textColor="@color/primaryText"/>
+
+        <!-- Task Count Badge -->
+        <TextView
+            android:id="@+id/taskCountBadge"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+
+            android:gravity="center"
+            android:layout_marginEnd="2dp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_event_orange"
             android:visibility="gone"/>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"
-            android:orientation="vertical">
+        <!-- Delete Icon -->
+        <ImageView
+            android:id="@+id/deleteIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_delete_forever"
+            app:tint="@color/colorError"/>
 
-            <TextView
-                android:id="@+id/classTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="@color/black"/>
-
-            <TextView
-                android:id="@+id/className"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="4dp"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
+    </RelativeLayout>
 </androidx.cardview.widget.CardView>
