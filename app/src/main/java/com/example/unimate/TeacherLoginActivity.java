@@ -69,8 +69,9 @@ public class TeacherLoginActivity extends AppCompatActivity {
 
     private void validateLogin(String email, String hashedPassword) {
         DatabaseReference acceptedRequestsRef = FirebaseDatabase.getInstance()
-                .getReference("AcceptedRequests")
-                .child("Teachers");
+                .getReference("AcceptedRequests").child("Teachers");
+        DatabaseReference teachersRef = FirebaseDatabase.getInstance()
+                .getReference("Teachers");
 
         acceptedRequestsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -85,18 +86,42 @@ public class TeacherLoginActivity extends AppCompatActivity {
                             storedEmail.equals(email) && storedPassword.equals(hashedPassword)) {
                         isValidUser = true;
                         break;
-
                     }
-
                 }
 
                 if (isValidUser) {
                     Toast.makeText(TeacherLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(TeacherLoginActivity.this, TeacherHomepage.class);
+                    intent.putExtra("teacherEmail", email);
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(TeacherLoginActivity.this, "Invalid Email or Password", Toast.LENGTH_SHORT).show();
+                    // Check if the user exists in the Teachers table
+                    teachersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot teacherSnapshot) {
+                            boolean existsInTeachers = false;
+
+                            for (DataSnapshot teacherUser : teacherSnapshot.getChildren()) {
+                                String teacherEmail = teacherUser.child("email").getValue(String.class);
+                                if (teacherEmail != null && teacherEmail.equals(email)) {
+                                    existsInTeachers = true;
+                                    break;
+                                }
+                            }
+
+                            if (existsInTeachers) {
+                                Toast.makeText(TeacherLoginActivity.this, "Please wait for admin approval", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(TeacherLoginActivity.this, "Invalid Email or Password", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(TeacherLoginActivity.this, "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
 
@@ -106,7 +131,6 @@ public class TeacherLoginActivity extends AppCompatActivity {
             }
         });
     }
-
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

@@ -29,7 +29,7 @@ import java.util.List;
 
 public class TeacherRegistrationActivity extends AppCompatActivity {
 
-    private EditText nameEditText, emailEditText, teacherIdEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
+    private EditText nameEditText, emailEditText,acronymEditText, teacherIdEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
     private TextView departmentTextView, designationTextView;
 
     private List<String> departmentList = Arrays.asList("CSE");
@@ -49,6 +49,7 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         designationTextView = findViewById(R.id.teacherdesignation);
         passwordEditText = findViewById(R.id.editTextPassword);
         confirmPasswordEditText = findViewById(R.id.editTextConPassword);
+        acronymEditText = findViewById(R.id.Acronymedittext);
 
         // Set initial text
         departmentTextView.setText("Select Department");
@@ -63,6 +64,7 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
 
     private void validateAndRegister() {
         String name = nameEditText.getText().toString().trim();
+        String acronym = acronymEditText.getText().toString().trim();
         String email = emailEditText.getText().toString().trim();
         String teacherId = teacherIdEditText.getText().toString().trim();
         String phone = phoneEditText.getText().toString().trim();
@@ -79,6 +81,11 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(email)) {
             showError(emailEditText, "Email is required");
             scrollToView(emailEditText);
+            return;
+        }
+        if (TextUtils.isEmpty(acronym)) {
+            showError(acronymEditText, "Acronym is required");
+            scrollToView(acronymEditText);
             return;
         }
         if (TextUtils.isEmpty(teacherId)) {
@@ -146,12 +153,12 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
                     Toast.makeText(TeacherRegistrationActivity.this, "Duplicate registration detected: Email or Teacher ID already exists", Toast.LENGTH_SHORT).show();
                 } else {
                     // Save data to Firebase
-                    DatabaseReference teacherRef = rootRef.child("Teachers").child(department).child(designation).child(teacherId);
-                    TeacherData teacherData = new TeacherData(name, email, teacherId, phone, department, designation, hashedPassword, false);
+                    DatabaseReference teacherRef = rootRef.child("Teachers").child(teacherId);
+                    TeacherData teacherData = new TeacherData(name, email,acronym, teacherId, phone, department, designation, hashedPassword, false);
 
                     teacherRef.setValue(teacherData).addOnSuccessListener(aVoid -> {
                         Toast.makeText(TeacherRegistrationActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(TeacherRegistrationActivity.this, TeacherHomepage.class));
+                        startActivity(new Intent(TeacherRegistrationActivity.this, TeacherLoginActivity.class));
                         finish();
                     }).addOnFailureListener(e -> {
                         Toast.makeText(TeacherRegistrationActivity.this, "Registration Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();

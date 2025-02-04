@@ -189,7 +189,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:text="Student"
+                        android:text="Teacher"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:textColor="#006A00" />
@@ -264,7 +264,7 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/unknownText1"
+                                android:id="@+id/tv_teacher_name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Dipta Paul "
@@ -273,16 +273,24 @@
                                 android:textSize="18sp" />
 
                             <TextView
-                                android:id="@+id/unknownText"
+                                android:id="@+id/tv_designation"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Lecturer"
                                 android:textColor="#006A00"
                                 android:textSize="16sp"
                                />
+                            <TextView
+                                android:id="@+id/tv_acronym"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DCP"
+                                android:textColor="#006A00"
+                                android:textSize="16sp"
+                                />
 
                             <TextView
-                                android:id="@+id/unknownText2"
+                                android:id="@+id/tv_email"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="diptapaul@gmail.com "
