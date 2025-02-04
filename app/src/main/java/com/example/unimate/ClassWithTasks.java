@@ -18,6 +18,10 @@ public class ClassWithTasks {
         this.instructor = instructor;
         this.room = room;
     }
+    public void setTasks(List<UniTask> tasks) {
+        this.tasks.clear();
+        this.tasks.addAll(tasks);
+    }
 
     // Getters
     public String getTimeSlot() { return timeSlot; }
@@ -25,6 +29,7 @@ public class ClassWithTasks {
     public String getInstructor() { return instructor; }
     public String getRoom() { return room; }
     public List<UniTask> getTasks() { return tasks; }
+
 
     public void addTask(UniTask task) { tasks.add(task); }
     public boolean hasTasks() { return !tasks.isEmpty(); }

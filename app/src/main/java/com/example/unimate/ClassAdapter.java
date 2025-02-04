@@ -65,21 +65,26 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> 
             holder.taskCountBadge.setVisibility(View.GONE);
         }
 
+        // Fix variable name from classItem to item
+//        if (item.hasTasks()) {
+//            holder.actionButton.setText("View Tasks");
+//            holder.actionButton.setCompoundDrawablesWithIntrinsicBounds(
+//                    ContextCompat.getDrawable(context, R.drawable.ic_schedule), null, null, null);
+//        } else {
+//            holder.actionButton.setText("Add Task");
+//            holder.actionButton.setCompoundDrawablesWithIntrinsicBounds(
+//                    ContextCompat.getDrawable(context, R.drawable.ic_add_task), null, null, null);
+//        }
+
         holder.itemView.setOnClickListener(v -> showOptionsDialog(item));
         holder.deleteIcon.setOnClickListener(v -> showDeleteConfirmation(item));
     }
 
     private void showOptionsDialog(ClassWithTasks classItem) {
-        new AlertDialog.Builder(context)
-                .setItems(new CharSequence[]{"Add Task", "Delete Class"}, (dialog, which) -> {
-                    if (which == 0) {
-                        clickListener.onClassClick(classItem);
-                    } else {
-                        clickListener.onDeleteClass(classItem);
-                    }
-                })
-                .show();
+        // Directly trigger the click event instead of showing the dialog
+        clickListener.onClassClick(classItem);
     }
+
 
     private void showDeleteConfirmation(ClassWithTasks classItem) {
         View dialogView = LayoutInflater.from(context)
@@ -140,15 +145,20 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> 
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+        // Add actionButton declaration
+        MaterialButton actionButton;
         TextView classTime, className, taskCountBadge;
         ImageView deleteIcon;
 
         public ViewHolder(View itemView) {
             super(itemView);
+//            // Add actionButton initialization
+//            actionButton = itemView.findViewById(R.id.actionButton);
             classTime = itemView.findViewById(R.id.classTime);
             className = itemView.findViewById(R.id.className);
             taskCountBadge = itemView.findViewById(R.id.taskCountBadge);
             deleteIcon = itemView.findViewById(R.id.deleteIcon);
         }
     }
+
 }
