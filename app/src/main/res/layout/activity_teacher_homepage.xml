@@ -666,7 +666,7 @@
 
         <!-- Include or inflate nav_menu_layout.xml here -->
         <include
-            layout="@layout/nav_menu_layout"
+            layout="@layout/teacher_nav_menu_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </LinearLayout>

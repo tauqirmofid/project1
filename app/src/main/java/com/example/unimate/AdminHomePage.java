@@ -9,7 +9,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.content.SharedPreferences;
+import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -134,8 +135,13 @@ public class AdminHomePage extends AppCompatActivity {
 
         if (navLogoutButton != null) {
             navLogoutButton.setOnClickListener(v -> {
-                drawerLayout.closeDrawer(GravityCompat.START);
-                Intent intent = new Intent(AdminHomePage.this, AdminLoginActivity.class);
+                SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear(); // Clear login state
+                editor.apply();
+
+                // Redirect to MainActivity
+                Intent intent = new Intent(AdminHomePage.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             });

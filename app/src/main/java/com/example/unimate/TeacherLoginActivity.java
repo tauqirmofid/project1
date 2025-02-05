@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -91,10 +92,19 @@ public class TeacherLoginActivity extends AppCompatActivity {
 
                 if (isValidUser) {
                     Toast.makeText(TeacherLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                    SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("isTeacherLoggedIn", true);
+                    editor.putString("teacherEmail", email); // Store email for fetching details
+                    editor.apply();
+
                     Intent intent = new Intent(TeacherLoginActivity.this, TeacherHomepage.class);
-                    intent.putExtra("teacherEmail", email);
+                    intent.putExtra("teacherEmail", email); // Pass email for fetching details
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                     startActivity(intent);
                     finish();
+
                 } else {
                     // Check if the user exists in the Teachers table
                     teachersRef.addListenerForSingleValueEvent(new ValueEventListener() {

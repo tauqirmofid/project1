@@ -41,7 +41,7 @@ import javax.mail.internet.MimeMessage;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText emailEditText, studentIdEditText, passwordEditText, confirmPasswordEditText;
+    private EditText emailEditText,nameEditText, studentIdEditText, passwordEditText, confirmPasswordEditText;
     private TextView departmentTextView, sectionTextView, batchTextView;
     private Button registerButton;
 
@@ -64,7 +64,8 @@ public class RegisterActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference("Students");
 
         // Initialize views
-        emailEditText = findViewById(R.id.emailEditText);
+        emailEditText = findViewById(R.id.emailEditText1);
+        nameEditText = findViewById(R.id.std_nameText);
         studentIdEditText = findViewById(R.id.studentIdEditText);
         passwordEditText = findViewById(R.id.editTextPassword);
         confirmPasswordEditText = findViewById(R.id.editTextConPassword);
@@ -137,6 +138,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void validateInputs() {
         String email = emailEditText.getText().toString().trim();
+        String name = nameEditText.getText().toString().trim();
         String studentId = studentIdEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString();
         String confirmPassword = confirmPasswordEditText.getText().toString();
@@ -146,6 +148,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(email)) {
             showError(emailEditText, "Email is required!");
+            return;
+        }
+        if (TextUtils.isEmpty(name)) {
+            showError(nameEditText, "Name is required!");
             return;
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -190,7 +196,7 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(authTask -> {
             if (authTask.isSuccessful()) {
                 // Add user data to Realtime Database
-                StudentModel newStudent = new StudentModel(email, studentId, selectedDepartment, selectedBatch, selectedSection, verificationCode, false);
+                StudentModel newStudent = new StudentModel(email, name, studentId, selectedDepartment, selectedBatch, selectedSection, verificationCode, false);
                 mDatabase.child(studentId).setValue(newStudent).addOnCompleteListener(dbTask -> {
                     if (dbTask.isSuccessful()) {
                         // Send verification email
@@ -199,6 +205,7 @@ public class RegisterActivity extends AppCompatActivity {
                         // Navigate to VerificationActivity
                         Intent intent = new Intent(RegisterActivity.this, VerificationActivity.class);
                         intent.putExtra("email", email);
+                        intent.putExtra("name", name);
                         intent.putExtra("studentId", studentId);
                         intent.putExtra("verificationCode", verificationCode);
                         intent.putExtra("password", password);

@@ -2,6 +2,7 @@ package com.example.unimate;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -97,16 +98,24 @@ public class StudentLoginActivity extends AppCompatActivity {
     }
 
     private void checkVerificationInDatabase(FirebaseUser user) {
-        String userId = user.getUid();
-        mDatabase.orderByChild("email").equalTo(user.getEmail())
+        String email = user.getEmail();
+        mDatabase.orderByChild("email").equalTo(email)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                                 Boolean isVerified = childSnapshot.child("isVerified").getValue(Boolean.class);
+                                String stdName = childSnapshot.child("name").getValue(String.class);
+                                String stdBatch = childSnapshot.child("batch").getValue(String.class);
+                                String stdSection = childSnapshot.child("section").getValue(String.class);
+
                                 if (Boolean.TRUE.equals(isVerified)) {
-                                    navigateToHomePage();
+                                    navigateToHomePage(
+                                            stdName != null ? stdName : "Student",
+                                            stdBatch != null ? stdBatch : "N/A",
+                                            stdSection != null ? stdSection : "N/A"
+                                    );
                                 } else {
                                     Toast.makeText(StudentLoginActivity.this, "Please verify your account first.", Toast.LENGTH_LONG).show();
                                 }
@@ -123,9 +132,25 @@ public class StudentLoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void navigateToHomePage() {
+    private void navigateToHomePage(String stdName, String stdBatch, String stdSection) {
+        SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean("isStudentLoggedIn", true);
+        editor.putString("studentEmail", mAuth.getCurrentUser().getEmail());
+        editor.putString("studentName", stdName);
+        editor.putString("studentBatch", stdBatch);
+        editor.putString("studentSection", stdSection);
+        editor.apply();
+
         Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+
         Intent intent = new Intent(StudentLoginActivity.this, StudentHomePage.class);
+        intent.putExtra("STUDENT_NAME", stdName);
+        intent.putExtra("STUDENT_BATCH", stdBatch);
+        intent.putExtra("STUDENT_SECTION", stdSection);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
         startActivity(intent);
         finish();
     }

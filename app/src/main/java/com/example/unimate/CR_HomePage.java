@@ -2,20 +2,27 @@ package com.example.unimate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import android.content.SharedPreferences;
+import android.content.Intent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class CR_HomePage extends AppCompatActivity {
-
+    private ImageView leftNavBarImage;
+    private DrawerLayout drawerLayout;
     private RecyclerView carouselRecyclerView;
     private DayAdapter dayAdapter;
     private List<DayModel> dayList;
@@ -47,6 +54,20 @@ public class CR_HomePage extends AppCompatActivity {
         TextView crNameTextView = findViewById(R.id.CR_nameText);
         TextView crBatchTextView = findViewById(R.id.tv_cr_batch);
         TextView crSectionTextView = findViewById(R.id.tv_cr_section);
+
+        leftNavBarImage = findViewById(R.id.leftNavBarImage);
+        drawerLayout = findViewById(R.id.drawerLayout);
+
+        if (leftNavBarImage != null) {
+            leftNavBarImage.setOnClickListener(view -> {
+                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                } else {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+            });
+        }
+        setUpNavigationButtons();
 
         // Get CR details from Intent
         Intent intent = getIntent();
@@ -99,6 +120,27 @@ public class CR_HomePage extends AppCompatActivity {
 
         // Fetch the routine for the CR's batch & section
         fetchAllDays(crBatch, crSection);
+    }
+    private void setUpNavigationButtons() {
+        Button navHomeButton = findViewById(R.id.navHomeButton);
+        Button navLogoutButton = findViewById(R.id.navLogoutButton);
+
+        if (navHomeButton != null) {
+            navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
+        }
+
+        if (navLogoutButton != null) {
+            navLogoutButton.setOnClickListener(v -> {
+                SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear(); // Clear login state
+                editor.apply();
+                drawerLayout.closeDrawer(GravityCompat.START);
+                Intent intent = new Intent(CR_HomePage.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            });
+        }
     }
 
 
