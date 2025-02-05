@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.SharedPreferences;
-import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -54,7 +54,7 @@ public class AdminHomePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Navigate to Upload Activity
-                Intent intent = new Intent(AdminHomePage.this, Upload.class);
+                Intent intent = new Intent(AdminHomePage.this, RoomCSVUpload.class);
                 startActivity(intent);
             }
         });
@@ -119,16 +119,16 @@ public class AdminHomePage extends AppCompatActivity {
 
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);
-        Button navProfileButton = findViewById(R.id.navProfileButton);
+        Button navCalenderButton = findViewById(R.id.calender);
         Button navLogoutButton = findViewById(R.id.navLogoutButton);
 
         if (navHomeButton != null) {
             navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
         }
-        if (navProfileButton != null) {
-            navProfileButton.setOnClickListener(v -> {
+        if (navCalenderButton != null) {
+            navCalenderButton.setOnClickListener(v -> {
                 drawerLayout.closeDrawer(GravityCompat.START);
-                Intent intent = new Intent(AdminHomePage.this, Upload.class);
+                Intent intent = new Intent(AdminHomePage.this, CalendarActivity.class);
                 startActivity(intent);
             });
         }

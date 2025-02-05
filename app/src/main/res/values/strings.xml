@@ -58,6 +58,17 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string-array name="building_options">
+        <item>RAB</item>
+        <item>RKB</item>
+    </string-array>
+
+    <string-array name="floor_options">
+        <item>1st</item>
+        <item>2nd</item>
+        <item>3rd</item>
+        <item>4th</item>
+    </string-array>
 
     <string-array name="time_slots">
         <item>09:00-10:20AM</item>

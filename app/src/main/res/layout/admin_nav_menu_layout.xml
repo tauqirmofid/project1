@@ -71,10 +71,10 @@
         app:cardUseCompatPadding="true">
 
         <Button
-            android:id="@+id/navProfileButton"
+            android:id="@+id/calender"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Upload CSV"
+            android:text="Calender"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold"

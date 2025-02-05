@@ -34,6 +34,7 @@ public class StudentHomePage extends AppCompatActivity {
     private RecyclerView carouselRecyclerView;
     private List<DayModel> dayList;
     private DayAdapter dayAdapter;
+    private CardView rooms;
 
     private TextView studentNameText, studentBatchText, studentSectionText;
     private DrawerLayout drawerLayout;
@@ -47,7 +48,6 @@ public class StudentHomePage extends AppCompatActivity {
             "9:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
             "1:00-1:30PM", "1:30-2:50PM", "2:50-4:10PM", "7:00-8:20PM"
     };
-    private CardView rooms;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +62,12 @@ public class StudentHomePage extends AppCompatActivity {
         studentSectionText = findViewById(R.id.tv_std_section);
         leftNavBarImage = findViewById(R.id.leftNavBarImage);
         drawerLayout = findViewById(R.id.drawerLayout);
+        rooms = findViewById(R.id.st_roomsCardView);
+        rooms.setOnClickListener(v -> {
+                    Intent intent = new Intent(StudentHomePage.this, RoomsActivity.class);
+                    startActivity(intent);
+                });
+
 
         Intent intent = getIntent();
         String stdName = intent.getStringExtra("STUDENT_NAME");
@@ -117,6 +123,7 @@ public class StudentHomePage extends AppCompatActivity {
         fetchAllDays(stdBatch, stdSection);
 
     }
+
     private String convertBatchToFirestoreFormat(String batch) {
         if (batch == null) return "batch_unknown";
         batch = batch.trim();
@@ -148,6 +155,7 @@ public class StudentHomePage extends AppCompatActivity {
 
         return section;
     }
+
 
     private void fetchAllDays(String batch, String section) {
         if (batch == null || section == null) {
