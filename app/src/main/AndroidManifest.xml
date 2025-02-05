@@ -22,7 +22,7 @@
             android:name=".UploadCsvActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".CalendarActivity"
             android:exported="false" />
         <activity
             android:name=".CR_HomePage"
@@ -76,7 +76,7 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".CalendarActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Unimate">
             <intent-filter>

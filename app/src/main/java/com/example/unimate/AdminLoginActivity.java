@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.Toast;
+import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -75,11 +76,20 @@ public class AdminLoginActivity extends AppCompatActivity {
                     String storedPassword = snapshot.child("password").getValue(String.class);
 
                     if (inputEmail.equals(storedEmail) && inputPassword.equals(storedPassword)) {
+                        SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean("isAdminLoggedIn", true);
+                        editor.putString("adminEmail", storedEmail); // Store email for fetching details
+                        editor.apply();
+
                         // Login successful
                         Toast.makeText(AdminLoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
 
                         // Navigate to Home Activity
                         Intent intent = new Intent(AdminLoginActivity.this, AdminHomePage.class);
+                        intent.putExtra("adminEmail", storedEmail); // Pass email for fetching details
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                         startActivity(intent);
                         finish();
                     } else {

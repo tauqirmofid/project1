@@ -9,7 +9,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.content.SharedPreferences;
+import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -32,7 +33,7 @@ public class AdminHomePage extends AppCompatActivity {
     private RecyclerView requestsRecyclerView;
     private RequestAdapter requestAdapter;
     private List<RequestModel> requestList;
-    private CardView roomCardView, routineCardView;
+    private CardView roomCardView, routineCardView,teacherinfoCardView,universityCardView;
 
     // Drawer references
     private DrawerLayout drawerLayout;
@@ -67,6 +68,8 @@ public class AdminHomePage extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        teacherinfoCardView = findViewById(R.id.admin_teachersInfoCard);
 
         // Drawer setup
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -132,8 +135,13 @@ public class AdminHomePage extends AppCompatActivity {
 
         if (navLogoutButton != null) {
             navLogoutButton.setOnClickListener(v -> {
-                drawerLayout.closeDrawer(GravityCompat.START);
-                Intent intent = new Intent(AdminHomePage.this, AdminLoginActivity.class);
+                SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear(); // Clear login state
+                editor.apply();
+
+                // Redirect to MainActivity
+                Intent intent = new Intent(AdminHomePage.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             });
@@ -147,17 +155,31 @@ public class AdminHomePage extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 requestList.clear();
-                for (DataSnapshot batchSnapshot : snapshot.getChildren()) {
-                    for (DataSnapshot sectionSnapshot : batchSnapshot.getChildren()) {
-                        for (DataSnapshot userSnapshot : sectionSnapshot.getChildren()) {
-                            RequestModel request = userSnapshot.getValue(RequestModel.class);
-                            if (request != null && !request.isVerified()) {
-                                request.setId(userSnapshot.getKey()); // Set Firebase key as ID
-                                requestList.add(request);
+
+                if (currentRole.equals("CR")) {
+                    // CRs have nested data (Batch -> Section -> CRs)
+                    for (DataSnapshot batchSnapshot : snapshot.getChildren()) {
+                        for (DataSnapshot sectionSnapshot : batchSnapshot.getChildren()) {
+                            for (DataSnapshot userSnapshot : sectionSnapshot.getChildren()) {
+                                RequestModel request = userSnapshot.getValue(RequestModel.class);
+                                if (request != null && !request.isVerified()) {
+                                    request.setId(userSnapshot.getKey()); // Set Firebase key as ID
+                                    requestList.add(request);
+                                }
                             }
                         }
                     }
+                } else {
+                    // Teachers are stored directly under "Teachers/{teacherId}"
+                    for (DataSnapshot teacherSnapshot : snapshot.getChildren()) {
+                        RequestModel request = teacherSnapshot.getValue(RequestModel.class);
+                        if (request != null && !request.isVerified()) {
+                            request.setId(teacherSnapshot.getKey()); // Set Firebase key as ID
+                            requestList.add(request);
+                        }
+                    }
                 }
+
                 requestAdapter.notifyDataSetChanged();
             }
 
@@ -213,30 +235,34 @@ public class AdminHomePage extends AppCompatActivity {
     private void moveRequestToAnotherDatabase(RequestModel request, boolean isAccepted) {
         DatabaseReference currentRef = FirebaseDatabase.getInstance()
                 .getReference(currentRole.equals("CR") ? "CR" : "Teachers")
-                .child(currentRole.equals("CR") ? request.getBatch() : request.getDepartment())
-                .child(currentRole.equals("CR") ? request.getSection() : request.getDesignation())
-                .child(request.getId());
+                .child(currentRole.equals("CR") ? request.getBatch() : request.getId()); // Adjust to Teacher's structure
 
         DatabaseReference targetRef = FirebaseDatabase.getInstance()
                 .getReference(isAccepted ? "AcceptedRequests" : "RejectedRequests")
                 .child(currentRole.equals("CR") ? "CR" : "Teachers")
-                .child(request.getId());
+                .child(request.getId()); // Save Teacher/CR under their unique ID
 
         currentRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                targetRef.setValue(snapshot.getValue()).addOnSuccessListener(aVoid -> {
-                    currentRef.removeValue().addOnSuccessListener(aVoid1 -> {
-                        Toast.makeText(AdminHomePage.this, isAccepted ? "Request approved and moved!" : "Request rejected and moved!", Toast.LENGTH_SHORT).show();
-                        requestList.remove(request);
-                        requestAdapter.notifyDataSetChanged();
+                if (snapshot.exists()) {
+                    // Copy data to the target location
+                    targetRef.setValue(snapshot.getValue()).addOnSuccessListener(aVoid -> {
+                        // Remove the original data after successfully copying
+                        currentRef.removeValue().addOnSuccessListener(aVoid1 -> {
+                            Toast.makeText(AdminHomePage.this, isAccepted ? "Request approved and moved!" : "Request rejected and moved!", Toast.LENGTH_SHORT).show();
+                            requestList.remove(request); // Remove from local list
+                            requestAdapter.notifyDataSetChanged(); // Update the adapter
+                        });
                     });
-                });
+                } else {
+                    Toast.makeText(AdminHomePage.this, "No data found at the current location.", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(AdminHomePage.this, "Failed to move request", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminHomePage.this, "Failed to move request: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -148,7 +148,7 @@ public class VerificationActivity extends AppCompatActivity {
     }
 
     private void navigateToHome() {
-        Intent intent = new Intent(VerificationActivity.this, StudentHomePage.class);
+        Intent intent = new Intent(VerificationActivity.this, StudentLoginActivity.class);
         startActivity(intent);
         finish();
     }

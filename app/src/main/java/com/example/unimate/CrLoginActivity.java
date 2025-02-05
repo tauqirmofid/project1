@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.SharedPreferences;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -99,11 +100,22 @@ public class CrLoginActivity extends AppCompatActivity {
                 }
 
                 if (isValidUser) {
+                    SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("isCRLoggedIn", true);
+                    editor.putString("crEmail", email);
+                    editor.putString("crName", crName);  // Store CR name
+                    editor.putString("crBatch", crBatch); // Store CR batch
+                    editor.putString("crSection", crSection); // Store CR section
+                    editor.apply();
+
                     Toast.makeText(CrLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(CrLoginActivity.this, CR_HomePage.class);
                     intent.putExtra("CR_NAME", crName);
                     intent.putExtra("CR_BATCH", crBatch);
                     intent.putExtra("CR_SECTION", crSection);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                     startActivity(intent);
                     finish();
                 } else {
