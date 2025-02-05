@@ -25,6 +25,7 @@ firebaseAuth = "23.1.0"
 firebaseDatabase = "21.0.0"
 sunAndroidMail = "1.6.7"
 firebaseFirestore = "25.1.1"
+volley = "1.2.1"
 
 [libraries]
 android-activation = { module = "com.sun.mail:android-activation", version.ref = "sunAndroidMail" }
@@ -52,6 +53,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 sun-android-mail = { module = "com.sun.mail:android-mail", version.ref = "sunAndroidMail" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

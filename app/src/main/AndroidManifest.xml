@@ -34,7 +34,7 @@
             android:name=".StudentHomePage"
             android:exported="false" />
         <activity
-            android:name=".Upload"
+            android:name=".RoomCSVUpload"
             android:exported="false" />
         <activity
             android:name=".StudentProfile"
