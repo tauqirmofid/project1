@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> {
+public class ClassAdapterOther extends RecyclerView.Adapter<ClassAdapterOther.ViewHolder> {
 
     private final List<ClassWithTasks> classes;
     private final OnClassClickListener clickListener;
@@ -37,7 +37,7 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> 
         void onDeleteClass(ClassWithTasks classItem);
     }
 
-    public ClassAdapter(List<ClassWithTasks> classes, OnClassClickListener listener, Context context) {
+    public ClassAdapterOther(List<ClassWithTasks> classes, OnClassClickListener listener, Context context) {
         this.classes = classes != null ? classes : new ArrayList<>();
         this.clickListener = listener;
         this.context = context;
@@ -67,7 +67,7 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> 
 
 
 
-
+        holder.deleteIcon.setVisibility(View.GONE);
 
         holder.itemView.setOnClickListener(v -> showOptionsDialog(item));
         holder.deleteIcon.setOnClickListener(v -> showDeleteConfirmation(item));

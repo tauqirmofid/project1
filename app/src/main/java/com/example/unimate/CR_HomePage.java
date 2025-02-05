@@ -6,6 +6,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -120,6 +122,16 @@ public class CR_HomePage extends AppCompatActivity {
 
         // Fetch the routine for the CR's batch & section
         fetchAllDays(crBatch, crSection);
+
+
+
+        LinearLayout otherRoutineLayout = findViewById(R.id.otherRoutine);
+        if (otherRoutineLayout != null) {
+            otherRoutineLayout.setOnClickListener(v -> {
+                Intent i = new Intent(CR_HomePage.this, OtherCalendar.class);
+                startActivity(i);
+            });
+        }
     }
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);

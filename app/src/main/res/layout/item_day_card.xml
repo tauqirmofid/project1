@@ -9,6 +9,8 @@
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
     android:layout_gravity="center"
+    android:layout_marginBottom="16dp"
+    android:layout_marginTop="16dp"
     card_view:cardUseCompatPadding="true"
     card_view:cardCornerRadius="12dp"
     card_view:cardElevation="8dp">
@@ -16,9 +18,12 @@
     <!-- A vertical container to stack your header (day name)
          and all the row layouts one below the other. -->
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,6 +41,8 @@
             android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="bold" />
+
+
 
         <!-- Row 1 -->
         <LinearLayout
@@ -253,7 +260,9 @@
                 android:textAlignment="center"
                 android:textStyle="bold" />
         </LinearLayout>
+
+
     </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.cardview.widget.CardView>

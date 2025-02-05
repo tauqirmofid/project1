@@ -18,12 +18,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class OthersRoutine extends AppCompatActivity {
 
@@ -38,6 +44,8 @@ public class OthersRoutine extends AppCompatActivity {
     private final String[] daysOfWeek = {
             "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"
     };
+
+    private Map<String, Set<String>> batchToSectionsMap = new HashMap<>();
 
     // Firestore
     private FirebaseFirestore db;
@@ -94,24 +102,7 @@ public class OthersRoutine extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // 1) Setup spinners
-        spinnerBatch = findViewById(R.id.spinnerBatch);
-        spinnerSection = findViewById(R.id.spinnerSection);
 
-        // For default: batch=59 (index=3), section=B (index=1)
-        String[] batchArray = {"56","57","58","59","60","61","62","63","64","65"};
-        ArrayAdapter<String> batchAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, batchArray
-        );
-        batchAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerBatch.setAdapter(batchAdapter);
-
-        String[] sectionArray = {"A","B","C","D","E","F","G","H","I"};
-        ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, sectionArray
-        );
-        sectionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerSection.setAdapter(sectionAdapter);
 
         // 2) The three new TextViews for current/next/previous class
         tvCurrentClass = findViewById(R.id.tvCurrentClass);
@@ -153,31 +144,158 @@ public class OthersRoutine extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         };
-        spinnerBatch.setOnItemSelectedListener(spinnerListener);
-        spinnerSection.setOnItemSelectedListener(spinnerListener);
 
-        // Set default: batch=59, section=B
-        spinnerBatch.setSelection(3, false);
-        spinnerSection.setSelection(1, false);
+        spinnerBatch = findViewById(R.id.spinnerBatch);
+        spinnerSection = findViewById(R.id.spinnerSection);
+        setupSpinners();
+        fetchBatchesAndSections();
+
+
 
         // Fetch initially
         fetchAllDays();
     }
 
+
+    private void setupSpinners() {
+        spinnerBatch.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, new ArrayList<>()));
+        spinnerSection.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, new ArrayList<>()));
+    }
+
+    private void fetchBatchesAndSections() {
+        List<String> days = Arrays.asList("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday");
+        int totalDays = days.size();
+        AtomicInteger completedDays = new AtomicInteger(0);
+
+        Set<String> allBatches = new HashSet<>();
+        batchToSectionsMap.clear();
+
+        for (String day : days) {
+            db.collection("schedules").document(day)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            Map<String, Object> dayData = documentSnapshot.getData();
+                            if (dayData != null) {
+                                for (String key : dayData.keySet()) {
+                                    if (key.startsWith("batch_")) {
+                                        String batchName = key.substring(6);
+                                        allBatches.add(batchName);
+
+                                        // Extract sections
+                                        Map<String, Object> batchData = (Map<String, Object>) dayData.get(key);
+                                        Set<String> sections = batchToSectionsMap.computeIfAbsent(batchName, k -> new HashSet<>());
+                                        sections.addAll(batchData.keySet());
+                                    }
+                                }
+                            }
+                        }
+
+                        if (completedDays.incrementAndGet() == totalDays) {
+                            updateSpinners(new ArrayList<>(allBatches));
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        if (completedDays.incrementAndGet() == totalDays) {
+                            updateSpinners(new ArrayList<>(allBatches));
+                        }
+                    });
+        }
+    }
+
+    private void updateSpinners(List<String> batches) {
+        Collections.sort(batches);
+        ArrayAdapter<String> batchAdapter = new ArrayAdapter<>(
+                this, R.layout.spinner_item, batches
+        );
+        batchAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinnerBatch.setAdapter(batchAdapter);
+
+        // Set default selection only if batches exist
+        if (!batches.isEmpty()) {
+            spinnerBatch.setSelection(0);
+            updateSectionSpinner(batches.get(0));
+        }
+
+        spinnerBatch.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (parent.getSelectedItem() != null) {
+                    String selectedBatch = parent.getSelectedItem().toString();
+                    updateSectionSpinner(selectedBatch);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private void updateSectionSpinner(String batch) {
+        Set<String> sections = batchToSectionsMap.getOrDefault(batch, new HashSet<>());
+        List<String> sectionList = new ArrayList<>(sections);
+        Collections.sort(sectionList);
+
+        ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(
+                this, R.layout.spinner_item, sectionList
+        );
+        sectionAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinnerSection.setAdapter(sectionAdapter);
+
+        // Set default selection only if sections exist
+        if (!sectionList.isEmpty()) {
+            spinnerSection.setSelection(0);
+        }
+
+        spinnerSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (parent.getSelectedItem() != null) {
+                    fetchAllDays();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // tauqir // tauqir // tauqir // tauqir
+    //tauqir
+    //tauqir
+
     /**
      * Fetch the schedule for all 7 days, for the currently selected batch & section.
      */
     private void fetchAllDays() {
-        final String selectedBatch = spinnerBatch.getSelectedItem().toString(); // e.g. "59"
-        final String selectedSection = spinnerSection.getSelectedItem().toString(); // e.g. "B"
-
-        // Re-create dayList each time
-        dayList = new ArrayList<>();
-        for (String dayName : daysOfWeek) {
-            dayList.add(new DayModel(dayName)); // default "No Class"
+        // Add null checks for spinner selections
+        if (spinnerBatch.getSelectedItem() == null || spinnerSection.getSelectedItem() == null) {
+            return;
         }
 
-        // We'll fetch day 0..6
+        final String selectedBatch = spinnerBatch.getSelectedItem().toString();
+        final String selectedSection = spinnerSection.getSelectedItem().toString();
+
+        // Rest of the method remains the same
+        dayList = new ArrayList<>();
+        for (String dayName : daysOfWeek) {
+            dayList.add(new DayModel(dayName));
+        }
         fetchDay(0, selectedBatch, selectedSection);
     }
 
