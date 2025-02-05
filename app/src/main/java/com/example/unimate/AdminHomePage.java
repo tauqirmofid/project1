@@ -119,16 +119,16 @@ public class AdminHomePage extends AppCompatActivity {
 
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);
-        Button navProfileButton = findViewById(R.id.navProfileButton);
+        Button navCalenderButton = findViewById(R.id.calender);
         Button navLogoutButton = findViewById(R.id.navLogoutButton);
 
         if (navHomeButton != null) {
             navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
         }
-        if (navProfileButton != null) {
-            navProfileButton.setOnClickListener(v -> {
+        if (navCalenderButton != null) {
+            navCalenderButton.setOnClickListener(v -> {
                 drawerLayout.closeDrawer(GravityCompat.START);
-                Intent intent = new Intent(AdminHomePage.this, RoomCSVUpload.class);
+                Intent intent = new Intent(AdminHomePage.this, CalendarActivity.class);
                 startActivity(intent);
             });
         }
