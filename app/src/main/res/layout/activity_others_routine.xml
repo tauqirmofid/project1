@@ -163,7 +163,6 @@
             android:layout_height="wrap_content"
             android:text="See calender and tasks"
             android:textColor="@color/primaryDark"
-            android:visibility="gone"
 
             android:backgroundTint="@color/Theme_Lightgreen"
             app:layout_constraintTop_toBottomOf="@id/selectionRow"

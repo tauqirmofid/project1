@@ -96,10 +96,10 @@ public class OthersRoutine extends AppCompatActivity {
 
 
         button = findViewById(R.id.btn1);
-//        button.setOnClickListener(v -> {
-//            Intent intent = new Intent(OthersRoutine.this, CalendarActivity.class);
-//            startActivity(intent);
-//        });
+        button.setOnClickListener(v -> {
+            Intent intent = new Intent(OthersRoutine.this, OtherCalendar.class);
+            startActivity(intent);
+        });
 
         db = FirebaseFirestore.getInstance();
 
