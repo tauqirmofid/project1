@@ -1,53 +1,70 @@
 package com.example.unimate;
 
+import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
+import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.view.GravityCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Guest_HomePage extends AppCompatActivity {
+    private DrawerLayout drawerLayout;
+    private ImageView leftNavBarImage;
 
-    private RecyclerView carouselRecyclerView;
-    private DayAdapter dayAdapter;
-    private List<DayModel> dayList;
+    private CardView routinecard;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guest_home_page);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        leftNavBarImage = findViewById(R.id.leftNavBarImage);
 
-        // Find the RecyclerView
-        carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
+        if (leftNavBarImage != null) {
+            leftNavBarImage.setOnClickListener(view -> {
+                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                } else {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+            });
+        }
+        setUpNavigationButtons();
 
-
-
-        // Create and set the adapter
-        dayAdapter = new DayAdapter(dayList);
-        carouselRecyclerView.setAdapter(dayAdapter);
-
-        // Create and set a custom LayoutManager
-        CarouselLayoutManager layoutManager =
-                new CarouselLayoutManager(this, RecyclerView.HORIZONTAL, false);
-        carouselRecyclerView.setLayoutManager(layoutManager);
-
-        // Attach a SnapHelper for centering
-        CarouselSnapHelper snapHelper = new CarouselSnapHelper();
-        snapHelper.attachToRecyclerView(carouselRecyclerView);
-
-        // Jump to the middle of the huge list so user can scroll left or right
-        int halfMaxValue = Integer.MAX_VALUE / 2;
-        int midPos = halfMaxValue - (halfMaxValue % dayList.size());
-        carouselRecyclerView.scrollToPosition(midPos);
-
-        carouselRecyclerView.post(() -> {
-            carouselRecyclerView.smoothScrollToPosition(midPos);
+        routinecard = findViewById(R.id.guest_routineCardView);
+        routinecard.setOnClickListener(v -> {
+            Intent intent = new Intent(Guest_HomePage.this, OthersRoutine.class);
+            startActivity(intent);
         });
+    }
 
-        // OverlapDecoration for overlapping cards; adjust the overlap as needed
-        OverlapDecoration decoration = new OverlapDecoration(300);
-        //try with 150 on right
-        carouselRecyclerView.addItemDecoration(decoration);
+    private void setUpNavigationButtons() {
+        Button navHomeButton = findViewById(R.id.navHomeButton);
+        Button navLoginButton = findViewById(R.id.navChooseRoleButton);
+        if (navHomeButton != null) {
+            navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
+        }
+        if (navLoginButton != null) {
+            navLoginButton.setOnClickListener(v ->{
+                    Intent intent = new Intent(Guest_HomePage.this, MainActivity.class);
+                    startActivity(intent);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
+
     }
 }

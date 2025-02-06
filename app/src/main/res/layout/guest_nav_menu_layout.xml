@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navMenuRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#97C93C"
+    android:padding="16dp">
+
+    <!-- Home Card -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/unimate_logo_green"
+        android:layout_above="@+id/bottomLayout"
+
+
+        android:layout_marginBottom="00dp"
+        android:layout_marginTop="0dp"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        />
+
+    <ImageView
+        android:id="@+id/Divider4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:src="@drawable/division"
+        android:contentDescription="@null"
+        />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/navHomeCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#006A00"
+        app:cardUseCompatPadding="true">
+
+        <Button
+            android:id="@+id/navHomeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#006A00"
+            android:padding="12dp" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Profile Card -->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/navLoginCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#006A00"
+
+        app:cardUseCompatPadding="true">
+
+        <Button
+            android:id="@+id/navChooseRoleButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#006A00"
+            android:padding="12dp" />
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/NavRooms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#006A00"
+
+        app:cardUseCompatPadding="true">
+
+        <Button
+            android:id="@+id/navRoom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rooms"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#006A00"
+            android:padding="12dp" />
+
+
+    </androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/navRoutineCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#006A00"
+
+        app:cardUseCompatPadding="true">
+
+        <Button
+            android:id="@+id/navRoutine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Routines"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#006A00"
+            android:padding="12dp" />
+
+
+    </androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/TeachersCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#006A00"
+
+        app:cardUseCompatPadding="true">
+
+        <Button
+            android:id="@+id/TeachersInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Teachers Info"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#006A00"
+            android:padding="12dp" />
+
+
+    </androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/unimapCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#006A00"
+
+        app:cardUseCompatPadding="true">
+
+        <Button
+            android:id="@+id/unimap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="University Map"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#006A00"
+            android:padding="12dp" />
+
+
+    </androidx.cardview.widget.CardView>
+
+
+
+
+
+
+
+
+
+
+
+    <ImageView
+        android:id="@+id/Divider3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:src="@drawable/division"
+        android:contentDescription="@null"
+        />
+
+    <TextView
+        android:id="@+id/hiText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hi,"
+        android:textSize="14sp"
+        android:textColor="#006A00" />
+
+
+
+</LinearLayout>
