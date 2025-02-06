@@ -86,7 +86,6 @@ public class OthersRoutine extends AppCompatActivity {
     };
 
 
-    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +93,6 @@ public class OthersRoutine extends AppCompatActivity {
         //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_others_routine);
 
-
-        button = findViewById(R.id.btn1);
-        button.setOnClickListener(v -> {
-            Intent intent = new Intent(OthersRoutine.this, OtherCalendar.class);
-            startActivity(intent);
-        });
 
         db = FirebaseFirestore.getInstance();
 
