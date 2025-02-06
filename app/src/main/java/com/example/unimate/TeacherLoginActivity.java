@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,6 +39,7 @@ public class TeacherLoginActivity extends AppCompatActivity {
         // Registration button
         teacher_reg = findViewById(R.id.TeaRegButton);
         teacher_reg.setOnClickListener(v -> {
+
             Intent intent = new Intent(TeacherLoginActivity.this, TeacherRegistrationActivity.class);
             startActivity(intent);
         });
@@ -64,6 +66,9 @@ public class TeacherLoginActivity extends AppCompatActivity {
                 return;
             }
 
+            // Show the LoadingActivity
+            startActivity(new Intent(TeacherLoginActivity.this, LoadingActivity.class));
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             validateLogin(email, hashPassword(password));
         });
     }
@@ -77,6 +82,7 @@ public class TeacherLoginActivity extends AppCompatActivity {
         acceptedRequestsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                sendCloseLoadingBroadcast();
                 boolean isValidUser = false;
 
                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
@@ -91,6 +97,7 @@ public class TeacherLoginActivity extends AppCompatActivity {
                 }
 
                 if (isValidUser) {
+                    sendCloseLoadingBroadcast();
                     Toast.makeText(TeacherLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                     SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -110,6 +117,7 @@ public class TeacherLoginActivity extends AppCompatActivity {
                     teachersRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot teacherSnapshot) {
+                            sendCloseLoadingBroadcast();
                             boolean existsInTeachers = false;
 
                             for (DataSnapshot teacherUser : teacherSnapshot.getChildren()) {
@@ -121,14 +129,17 @@ public class TeacherLoginActivity extends AppCompatActivity {
                             }
 
                             if (existsInTeachers) {
+                                sendCloseLoadingBroadcast();
                                 Toast.makeText(TeacherLoginActivity.this, "Please wait for admin approval", Toast.LENGTH_SHORT).show();
                             } else {
+                                sendCloseLoadingBroadcast();
                                 Toast.makeText(TeacherLoginActivity.this, "Invalid Email or Password", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
+                            sendCloseLoadingBroadcast();
                             Toast.makeText(TeacherLoginActivity.this, "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -137,6 +148,7 @@ public class TeacherLoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                sendCloseLoadingBroadcast();
                 Toast.makeText(TeacherLoginActivity.this, "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -154,5 +166,10 @@ public class TeacherLoginActivity extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private void sendCloseLoadingBroadcast() {
+        LocalBroadcastManager.getInstance(TeacherLoginActivity.this)
+                .sendBroadcast(new Intent("CLOSE_LOADING"));
     }
 }

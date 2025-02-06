@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -57,7 +58,17 @@ public class StudentLoginActivity extends AppCompatActivity {
 
         // Login button
         lgnButton = findViewById(R.id.lgnButton);
-        lgnButton.setOnClickListener(v -> attemptLogin());
+        lgnButton.setOnClickListener(v -> {
+            // Show the LoadingActivity
+            startActivity(new Intent(StudentLoginActivity.this, LoadingActivity.class));
+
+            // Immediately override the transition
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+            // Attempt login
+            attemptLogin();
+        });
+
 
         // Register button
         std_reg = findViewById(R.id.RegButton);
@@ -87,13 +98,19 @@ public class StudentLoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            checkVerificationInDatabase(user);
+                             checkVerificationInDatabase(user);
+                            sendCloseLoadingBroadcast();
                         }
                     } else {
+                        // Close loading screen before showing the toast
+                        sendCloseLoadingBroadcast();
+
+                        // Show login failed message
                         Toast.makeText(StudentLoginActivity.this,
                                 "Login failed: " + (task.getException() != null ? task.getException().getMessage() : ""),
                                 Toast.LENGTH_SHORT).show();
                     }
+
                 });
     }
 
@@ -103,6 +120,9 @@ public class StudentLoginActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        sendCloseLoadingBroadcast();
+
                         if (snapshot.exists()) {
                             for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                                 Boolean isVerified = childSnapshot.child("isVerified").getValue(Boolean.class);
@@ -127,6 +147,7 @@ public class StudentLoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        sendCloseLoadingBroadcast();
                         Toast.makeText(StudentLoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -174,5 +195,10 @@ public class StudentLoginActivity extends AppCompatActivity {
             }
         }
         return super.dispatchTouchEvent(ev);
+    }
+
+    private void sendCloseLoadingBroadcast() {
+        LocalBroadcastManager.getInstance(StudentLoginActivity.this)
+                .sendBroadcast(new Intent("CLOSE_LOADING"));
     }
 }

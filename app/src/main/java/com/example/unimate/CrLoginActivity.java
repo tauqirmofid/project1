@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.content.SharedPreferences;
 
 import com.google.firebase.database.DataSnapshot;
@@ -63,6 +65,13 @@ public class CrLoginActivity extends AppCompatActivity {
                 return;
             }
 
+
+            // 1. Show the LoadingActivity
+            startActivity(new Intent(CrLoginActivity.this, LoadingActivity.class));
+// Immediately override the transition
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+
             validateLogin(email, hashPassword(password));
         });
     }
@@ -75,6 +84,10 @@ public class CrLoginActivity extends AppCompatActivity {
         acceptedRequestsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                sendCloseLoadingBroadcast();
+
+
                 boolean isValidUser = false;
                 String crName = "Unknown CR";  // Default value to prevent null
                 String crBatch = "N/A";
@@ -125,6 +138,7 @@ public class CrLoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                sendCloseLoadingBroadcast();
                 Toast.makeText(CrLoginActivity.this, "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -143,5 +157,10 @@ public class CrLoginActivity extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private void sendCloseLoadingBroadcast() {
+        LocalBroadcastManager.getInstance(CrLoginActivity.this)
+                .sendBroadcast(new Intent("CLOSE_LOADING"));
     }
 }

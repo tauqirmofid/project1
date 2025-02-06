@@ -19,5 +19,24 @@
         <item name="cornerSizeBottomLeft">0dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
     </style>
+    <style name="Theme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Makes the window background transparent -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- Allows the background behind it to be seen -->
+        <item name="android:windowIsTranslucent">true</item>
+        <!-- Prevents the user from accidentally closing by tapping outside (optional) -->
+        <item name="android:windowCloseOnTouchOutside">false</item>
+        <!-- Optional: remove the standard sliding animation -->
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+        <!-- Make the status bar color transparent -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- Make the navigation bar color transparent -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- You can also dim the background behind it if you like -->
+        <!-- <item name="android:backgroundDimEnabled">true</item> -->
+    </style>
+
 
 </resources>
