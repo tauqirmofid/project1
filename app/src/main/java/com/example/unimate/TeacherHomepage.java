@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,6 +32,7 @@ public class TeacherHomepage extends AppCompatActivity {
     private TextView tvTeacherName, tvDesignation, tvAcronym, tvEmail;
     private RecyclerView carouselRecyclerView;
     private DayAdapter dayAdapter;
+    private CardView task;
     private List<DayModel> dayList;
     private ImageView leftNavBarImage;
     private DrawerLayout drawerLayout;
@@ -56,6 +58,12 @@ public class TeacherHomepage extends AppCompatActivity {
         tvDesignation = findViewById(R.id.tv_designation);
         tvAcronym = findViewById(R.id.tv_acronym);
         tvEmail = findViewById(R.id.tv_email);
+        task=findViewById(R.id.t_upcomingTaskCard);
+        task.setOnClickListener(v -> {
+            Intent intent = new Intent(TeacherHomepage.this, TeacherCalendarActivity.class);
+            intent.putExtra("acronym", teacherAcronym);
+            startActivity(intent);
+        });
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
 
         leftNavBarImage = findViewById(R.id.leftNavBarImage);

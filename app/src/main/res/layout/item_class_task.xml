@@ -33,6 +33,16 @@
             android:layout_marginStart="25dp"
             android:textSize="16sp"
             android:textColor="@color/primaryText"/>
+        <TextView
+            android:id="@+id/instructorName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/classTime"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="25dp"
+            android:textSize="16sp"
+            android:textColor="@color/primaryText"/>
+
         <!--
         <com.google.android.material.button.MaterialButton
             android:id="@+id/actionButton"

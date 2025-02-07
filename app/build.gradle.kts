@@ -68,6 +68,9 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation (libs.firebase.firestore.v2491)
     implementation (libs.play.services.auth)
+    implementation ("androidx.viewpager2:viewpager2:1.0.0'")
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
 
     implementation (libs.play.services.base)
 

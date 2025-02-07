@@ -1,11 +1,9 @@
 package com.example.unimate;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -48,7 +46,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CalendarActivity extends AppCompatActivity {
+public class TeacherCalendarActivity extends AppCompatActivity {
     private static final String TAG = "CalendarActivity";
     private TasksAdapter tasksAdapter;
     private CalendarView calendarView;
@@ -85,7 +83,7 @@ public class CalendarActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calendar);
+        setContentView(R.layout.activity_teacher_calendar);
 
         emptyDayContainer = findViewById(R.id.emptyDayContainer);
 
@@ -112,7 +110,7 @@ public class CalendarActivity extends AppCompatActivity {
         setupCalendar();
 
         // Load schedules/tasks when we first open
-      //  loadAllDataForRange();
+        //  loadAllDataForRange();
     }
 
 
@@ -129,10 +127,6 @@ public class CalendarActivity extends AppCompatActivity {
         return c.getTime();
     }
 
-
-
-    //tauqir tauqir tauqir tauqir Tauqir tauqir
-    // tauqir tauqir eediting time start
 
     /**
      * Setup the batch & section spinners
@@ -848,7 +842,7 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
 
-    private void checkAvailableSlots(Date date, OnSlotCheckListener listener) {
+    private void checkAvailableSlots(Date date, CalendarActivity.OnSlotCheckListener listener) {
         db.collection("schedules")
                 .document(getDayName(date).toLowerCase())
                 .get()
@@ -1157,17 +1151,6 @@ public class CalendarActivity extends AppCompatActivity {
                 });
     }
 
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Show a dialog that lets the user add a new task for this class/time.
      */
@@ -1181,6 +1164,8 @@ public class CalendarActivity extends AppCompatActivity {
         TextView taskDateView = dialogView.findViewById(R.id.taskDate);
         TextView taskTimeSlotView = dialogView.findViewById(R.id.taskTimeSlot);
         TextView taskCourseView = dialogView.findViewById(R.id.taskCourse);
+        TextView instructorCourseView = dialogView.findViewById(R.id.instructorName);
+
         EditText taskTitle = dialogView.findViewById(R.id.taskTitle);
         EditText taskDetails = dialogView.findViewById(R.id.taskDetails);
 
@@ -1192,7 +1177,7 @@ public class CalendarActivity extends AppCompatActivity {
         // ✅ Set time slot and course name
         taskTimeSlotView.setText("Time Slot: " + classItem.getTimeSlot());
         taskCourseView.setText("Course: " + classItem.getCourse());
-
+        instructorCourseView.setText("Instructor: " + classItem.getInstructor());
         builder.setView(dialogView)
                 .setPositiveButton("Add Task", (dialog, which) -> {
                     UniTask newTask = new UniTask(
