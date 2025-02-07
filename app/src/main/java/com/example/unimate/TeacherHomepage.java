@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.SharedPreferences;
-import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -21,10 +21,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +36,7 @@ public class TeacherHomepage extends AppCompatActivity {
     private List<DayModel> dayList;
     private ImageView leftNavBarImage;
     private DrawerLayout drawerLayout;
+    private CardView routine,rooms,otherRoutine,teacherInfo;
 
     private final String[] daysOfWeek = {
             "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
@@ -59,8 +60,9 @@ public class TeacherHomepage extends AppCompatActivity {
         tvAcronym = findViewById(R.id.tv_acronym);
         tvEmail = findViewById(R.id.tv_email);
         task=findViewById(R.id.t_upcomingTaskCard);
-        task.setOnClickListener(v -> {
-            Intent intent = new Intent(TeacherHomepage.this, TeacherCalendarActivity.class);
+        routine=findViewById(R.id.t_routineCardView);
+        routine.setOnClickListener(v -> {
+            Intent intent = new Intent(TeacherHomepage.this, TeacherRoutineActivity.class);
             intent.putExtra("acronym", teacherAcronym);
             startActivity(intent);
         });
@@ -159,7 +161,7 @@ public class TeacherHomepage extends AppCompatActivity {
                        // Toast.makeText(TeacherHomepage.this, "Teacher found: " + name, Toast.LENGTH_SHORT).show();
 
                         if (teacherAcronym != null) {
-                            fetchRoutineByAcronymFromFirestore(teacherAcronym);
+                            fetchRoutineAndStoreInTeacherSchedule(teacherAcronym);
                         } else {
                            // Toast.makeText(TeacherHomepage.this, "Acronym not found for the teacher", Toast.LENGTH_SHORT).show();
                         }
@@ -177,7 +179,7 @@ public class TeacherHomepage extends AppCompatActivity {
         });
     }
 
-    private void fetchRoutineByAcronymFromFirestore(String acronym) {
+    private void fetchRoutineAndStoreInTeacherSchedule(String acronym) {
         for (String dayName : daysOfWeek) {
             db.collection("schedules")
                     .document(dayName.toLowerCase())
@@ -215,6 +217,7 @@ public class TeacherHomepage extends AppCompatActivity {
                                                         found = true;
                                                         String course = (String) classDetails.get("course");
                                                         String room = (String) classDetails.get("room");
+
                                                         String classInfo = (course != null ? course : "N/A") + "\n" +
                                                                 instructor + "\n" +
                                                                 (room != null ? room : "N/A");
@@ -223,6 +226,9 @@ public class TeacherHomepage extends AppCompatActivity {
                                                         if (timeIndex != -1) {
                                                             setClassInfo(dayModel, timeIndex, classInfo);
                                                         }
+
+                                                        // ✅ Store into teacher_schedule
+                                                        storeTeacherSchedule(acronym, dayName, batchEntry.getKey(), sectionEntry.getKey(), timeEntry.getKey(), course, room);
                                                     }
                                                 }
                                             }
@@ -233,15 +239,31 @@ public class TeacherHomepage extends AppCompatActivity {
                         }
 
                         if (found) {
-                           // Toast.makeText(this, "📅 Instructor " + acronym + " found on " + dayName, Toast.LENGTH_SHORT).show();
+                            Log.d("Routine", "✅ Instructor " + acronym + " found on " + dayName);
                         } else {
-                            Log.d("Routine", "Instructor " + acronym + " NOT found on " + dayName);
+                            Log.d("Routine", "❌ Instructor " + acronym + " NOT found on " + dayName);
                         }
 
                         dayAdapter.notifyItemChanged(getDayIndex(dayName));
                     })
                     .addOnFailureListener(e -> Log.e("FirestoreError", "❌ Firestore Error: " + e.getMessage()));
         }
+    }
+    private void storeTeacherSchedule(String acronym, String day, String batch, String section, String timeSlot, String course, String room) {
+        Map<String, Object> classData = new HashMap<>();
+        classData.put("course_name", course);
+        classData.put("room", room);
+        classData.put("details", "Class for " + course);
+
+        db.collection("teacher_schedule")
+                .document(acronym)
+                .collection(day)
+                .document(batch)
+                .collection(section)
+                .document(timeSlot)
+                .set(classData)
+                .addOnSuccessListener(aVoid -> Log.d("TeacherSchedule", "✅ Stored: " + acronym + " - " + day + " - " + timeSlot))
+                .addOnFailureListener(e -> Log.e("FirestoreError", "❌ Failed to store teacher schedule", e));
     }
 
     private int getDayIndex(String dayName) {
