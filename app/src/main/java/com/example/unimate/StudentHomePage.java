@@ -34,7 +34,7 @@ public class StudentHomePage extends AppCompatActivity {
     private RecyclerView carouselRecyclerView;
     private List<DayModel> dayList;
     private DayAdapter dayAdapter;
-    private CardView rooms;
+    private CardView rooms,otherRoutine,task,maps,teacherInfo,routine;
 
     private TextView studentNameText, studentBatchText, studentSectionText;
     private DrawerLayout drawerLayout;
@@ -62,6 +62,17 @@ public class StudentHomePage extends AppCompatActivity {
         studentSectionText = findViewById(R.id.tv_std_section);
         leftNavBarImage = findViewById(R.id.leftNavBarImage);
         drawerLayout = findViewById(R.id.drawerLayout);
+        otherRoutine=findViewById(R.id.othersRoutineCard);
+        otherRoutine.setOnClickListener(v->{
+            Intent intent = new Intent(StudentHomePage.this, OthersRoutine.class);
+            startActivity(intent);
+
+        });
+        task=findViewById(R.id.upcomingTaskCard);
+        task.setOnClickListener(v->{
+            Intent intent = new Intent(StudentHomePage.this, OtherCalendar.class);
+            startActivity(intent);
+        });
         rooms = findViewById(R.id.st_roomsCardView);
         rooms.setOnClickListener(v -> {
                     Intent intent = new Intent(StudentHomePage.this, RoomsActivity.class);

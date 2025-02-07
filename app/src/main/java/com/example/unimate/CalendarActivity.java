@@ -59,7 +59,6 @@ public class CalendarActivity extends AppCompatActivity {
     private TextView loadingText;
     private final Set<Date> taskDates = new HashSet<>();
 
-    private Button button;
 
 
     private TextView loadingPercentage;
@@ -90,11 +89,7 @@ public class CalendarActivity extends AppCompatActivity {
 
         emptyDayContainer = findViewById(R.id.emptyDayContainer);
 
-        button = findViewById(R.id.btn1);
-        button.setOnClickListener(v -> {
-            Intent intent = new Intent(CalendarActivity.this, OthersRoutine.class);
-            startActivity(intent);
-        });
+
 
 
         db = FirebaseFirestore.getInstance();

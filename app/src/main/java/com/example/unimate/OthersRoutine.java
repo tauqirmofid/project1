@@ -1,5 +1,6 @@
 package com.example.unimate;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -36,7 +37,7 @@ public class OthersRoutine extends AppCompatActivity {
     private Spinner spinnerBatch, spinnerSection;
     private RecyclerView carouselRecyclerView;
     private DayAdapter dayAdapter;
-
+    private ProgressDialog progressDialog;
     private TextView tvCurrentClass, tvNextClass, tvPreviousClass;
 
     // We'll store 7 DayModel objects, one for each day
@@ -85,7 +86,6 @@ public class OthersRoutine extends AppCompatActivity {
     };
 
 
-    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,15 +94,11 @@ public class OthersRoutine extends AppCompatActivity {
         setContentView(R.layout.activity_others_routine);
 
 
-        button = findViewById(R.id.btn1);
-        button.setOnClickListener(v -> {
-            Intent intent = new Intent(OthersRoutine.this, CalendarActivity.class);
-            startActivity(intent);
-        });
-
         db = FirebaseFirestore.getInstance();
 
-
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading schedules...");
+        progressDialog.setCancelable(false);
 
         // 2) The three new TextViews for current/next/previous class
         tvCurrentClass = findViewById(R.id.tvCurrentClass);
@@ -169,6 +165,8 @@ public class OthersRoutine extends AppCompatActivity {
 
         Set<String> allBatches = new HashSet<>();
         batchToSectionsMap.clear();
+        // Show the loading dialog
+        progressDialog.show();
 
         for (String day : days) {
             db.collection("schedules").document(day)
@@ -193,11 +191,15 @@ public class OthersRoutine extends AppCompatActivity {
 
                         if (completedDays.incrementAndGet() == totalDays) {
                             updateSpinners(new ArrayList<>(allBatches));
+                            progressDialog.dismiss(); // Dismiss dialog when done
+
                         }
                     })
                     .addOnFailureListener(e -> {
                         if (completedDays.incrementAndGet() == totalDays) {
                             updateSpinners(new ArrayList<>(allBatches));
+                            progressDialog.dismiss(); // Dismiss dialog on error
+
                         }
                     });
         }
@@ -287,6 +289,7 @@ public class OthersRoutine extends AppCompatActivity {
         if (spinnerBatch.getSelectedItem() == null || spinnerSection.getSelectedItem() == null) {
             return;
         }
+        progressDialog.show(); // Show the loading dialog
 
         final String selectedBatch = spinnerBatch.getSelectedItem().toString();
         final String selectedSection = spinnerSection.getSelectedItem().toString();
@@ -310,6 +313,8 @@ public class OthersRoutine extends AppCompatActivity {
 
             // After we loaded today's data, let's find current/next/previous
             displayCurrentNextPrev(todayIndex);
+            progressDialog.dismiss(); // Dismiss the loading dialog
+
             return;
         }
 

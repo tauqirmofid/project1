@@ -232,16 +232,12 @@ public class RoomCSVUpload extends AppCompatActivity {
                         String[] fields = line.split(",");
 
                         if (fields.length >= 4) {
-                            // Get the values, trimming spaces
                             String building = fields[0].trim();
                             String floor = fields[1].trim();
                             String room = fields[2].trim();
                             String description = fields[3].trim();
 
-                            // Log current values
-                            Log.d("CSV_PROCESS", "Read values - Building: " + building + ", Floor: " + floor + ", Room: " + room + ", Description: " + description);
-
-                            // Update the last building and floor if current values are not empty
+                            // Update last known values for building and floor
                             if (!building.isEmpty()) {
                                 lastBuilding = building;
                             }
@@ -249,34 +245,37 @@ public class RoomCSVUpload extends AppCompatActivity {
                                 lastFloor = floor;
                             }
 
-                            // Use the last known building and floor if current values are empty
+                            // Use the last known values if current ones are empty
                             if (building.isEmpty()) {
-                                building = lastBuilding;
+                                building = lastBuilding != null ? lastBuilding : "UnknownBuilding";
                             }
                             if (floor.isEmpty()) {
-                                floor = lastFloor;
+                                floor = lastFloor != null ? lastFloor : "UnknownFloor";
                             }
 
-                            // Log final values to be used
-                            Log.d("CSV_PROCESS", "Final values - Building: " + building + ", Floor: " + floor + ", Room: " + room);
+                            // Log final values
+                            Log.d("CSV_FINAL", "Uploading - Building: " + building + ", Floor: " + floor + ", Room: " + room);
 
-                            // Prepare data for Firestore
+                            // Check for empty room names
+                            if (room.isEmpty()) {
+                                Log.e("CSV_ERROR", "Skipping entry with empty room name.");
+                                continue;
+                            }
+
+                            // Prepare Firestore data
                             Map<String, Object> roomData = new HashMap<>();
                             roomData.put("description", description);
 
-                            try {
-                                // Store data in Firestore using the hierarchical structure
-                                roomsCollection
-                                        .document(building)
-                                        .collection(floor)
-                                        .document(room)
-                                        .set(roomData)
-                                        .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Room added successfully: " + room))
-                                        .addOnFailureListener(e -> Log.e("FIRESTORE_ERROR", "Error adding room: " + room, e));
-                            } catch (Exception e) {
-                                Log.e("FIRESTORE_ERROR", "Exception while adding room", e);
-                            }
-                        } else {
+                            // Add to Firestore
+                            roomsCollection
+                                    .document(building)
+                                    .collection(floor)
+                                    .document(room)
+                                    .set(roomData)
+                                    .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Room added: " + room))
+                                    .addOnFailureListener(e -> Log.e("FIRESTORE_ERROR", "Error adding room: " + room, e));
+                        }
+                        else {
                             // Log if the row is malformed
                             Log.e("CSV_PROCESS", "Skipping malformed row: " + line);
                         }
