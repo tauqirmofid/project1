@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -57,6 +58,14 @@ public class AdminLoginActivity extends AppCompatActivity {
                 }
 
 
+                // 1. Show the LoadingActivity
+                startActivity(new Intent(AdminLoginActivity.this, LoadingActivity.class));
+// Immediately override the transition
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+
+
+
 
 
                 // Call the login method
@@ -69,6 +78,9 @@ public class AdminLoginActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                sendCloseLoadingBroadcast();
+
 
 
                 if (snapshot.exists()) {
@@ -104,8 +116,16 @@ public class AdminLoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+
+                // 3. Close LoadingActivity even if there's an error
+                sendCloseLoadingBroadcast();
                 Toast.makeText(AdminLoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void sendCloseLoadingBroadcast() {
+        LocalBroadcastManager.getInstance(AdminLoginActivity.this)
+                .sendBroadcast(new Intent("CLOSE_LOADING"));
     }
 }
