@@ -838,8 +838,16 @@ public class CalendarActivity extends AppCompatActivity {
                 addClassButton.setVisibility(View.GONE);
             }
         });
+        checkAvailableSlots(date, isVacant -> {
+            if (isVacant) {
+                addTaskButton.setVisibility(View.VISIBLE);
+                addTaskButton.setOnClickListener(v -> showAddTaskDialogWithoutClass(date));
+            } else {
+                addTaskButton.setVisibility(View.GONE);
+            }
+        });
 
-        addTaskButton.setOnClickListener(v -> showAddTaskDialogWithoutClass(date));
+       // addTaskButton.setOnClickListener(v -> showAddTaskDialogWithoutClass(date));
 
         LinearLayout container = findViewById(R.id.emptyDayContainer);
         container.removeAllViews();
@@ -901,18 +909,12 @@ public class CalendarActivity extends AppCompatActivity {
 
     // Add this method for empty day UI
     private void showAddTaskDialogWithoutClass(Date date) {
-        // Show loading dialog while fetching slots
-        AlertDialog loadingDialog = new AlertDialog.Builder(this)
-                .setView(R.layout.activity_loading)
-                .setCancelable(false)
-                .show();
+
 
         db.collection("schedules")
                 .document(getDayName(date).toLowerCase())
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    loadingDialog.dismiss();
-
                     List<String> allTimeSlots = Arrays.asList(
                             "09:00-10:20AM",
                             "10:20-11:40AM",
@@ -926,25 +928,44 @@ public class CalendarActivity extends AppCompatActivity {
                     List<String> occupiedSlots = new ArrayList<>();
                     if (documentSnapshot.exists()) {
                         Map<String, Object> dayData = documentSnapshot.getData();
-                        String batchKey = "batch_" + selectedBatch;
-                        if (dayData != null && dayData.containsKey(batchKey)) {
-                            Map<String, Object> batchMap = (Map<String, Object>) dayData.get(batchKey);
-                            if (batchMap.containsKey(selectedSection)) {
-                                Map<String, Object> sectionMap = (Map<String, Object>) batchMap.get(selectedSection);
-                                occupiedSlots.addAll(sectionMap.keySet());
+                        if (dayData != null) {
+                            String batchKey = "batch_" + selectedBatch;
+                            if (dayData.containsKey(batchKey)) {
+                                Map<String, Object> batchMap = (Map<String, Object>) dayData.get(batchKey);
+                                if (batchMap.containsKey(selectedSection)) {
+                                    Map<String, Object> sectionMap = (Map<String, Object>) batchMap.get(selectedSection);
+                                    occupiedSlots.addAll(sectionMap.keySet());
+                                }
                             }
                         }
                     }
+// TAUQIR
+                    // TAUQIR// TAUQIR// TAUQIR
+                    // TAUQIR// TAUQIR// TAUQIR
+                    // TAUQIR// TAUQIR// TAUQIR
 
+                    // TAUQIR// TAUQIR// TAUQIR
+                    // TAUQIR// TAUQIR// TAUQIR
+                    // Calculate available slots
                     List<String> vacantSlots = new ArrayList<>(allTimeSlots);
                     vacantSlots.removeAll(occupiedSlots);
 
                     if (vacantSlots.isEmpty()) {
-                        Toast.makeText(this, "No available time slots", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                        Toast.makeText(this, "No vacant time slots available.", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        showAddTaskDialogWithAvailableSlots(date, vacantSlots);
+                       }
+                })
+                .addOnFailureListener(e -> {
+
+                    Toast.makeText(this, "Failed to load time slots", Toast.LENGTH_SHORT).show();
+                });
+
+    }
 
 
+    private void showAddTaskDialogWithAvailableSlots(Date date, List<String> vacantSlots) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task_without_class, null);
 
@@ -954,8 +975,7 @@ public class CalendarActivity extends AppCompatActivity {
         EditText instructorEditText = dialogView.findViewById(R.id.instructorEditText);
 
         // Populate time slots
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.time_slots, android.R.layout.simple_spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, vacantSlots);
         timeSlotSpinner.setAdapter(adapter);
         instructorEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -996,11 +1016,9 @@ public class CalendarActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
-                })
-                .addOnFailureListener(e -> {
-                    loadingDialog.dismiss();
-                    Toast.makeText(this, "Failed to load time slots", Toast.LENGTH_SHORT).show();
-                });
+
+
+
     }
 
 
