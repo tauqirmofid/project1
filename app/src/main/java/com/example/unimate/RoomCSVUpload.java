@@ -3,11 +3,14 @@ package com.example.unimate;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -19,17 +22,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
@@ -54,8 +58,12 @@ public class RoomCSVUpload extends AppCompatActivity {
         setContentView(R.layout.activity_room_upload_page);
 
         Button uploadCsvButton = findViewById(R.id.uploadCsvButton);
-        Button uploadPicture = findViewById(R.id.uploadPicButton);
-        uploadPicture.setOnClickListener(view -> showUploadDialog());
+        Button uploadFloorPicture = findViewById(R.id.uploadfloorPicButton);
+        Button uploadRoomPicture = findViewById(R.id.uploadroomPicButton);
+        uploadRoomPicture.setOnClickListener(v->{
+            showRoomUploadDialog();
+        });
+        uploadFloorPicture.setOnClickListener(view -> showfloorUploadDialog());
         uploadCsvButton.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("text/csv");
@@ -67,24 +75,166 @@ public class RoomCSVUpload extends AppCompatActivity {
             }
         });
     }
-    private void showLoadingDialog(String message) {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setCancelable(false); // Prevent dialog from being dismissed by the user
-            progressDialog.setMessage(message);
-        }
-        progressDialog.show();
-    }
-    private void hideLoadingDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
-    }
 
-    private void showUploadDialog() {
+    private void showRoomUploadDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_upload_rooms_pic, null);
+        View dialogView = inflater.inflate(R.layout.dialog_upload_room_pic, null);
+        builder.setView(dialogView);
+        uploadDialog = builder.create();
+
+        // Initialize UI Elements
+        Spinner buildingSpinner = dialogView.findViewById(R.id.buildingSpinner);
+        Spinner floorSpinner = dialogView.findViewById(R.id.floorSpinner);
+        Spinner roomSpinner = dialogView.findViewById(R.id.roomSpinner);
+        Button pickImageButton = dialogView.findViewById(R.id.pickImageButton);
+        fileNameTextView = dialogView.findViewById(R.id.fileNameTextView);
+        Button uploadButton = dialogView.findViewById(R.id.uploadButton);
+
+        // Load predefined buildings from strings.xml
+        ArrayAdapter<CharSequence> buildingAdapter = ArrayAdapter.createFromResource(
+                this, R.array.building_options, android.R.layout.simple_spinner_dropdown_item);
+        buildingSpinner.setAdapter(buildingAdapter);
+
+        // Load predefined floors from strings.xml
+        ArrayAdapter<CharSequence> floorAdapter = ArrayAdapter.createFromResource(
+                this, R.array.floor_options, android.R.layout.simple_spinner_dropdown_item);
+        floorSpinner.setAdapter(floorAdapter);
+
+        // Handle floor selection to load rooms dynamically
+        floorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedBuilding = buildingSpinner.getSelectedItem().toString();
+                String selectedFloor = floorSpinner.getSelectedItem().toString();
+                loadRoomsForFloor(selectedBuilding, selectedFloor, roomSpinner);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        // Set up the image picker for the "Pick Image" button
+        pickImageButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, PICK_IMAGE_FILE);
+        });
+        uploadButton.setOnClickListener(v -> {
+            String selectedBuilding = buildingSpinner.getSelectedItem().toString();
+            String selectedFloor = floorSpinner.getSelectedItem().toString();
+            String selectedRoom = roomSpinner.getSelectedItem().toString();
+
+            if (selectedImageUri == null) {
+                Toast.makeText(RoomCSVUpload.this, "Please select an image first!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            uploadRoomsImageToCloudinary(selectedImageUri, selectedBuilding, selectedFloor, selectedRoom);
+        });
+
+        uploadDialog.show();
+    }
+
+    private void uploadRoomsImageToCloudinary(Uri selectedImageUri, String selectedBuilding, String selectedFloor, String selectedRoom) {
+        if (selectedImageUri == null || selectedBuilding == null || selectedFloor == null || selectedRoom == null) {
+            Toast.makeText(this, "Please ensure all fields and image are selected!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String cloudinaryUrl = "https://api.cloudinary.com/v1_1/dp4ha5cws/image/upload";
+
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
+            byte[] imageData = new byte[inputStream.available()];
+            inputStream.read(imageData);
+            inputStream.close();
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, cloudinaryUrl,
+                    response -> {
+                        Log.d("CloudinaryUpload", "Response: " + response);
+
+                        // Extract the public_id (image key) from Cloudinary's response
+                        String imageKey = extractImageKey(response);
+
+                        if (imageKey != null) {
+                            // Save the image key to Firestore
+                            saveImageKeyToRoomDescription(selectedBuilding, selectedFloor, selectedRoom, imageKey);
+                        } else {
+                            Toast.makeText(RoomCSVUpload.this, "Failed to extract image key!", Toast.LENGTH_SHORT).show();
+                        }
+                    },
+                    error -> {
+                        Log.e("CloudinaryUpload", "Upload Error: " + error.toString());
+                        Toast.makeText(RoomCSVUpload.this, "Upload Failed!", Toast.LENGTH_SHORT).show();
+                    }) {
+
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("upload_preset", "ml_default");
+                    params.put("file", "data:image/jpeg;base64," + android.util.Base64.encodeToString(imageData, android.util.Base64.DEFAULT));
+                    return params;
+                }
+            };
+
+            requestQueue.add(stringRequest);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error reading image file", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void saveImageKeyToRoomDescription(String building, String floor, String room, String imageKey) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        firestore.collection("rooms")
+                .document(building)
+                .collection(floor)
+                .document(room)
+                .update("description", imageKey) // Update the description field with the image key
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("FirestoreUpdate", "Image key added to description successfully for: " + room);
+                    Toast.makeText(RoomCSVUpload.this, "Image uploaded and description updated successfully!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreUpdate", "Error updating description: " + e.getMessage(), e);
+                    Toast.makeText(RoomCSVUpload.this, "Failed to update description!", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void loadRoomsForFloor(String building, String floor, Spinner roomSpinner) {
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        firestore.collection("rooms").document(building).collection(floor)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<String> rooms = new ArrayList<>();
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+                        String roomName = document.getId();
+                        if (!roomName.equalsIgnoreCase("Image")) { // Skip "Image" field
+                            rooms.add(roomName);
+                        }
+                    }
+                    if (rooms.isEmpty()) {
+                        rooms.add("No Rooms Available"); // Show message if no rooms are found
+                    }
+
+                    // Update roomSpinner
+                    ArrayAdapter<String> roomAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, rooms);
+                    roomSpinner.setAdapter(roomAdapter);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load rooms", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+    private void showfloorUploadDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_upload_floors_pic, null);
         builder.setView(dialogView);
         uploadDialog = builder.create();
 
@@ -120,12 +270,12 @@ public class RoomCSVUpload extends AppCompatActivity {
                 return;
             }
 
-            uploadImageToCloudinary(selectedImageUri, selectedBuilding, selectedFloor);
+            uploadfloorImageToCloudinary(selectedImageUri, selectedBuilding, selectedFloor);
         });
 
         uploadDialog.show();
     }
-    private void uploadImageToCloudinary(Uri imageUri, String building, String floor) {
+    private void uploadfloorImageToCloudinary(Uri imageUri, String building, String floor) {
         String cloudinaryUrl = "https://api.cloudinary.com/v1_1/dp4ha5cws/image/upload";
 
         try {
@@ -199,6 +349,24 @@ public class RoomCSVUpload extends AppCompatActivity {
                     Log.e("FirestoreSave", "Error saving image key: " + e.getMessage(), e);
                     Toast.makeText(RoomCSVUpload.this, "Failed to save image key!", Toast.LENGTH_SHORT).show();
                 });
+    }
+    private String getFileNameFromUri(Uri uri) {
+        String fileName = "Unknown";
+        if (uri.getScheme().equals("content")) {
+            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (displayNameIndex != -1) {
+                        fileName = cursor.getString(displayNameIndex);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("FileNameError", "Error retrieving file name: " + e.getMessage());
+            }
+        } else {
+            fileName = uri.getLastPathSegment();
+        }
+        return fileName;
     }
 
     @Override
@@ -291,11 +459,13 @@ public class RoomCSVUpload extends AppCompatActivity {
                 }
             }
         }
-        if (requestCode == PICK_IMAGE_FILE && resultCode == RESULT_OK && data != null) {
+        else if (requestCode == PICK_IMAGE_FILE && resultCode == RESULT_OK && data != null) {
             selectedImageUri = data.getData();
             if (selectedImageUri != null) {
-                String fileName = selectedImageUri.getLastPathSegment();
-                fileNameTextView.setText(fileName); // Show file name below button
+                String fileName = getFileNameFromUri(selectedImageUri);
+                if (fileNameTextView != null) {
+                    fileNameTextView.setText(fileName);
+                }
             }
         }
 
