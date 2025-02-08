@@ -15,7 +15,9 @@ import java.util.List;
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHolder> {
     private List<UniTask> taskList;
     private OnTaskRemoveListener removeListener;
-    private OnTaskClickListener clickListener; // New click listener
+    private OnTaskClickListener clickListener;
+    // New click listener
+
 
     // Existing interface (keep unchanged)
     public interface OnTaskRemoveListener {

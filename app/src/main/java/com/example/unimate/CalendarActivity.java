@@ -901,32 +901,106 @@ public class CalendarActivity extends AppCompatActivity {
 
     // Add this method for empty day UI
     private void showAddTaskDialogWithoutClass(Date date) {
+        // Show loading dialog while fetching slots
+        AlertDialog loadingDialog = new AlertDialog.Builder(this)
+                .setView(R.layout.activity_loading)
+                .setCancelable(false)
+                .show();
+
+        db.collection("schedules")
+                .document(getDayName(date).toLowerCase())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    loadingDialog.dismiss();
+
+                    List<String> allTimeSlots = Arrays.asList(
+                            "09:00-10:20AM",
+                            "10:20-11:40AM",
+                            "11:40-1:00PM",
+                            "1:00-1:30PM",
+                            "1:30-2:50PM",
+                            "2:50-4:10PM",
+                            "7:00-8:20PM"
+                    );
+
+                    List<String> occupiedSlots = new ArrayList<>();
+                    if (documentSnapshot.exists()) {
+                        Map<String, Object> dayData = documentSnapshot.getData();
+                        String batchKey = "batch_" + selectedBatch;
+                        if (dayData != null && dayData.containsKey(batchKey)) {
+                            Map<String, Object> batchMap = (Map<String, Object>) dayData.get(batchKey);
+                            if (batchMap.containsKey(selectedSection)) {
+                                Map<String, Object> sectionMap = (Map<String, Object>) batchMap.get(selectedSection);
+                                occupiedSlots.addAll(sectionMap.keySet());
+                            }
+                        }
+                    }
+
+                    List<String> vacantSlots = new ArrayList<>(allTimeSlots);
+                    vacantSlots.removeAll(occupiedSlots);
+
+                    if (vacantSlots.isEmpty()) {
+                        Toast.makeText(this, "No available time slots", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task_without_class, null);
 
         Spinner timeSlotSpinner = dialogView.findViewById(R.id.timeSlotSpinner);
         EditText taskTitle = dialogView.findViewById(R.id.taskTitle);
         EditText taskDetails = dialogView.findViewById(R.id.taskDetails);
+        EditText instructorEditText = dialogView.findViewById(R.id.instructorEditText);
 
         // Populate time slots
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.time_slots, android.R.layout.simple_spinner_item);
         timeSlotSpinner.setAdapter(adapter);
+        instructorEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String current = s.toString();
+                if (!current.isEmpty() && !current.equals(current.toUpperCase())) {
+                    instructorEditText.setText(current.toUpperCase());
+                    instructorEditText.setSelection(current.length());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         builder.setView(dialogView)
                 .setPositiveButton("Add Task", (dialog, which) -> {
+                    String instructor = instructorEditText.getText().toString().trim();
+
+                    if (instructor.isEmpty()) {
+                        Toast.makeText(this, "Instructor acronym is required", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     UniTask newTask = new UniTask(
                             taskTitle.getText().toString(),
                             taskDetails.getText().toString(),
                             timeSlotSpinner.getSelectedItem().toString(), // Get selected time slot
                             selectedBatch,
-                            selectedSection
+                            selectedSection,
+                            instructor
+
                     );
                     newTask.setDate(date);
                     saveTaskToFirestore(newTask);
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+                })
+                .addOnFailureListener(e -> {
+                    loadingDialog.dismiss();
+                    Toast.makeText(this, "Failed to load time slots", Toast.LENGTH_SHORT).show();
+                });
     }
 
 
@@ -1181,8 +1255,12 @@ public class CalendarActivity extends AppCompatActivity {
         TextView taskDateView = dialogView.findViewById(R.id.taskDate);
         TextView taskTimeSlotView = dialogView.findViewById(R.id.taskTimeSlot);
         TextView taskCourseView = dialogView.findViewById(R.id.taskCourse);
+
+
         EditText taskTitle = dialogView.findViewById(R.id.taskTitle);
         EditText taskDetails = dialogView.findViewById(R.id.taskDetails);
+        // Get instructor from the class item
+        String instructorAcronym = classItem.getInstructor();
 
         // ✅ Format and set the selected date
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault());
@@ -1200,7 +1278,8 @@ public class CalendarActivity extends AppCompatActivity {
                             taskDetails.getText().toString(),
                             classItem.getTimeSlot(),
                             selectedBatch,
-                            selectedSection
+                            selectedSection,
+                            instructorAcronym
                     );
                     newTask.setDate(stripTime(currentSelectedDate));
 
@@ -1210,9 +1289,15 @@ public class CalendarActivity extends AppCompatActivity {
                                 String newId = docRef.getId();
                                 newTask.setTaskId(newId);
 
+                                // Update Firestore with the taskId and instructor
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put("taskId", newId);
+                                updates.put("instructorAcronym", instructorAcronym);
+
+
                                 // Update Firestore with the taskId
                                 db.collection("tasks").document(newId)
-                                        .update("taskId", newId)
+                                        .update(updates)
                                         .addOnSuccessListener(aVoid -> {
                                             Log.d(TAG, "Task ID updated");
                                             classItem.addTask(newTask);

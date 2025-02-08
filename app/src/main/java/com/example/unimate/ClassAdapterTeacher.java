@@ -26,11 +26,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> {
+public class ClassAdapterTeacher extends RecyclerView.Adapter<ClassAdapterTeacher.ViewHolder> {
 
     private final List<ClassWithTasks> classes;
     private final OnClassClickListener clickListener;
     private final Context context;
+    private final String teacherAcronym;
 
 
     public interface OnClassClickListener {
@@ -38,11 +39,12 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> 
         void onDeleteClass(ClassWithTasks classItem);
     }
 
-    public ClassAdapter(List<ClassWithTasks> classes, OnClassClickListener listener, Context context) {
+    public ClassAdapterTeacher(List<ClassWithTasks> classes, OnClassClickListener listener,
+                        Context context, String teacherAcronym) {
         this.classes = classes != null ? classes : new ArrayList<>();
         this.clickListener = listener;
         this.context = context;
-
+        this.teacherAcronym = teacherAcronym;
     }
 
     @NonNull
@@ -59,8 +61,13 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> 
         holder.classTime.setText(item.getTimeSlot());
         holder.className.setText(item.getCourse());
 
+        // Show/hide UI elements based on instructor match
+        boolean isOwnClass = item.getInstructor().equals(teacherAcronym);
+        holder.deleteIcon.setVisibility(isOwnClass ? View.VISIBLE : View.GONE);
+       // holder.taskCountBadge.setVisibility(isOwnClass ? View.VISIBLE : View.GONE);
 
-        // Maintain hasTasks() functionality
+        // Update click listeners only for own classes
+        // Show the task badge if tasks exist
         if (item.hasTasks()) {
             holder.taskCountBadge.setVisibility(View.VISIBLE);
             holder.taskCountBadge.setText(String.valueOf(item.getTasks().size()));
@@ -68,12 +75,21 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> 
             holder.taskCountBadge.setVisibility(View.GONE);
         }
 
+        // Set click listeners only if it's the teacher’s class
+        if (isOwnClass) {
+            holder.itemView.setOnClickListener(v -> showOptionsDialog(item));
+            holder.deleteIcon.setOnClickListener(v -> showDeleteConfirmation(item));
+        } else {
+            holder.itemView.setOnClickListener(null);
+            holder.deleteIcon.setOnClickListener(null);
+        }
 
 
 
 
-        holder.itemView.setOnClickListener(v -> showOptionsDialog(item));
-        holder.deleteIcon.setOnClickListener(v -> showDeleteConfirmation(item));
+
+//        holder.itemView.setOnClickListener(v -> showOptionsDialog(item));
+//        holder.deleteIcon.setOnClickListener(v -> showDeleteConfirmation(item));
     }
 
     private void showOptionsDialog(ClassWithTasks classItem) {
@@ -83,6 +99,12 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> 
 
 
     private void showDeleteConfirmation(ClassWithTasks classItem) {
+        // Add validation to delete method
+        if (!classItem.getInstructor().equals(teacherAcronym)) {
+            Toast.makeText(context, "You can only delete your own classes", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         View dialogView = LayoutInflater.from(context)
                 .inflate(R.layout.dialog_delete_class, null);
 

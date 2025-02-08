@@ -13,6 +13,7 @@ public class UniTask {
     private String classTime;
     private String batch;
     private String section;
+    private String instructorAcronym;
 
     @ServerTimestamp
     private Date date;
@@ -20,14 +21,29 @@ public class UniTask {
     // Required empty constructor for Firestore
     public UniTask() {}
 
+
+
     public UniTask(String taskTitle, String taskDetails, String classTime,
-                   String batch, String section) {
+                   String batch, String section,String instructorAcronym) {
         this.taskTitle = taskTitle;
         this.taskDetails = taskDetails;
         this.classTime = classTime;
         this.batch = batch;
         this.section = section;
-        this.completed = false; // Default to not completed
+        this.completed = false;
+        this.instructorAcronym = instructorAcronym.toUpperCase();// Default to not completed
+    }
+
+    // Add correct setter for instructorAcronym
+    @PropertyName("instructor_acronym")
+    public void setInstructorAcronym(String instructorAcronym) {
+        this.instructorAcronym = instructorAcronym;
+    }
+
+    // Add proper getter for instructorAcronym
+    @PropertyName("instructor_acronym")
+    public String getInstructorAcronym() {
+        return instructorAcronym;
     }
 
     @PropertyName("task_title")

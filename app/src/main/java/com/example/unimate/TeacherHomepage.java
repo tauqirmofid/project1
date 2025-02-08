@@ -66,6 +66,12 @@ public class TeacherHomepage extends AppCompatActivity {
             intent.putExtra("acronym", teacherAcronym);
             startActivity(intent);
         });
+
+        task.setOnClickListener(v -> {
+            Intent intent = new Intent(TeacherHomepage.this, TeacherCalendarActivity.class);
+            intent.putExtra("acronym", teacherAcronym);
+            startActivity(intent);
+        });
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
 
         leftNavBarImage = findViewById(R.id.leftNavBarImage);
