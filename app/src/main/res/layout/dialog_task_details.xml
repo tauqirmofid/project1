@@ -24,6 +24,19 @@
         android:textColor="@color/secondaryText"/>
 
     <TextView
+        android:id="@+id/taskClassTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+    <TextView
+        android:id="@+id/taskInstructor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+
+    <TextView
         android:id="@+id/taskDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

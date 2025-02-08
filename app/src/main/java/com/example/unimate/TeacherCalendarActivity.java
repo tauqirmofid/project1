@@ -57,6 +57,7 @@ public class TeacherCalendarActivity extends AppCompatActivity {
     private TextView loadingText;
     private final Set<Date> taskDates = new HashSet<>();
     private String teacherAcronym;
+    private RecyclerView standaloneRecycler;
 
 
 
@@ -98,6 +99,7 @@ public class TeacherCalendarActivity extends AppCompatActivity {
         calendarView = findViewById(R.id.calendarView);
         classRecycler = findViewById(R.id.classRecycler);
         classRecycler.setLayoutManager(new LinearLayoutManager(this));
+        standaloneRecycler = findViewById(R.id.standaloneRecycler);
 
         batchSpinner = findViewById(R.id.batchSpinner);
         sectionSpinner = findViewById(R.id.sectionSpinner);
@@ -573,18 +575,35 @@ public class TeacherCalendarActivity extends AppCompatActivity {
         Date stripped = stripTime(date);
         List<ClassWithTasks> classes = classTaskMap.getOrDefault(stripped, new ArrayList<>());
 
+        // Reset UI
         classRecycler.setAdapter(null);
+        standaloneRecycler.setAdapter(null);
         emptyDayContainer.setVisibility(View.GONE);
         classRecycler.setVisibility(View.GONE);
+        standaloneRecycler.setVisibility(View.GONE);
 
-        if (!classes.isEmpty()) {
+        showEmptyDayUI(date);
+
+        boolean hasClasses = !classes.isEmpty();
+        if (hasClasses) {
             showClassesWithTasks(classes);
-            showEmptyDayUI(date);
-        } else {
-            // Initialize with empty adapter first
-
-            fetchStandaloneTasks(stripped);
+            classRecycler.setVisibility(View.VISIBLE);
         }
+
+        // Always fetch standalone tasks
+        fetchStandaloneTasks(stripped, standaloneTasks -> {
+            boolean hasStandalone = !standaloneTasks.isEmpty();
+
+            if (hasStandalone) {
+                showStandaloneTasks(standaloneTasks);
+                standaloneRecycler.setVisibility(View.VISIBLE);
+            }
+
+//            // Show empty UI only if both are empty
+//            if (!hasClasses && !hasStandalone) {
+//
+//            }
+        });
     }
 
     private void showClassesWithTasks(List<ClassWithTasks> classes) {
@@ -653,12 +672,11 @@ public class TeacherCalendarActivity extends AppCompatActivity {
     }
 
 
-    private void fetchStandaloneTasks(Date date) {
+    private void fetchStandaloneTasks(Date date, CalendarActivity.OnStandaloneTasksFetchedListener listener) {
         db.collection("tasks")
                 .whereEqualTo("date", date)
                 .whereEqualTo("batch", selectedBatch)
                 .whereEqualTo("section", selectedSection)
-                //.whereEqualTo("instructor_acronym", teacherAcronym)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<UniTask> standaloneTasks = new ArrayList<>();
@@ -668,43 +686,75 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                             standaloneTasks.add(task);
                         }
                     }
-
-                    if (!standaloneTasks.isEmpty()) {
-                        showStandaloneTasks(standaloneTasks);
-                        showEmptyDayUI(date);
-
-                    } else {
-                        showEmptyDayUI(date);
-                    }
+                    listener.onTasksFetched(standaloneTasks);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching standalone tasks", e);
+                    listener.onTasksFetched(new ArrayList<>());
                 });
     }
 
     private void showStandaloneTasks(List<UniTask> tasks) {
-        // Group tasks by time slot
-        Map<String, List<UniTask>> groupedTasks = new HashMap<>();
-        for (UniTask task : tasks) {
-            String timeSlot = task.getClassTime();
-            if (!groupedTasks.containsKey(timeSlot)) {
-                groupedTasks.put(timeSlot, new ArrayList<>());
+
+        String acronym = teacherAcronym != null ? teacherAcronym : "";
+
+        StandaloneTasksAdapterTeacher adapter = new StandaloneTasksAdapterTeacher(
+                tasks,
+                acronym,
+                // Pass the teacher's acronym here
+                new StandaloneTasksAdapterTeacher.OnTaskClickListener() {
+                    @Override
+                    public void onTaskClick(UniTask task) {
+                        showTaskDetailsDialog(task);
+                    }
+
+                    @Override
+                    public void onDeleteClick(UniTask task) {
+                        showDeleteTaskConfirmation(task);
+                    }
+                }
+        );
+
+        standaloneRecycler.setAdapter(adapter);
+        standaloneRecycler.setVisibility(View.VISIBLE);
+    }
+    private void showDeleteTaskConfirmation(UniTask task) {
+
+
+        if (!task.getInstructorAcronym().equalsIgnoreCase(teacherAcronym)) {
+            Toast.makeText(this, "You can only delete your own tasks", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_delete_class, null);
+        EditText confirmInput = dialogView.findViewById(R.id.confirmEditText);
+        MaterialButton deleteBtn = dialogView.findViewById(R.id.deleteButton);
+        MaterialButton cancelBtn = dialogView.findViewById(R.id.cancelButton);
+
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        deleteBtn.setEnabled(false);
+        confirmInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                deleteBtn.setEnabled(s.toString().equalsIgnoreCase("DELETE"));
             }
-            groupedTasks.get(timeSlot).add(task);
-        }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        });
 
-        // Convert to ClassWithTasks objects for consistent display
-        List<ClassWithTasks> virtualClasses = new ArrayList<>();
-        for (Map.Entry<String, List<UniTask>> entry : groupedTasks.entrySet()) {
-            ClassWithTasks virtualClass = new ClassWithTasks(
-                    entry.getKey(),
-                    "Click to See the task",
-                    "",
-                    ""
-            );
-            virtualClass.setTasks(entry.getValue());
-            virtualClasses.add(virtualClass);
-        }
+        deleteBtn.setOnClickListener(v -> {
+            deleteStandaloneTask(task);
+            dialog.dismiss();
+        });
 
-        showClassesWithTasks(virtualClasses);
 
+
+        cancelBtn.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 
 
@@ -720,9 +770,13 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Task removed", Toast.LENGTH_SHORT).show();
+                    displayClassesForDate(currentSelectedDate);
+                    updateCalendarAppearance();
+
 
                     // ✅ Check if other standalone tasks exist for this date before removing it
                     Date taskDate = stripTime(task.getDate());
+
 
                     db.collection("tasks")
                             .whereEqualTo("date", taskDate)
@@ -733,7 +787,7 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                                 if (querySnapshot.isEmpty()) {
                                     taskDates.remove(taskDate); // Only remove if no standalone tasks exist
                                 }
-                                fetchAllStandaloneTasksAndUpdateCalendar();
+                               // fetchAllStandaloneTasksAndUpdateCalendar();
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Error checking remaining tasks", e));
                 })
@@ -756,12 +810,16 @@ public class TeacherCalendarActivity extends AppCompatActivity {
 
         TextView title = dialogView.findViewById(R.id.taskTitle);
         TextView details = dialogView.findViewById(R.id.taskDetails);
+        TextView classTime = dialogView.findViewById(R.id.taskClassTime);
+        TextView instructor = dialogView.findViewById(R.id.taskInstructor);
         TextView date = dialogView.findViewById(R.id.taskDate);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d yyyy • hh:mm a", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d yyyy", Locale.getDefault());
 
         title.setText(task.getTaskTitle());
         details.setText(task.getTaskDetails());
+        classTime.setText("Class Time: " + task.getClassTime());
+        instructor.setText("Instructor: " + task.getInstructorAcronym());
         date.setText(sdf.format(task.getDate()));
 
         builder.setView(dialogView)
@@ -918,18 +976,18 @@ public class TeacherCalendarActivity extends AppCompatActivity {
 
     // Add this method for empty day UI
     private void showAddTaskDialogWithoutClass(Date date) {
-        // Show loading dialog while fetching slots
+        // Show "loading" dialog while we fetch data
         AlertDialog loadingDialog = new AlertDialog.Builder(this)
                 .setView(R.layout.activity_loading)
                 .setCancelable(false)
                 .show();
 
+        // 1) Fetch the schedule document first
         db.collection("schedules")
                 .document(getDayName(date).toLowerCase())
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    loadingDialog.dismiss();
-
+                    // Possible time slots in the day
                     List<String> allTimeSlots = Arrays.asList(
                             "09:00-10:20AM",
                             "10:20-11:40AM",
@@ -940,80 +998,133 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                             "7:00-8:20PM"
                     );
 
+                    // Start a list to hold occupied slots
                     List<String> occupiedSlots = new ArrayList<>();
+
+                    // If that schedule doc exists, add the class slots to occupied
                     if (documentSnapshot.exists()) {
                         Map<String, Object> dayData = documentSnapshot.getData();
-                        String batchKey = "batch_" + selectedBatch;
-                        if (dayData != null && dayData.containsKey(batchKey)) {
-                            Map<String, Object> batchMap = (Map<String, Object>) dayData.get(batchKey);
-                            if (batchMap.containsKey(selectedSection)) {
-                                Map<String, Object> sectionMap = (Map<String, Object>) batchMap.get(selectedSection);
-                                occupiedSlots.addAll(sectionMap.keySet());
+                        if (dayData != null) {
+                            String batchKey = "batch_" + selectedBatch;
+                            if (dayData.containsKey(batchKey)) {
+                                Map<String, Object> batchMap = (Map<String, Object>) dayData.get(batchKey);
+                                if (batchMap.containsKey(selectedSection)) {
+                                    Map<String, Object> sectionMap = (Map<String, Object>) batchMap.get(selectedSection);
+                                    // sectionMap keySet = class time slots
+                                    occupiedSlots.addAll(sectionMap.keySet());
+                                }
                             }
                         }
                     }
 
-                    List<String> vacantSlots = new ArrayList<>(allTimeSlots);
-                    vacantSlots.removeAll(occupiedSlots);
+                    // 2) Now also fetch tasks (for the same batch, section, and exact date)
+                    db.collection("tasks")
+                            .whereEqualTo("batch", selectedBatch)
+                            .whereEqualTo("section", selectedSection)
+                            .whereEqualTo("date", date)
+                            .get()
+                            .addOnSuccessListener(taskSnapshot -> {
+                                // If we find tasks, mark their time slots as occupied
+                                for (QueryDocumentSnapshot doc : taskSnapshot) {
+                                    UniTask t = doc.toObject(UniTask.class);
+                                    if (t.getClassTime() != null && !t.getClassTime().isEmpty()) {
+                                        occupiedSlots.add(t.getClassTime());
+                                    }
+                                }
 
-                    if (vacantSlots.isEmpty()) {
-                        Toast.makeText(this, "No available time slots", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                                // Determine the final list of vacant slots
+                                List<String> vacantSlots = new ArrayList<>(allTimeSlots);
+                                vacantSlots.removeAll(occupiedSlots);
 
-                    // Create and show the actual dialog
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task_without_class, null);
+                                // Done loading—dismiss the loading dialog
+                                loadingDialog.dismiss();
 
-                    Spinner timeSlotSpinner = dialogView.findViewById(R.id.timeSlotSpinner);
-                    EditText taskTitle = dialogView.findViewById(R.id.taskTitle);
-                    EditText taskDetails = dialogView.findViewById(R.id.taskDetails);
-                    EditText instructorEditText = dialogView.findViewById(R.id.instructorEditText);
-
-                    // Set up spinner with vacant slots
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            this,
-                            android.R.layout.simple_spinner_item,
-                            vacantSlots
-                    );
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    timeSlotSpinner.setAdapter(adapter);
-
-                    // Auto-fill instructor for teachers
-                    String teacherAcronym = getIntent().getStringExtra("acronym");
-                    if (teacherAcronym != null && !teacherAcronym.isEmpty()) {
-                        instructorEditText.setText(teacherAcronym);
-                        instructorEditText.setEnabled(false);
-                    }
-
-                    builder.setView(dialogView)
-                            .setPositiveButton("Add Task", (dialog, which) -> {
-                                String instructor = instructorEditText.getText().toString().trim();
-
-                                if (instructor.isEmpty()) {
-                                    Toast.makeText(this, "Instructor acronym is required", Toast.LENGTH_SHORT).show();
+                                // If no slots are left, just stop
+                                if (vacantSlots.isEmpty()) {
+                                    Toast.makeText(
+                                            this,
+                                            "No available time slots",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
                                     return;
                                 }
 
-                                UniTask newTask = new UniTask(
-                                        taskTitle.getText().toString(),
-                                        taskDetails.getText().toString(),
-                                        timeSlotSpinner.getSelectedItem().toString(),
-                                        selectedBatch,
-                                        selectedSection,
-                                        instructor
+                                // 3) Finally, show the "Add Task" dialog using the vacant slots
+                                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                                View dialogView = getLayoutInflater().inflate(
+                                        R.layout.dialog_add_task_without_class,
+                                        null
                                 );
-                                newTask.setDate(date);
-                                saveTaskToFirestore(newTask);
+
+                                Spinner timeSlotSpinner = dialogView.findViewById(R.id.timeSlotSpinner);
+                                EditText taskTitle = dialogView.findViewById(R.id.taskTitle);
+                                EditText taskDetails = dialogView.findViewById(R.id.taskDetails);
+                                EditText instructorEditText = dialogView.findViewById(R.id.instructorEditText);
+
+                                // Set spinner with the free slots
+                                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        vacantSlots
+                                );
+                                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                timeSlotSpinner.setAdapter(adapter);
+
+                                // Auto-fill teacher's acronym if available
+                                String teacherAcronym = getIntent().getStringExtra("acronym");
+                                if (teacherAcronym != null && !teacherAcronym.isEmpty()) {
+                                    instructorEditText.setText(teacherAcronym);
+                                    instructorEditText.setEnabled(false);
+                                }
+
+                                builder.setView(dialogView)
+                                        .setPositiveButton("Add Task", (dialog, which) -> {
+                                            String instructor = instructorEditText
+                                                    .getText()
+                                                    .toString()
+                                                    .trim();
+                                            if (instructor.isEmpty()) {
+                                                Toast.makeText(
+                                                        this,
+                                                        "Instructor acronym is required",
+                                                        Toast.LENGTH_SHORT
+                                                ).show();
+                                                return;
+                                            }
+
+                                            // Build our new task
+                                            UniTask newTask = new UniTask(
+                                                    taskTitle.getText().toString(),
+                                                    taskDetails.getText().toString(),
+                                                    timeSlotSpinner.getSelectedItem().toString(),
+                                                    selectedBatch,
+                                                    selectedSection,
+                                                    instructor
+                                            );
+                                            newTask.setDate(date);
+
+                                            // Save to Firestore
+                                            saveTaskToFirestore(newTask);
+                                        })
+                                        .setNegativeButton("Cancel", null)
+                                        .show();
+
                             })
-                            .setNegativeButton("Cancel", null)
-                            .show();
+                            .addOnFailureListener(e -> {
+                                loadingDialog.dismiss();
+                                Toast.makeText(
+                                        this,
+                                        "Failed to load tasks",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            });
                 })
                 .addOnFailureListener(e -> {
                     loadingDialog.dismiss();
-                    Toast.makeText(this, "Failed to load time slots", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Failed to load schedule doc", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
     private boolean checkForStandaloneTasks(Date date) {
@@ -1229,7 +1340,7 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                                     taskDates.remove(taskDate);
                                 }
                                 // Force full calendar refresh
-                                fetchAllStandaloneTasksAndUpdateCalendar();
+                              //  fetchAllStandaloneTasksAndUpdateCalendar();
                                 updateCalendarAppearance();
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Error checking remaining tasks", e));
@@ -1344,7 +1455,7 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                                 Date taskDate = stripTime(task.getDate());
                                 taskDates.add(taskDate);
                                 updateCalendarAppearance();
-                                fetchAllStandaloneTasksAndUpdateCalendar();
+                               // fetchAllStandaloneTasksAndUpdateCalendar();
                                 loadAllDataForRange();// Immediate fetch
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Failed to update taskId", e));

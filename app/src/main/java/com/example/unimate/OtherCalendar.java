@@ -58,6 +58,7 @@ public class OtherCalendar extends AppCompatActivity {
     private ProgressBar loadingProgressBar;
     private TextView loadingText;
     private final Set<Date> taskDates = new HashSet<>();
+    private RecyclerView standaloneRecycler;
 
 
 
@@ -98,6 +99,7 @@ public class OtherCalendar extends AppCompatActivity {
         calendarView = findViewById(R.id.calendarView);
         classRecycler = findViewById(R.id.classRecycler);
         classRecycler.setLayoutManager(new LinearLayoutManager(this));
+        standaloneRecycler = findViewById(R.id.standaloneRecycler);
 
         batchSpinner = findViewById(R.id.batchSpinner);
         sectionSpinner = findViewById(R.id.sectionSpinner);
@@ -107,6 +109,7 @@ public class OtherCalendar extends AppCompatActivity {
         loadingProgressBar = findViewById(R.id.loadingProgressBar);
         loadingPercentage = findViewById(R.id.loadingPercentage);
         loadingText = findViewById(R.id.loadingText);
+
 
         setupSpinners();
         setupCalendar();
@@ -566,16 +569,35 @@ public class OtherCalendar extends AppCompatActivity {
         Date stripped = stripTime(date);
         List<ClassWithTasks> classes = classTaskMap.getOrDefault(stripped, new ArrayList<>());
 
+        // Reset UI
         classRecycler.setAdapter(null);
+        standaloneRecycler.setAdapter(null);
         emptyDayContainer.setVisibility(View.GONE);
         classRecycler.setVisibility(View.GONE);
+        standaloneRecycler.setVisibility(View.GONE);
 
-        if (!classes.isEmpty()) {
+
+
+        boolean hasClasses = !classes.isEmpty();
+        if (hasClasses) {
             showClassesWithTasks(classes);
-
-        } else {
-            fetchStandaloneTasks(stripped);
+            classRecycler.setVisibility(View.VISIBLE);
         }
+
+        // Always fetch standalone tasks
+        fetchStandaloneTasks(stripped, standaloneTasks -> {
+            boolean hasStandalone = !standaloneTasks.isEmpty();
+
+            if (hasStandalone) {
+                showStandaloneTasks(standaloneTasks);
+                standaloneRecycler.setVisibility(View.VISIBLE);
+            }
+
+//            // Show empty UI only if both are empty
+//            if (!hasClasses && !hasStandalone) {
+//
+//            }
+        });
     }
 
     private void showClassesWithTasks(List<ClassWithTasks> classes) {
@@ -620,7 +642,7 @@ public class OtherCalendar extends AppCompatActivity {
     }
 
 
-    private void fetchStandaloneTasks(Date date) {
+    private void fetchStandaloneTasks(Date date, CalendarActivity.OnStandaloneTasksFetchedListener listener) {
         db.collection("tasks")
                 .whereEqualTo("date", date)
                 .whereEqualTo("batch", selectedBatch)
@@ -634,41 +656,29 @@ public class OtherCalendar extends AppCompatActivity {
                             standaloneTasks.add(task);
                         }
                     }
-
-                    if (!standaloneTasks.isEmpty()) {
-                        showStandaloneTasks(standaloneTasks);
-
-
-                    }
+                    listener.onTasksFetched(standaloneTasks);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching standalone tasks", e);
+                    listener.onTasksFetched(new ArrayList<>());
                 });
     }
 
     private void showStandaloneTasks(List<UniTask> tasks) {
-        // Group tasks by time slot
-        Map<String, List<UniTask>> groupedTasks = new HashMap<>();
-        for (UniTask task : tasks) {
-            String timeSlot = task.getClassTime();
-            if (!groupedTasks.containsKey(timeSlot)) {
-                groupedTasks.put(timeSlot, new ArrayList<>());
+        StandaloneTasksAdapterOther adapter = new StandaloneTasksAdapterOther(tasks, new StandaloneTasksAdapterOther.OnTaskClickListener() {
+            @Override
+            public void onTaskClick(UniTask task) {
+                showTaskDetailsDialog(task);
             }
-            groupedTasks.get(timeSlot).add(task);
-        }
 
-        // Convert to ClassWithTasks objects for consistent display
-        List<ClassWithTasks> virtualClasses = new ArrayList<>();
-        for (Map.Entry<String, List<UniTask>> entry : groupedTasks.entrySet()) {
-            ClassWithTasks virtualClass = new ClassWithTasks(
-                    entry.getKey(),
-                    "Click to See the task",
-                    "",
-                    ""
-            );
-            virtualClass.setTasks(entry.getValue());
-            virtualClasses.add(virtualClass);
-        }
+            @Override
+            public void onDeleteClick(UniTask task) {
+                //showDeleteTaskConfirmation(task);  // Changed to use confirmation dialog
+            }
+        });
 
-        showClassesWithTasks(virtualClasses);
-
+        standaloneRecycler.setAdapter(adapter);
+        standaloneRecycler.setVisibility(View.VISIBLE);
     }
 
 
@@ -720,12 +730,16 @@ public class OtherCalendar extends AppCompatActivity {
 
         TextView title = dialogView.findViewById(R.id.taskTitle);
         TextView details = dialogView.findViewById(R.id.taskDetails);
+        TextView classTime = dialogView.findViewById(R.id.taskClassTime);
+        TextView instructor = dialogView.findViewById(R.id.taskInstructor);
         TextView date = dialogView.findViewById(R.id.taskDate);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d yyyy • hh:mm a", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d yyyy", Locale.getDefault());
 
         title.setText(task.getTaskTitle());
         details.setText(task.getTaskDetails());
+        classTime.setText("Class Time: " + task.getClassTime());
+        instructor.setText("Instructor: " + task.getInstructorAcronym());
         date.setText(sdf.format(task.getDate()));
 
         builder.setView(dialogView)

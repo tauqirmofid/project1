@@ -59,6 +59,8 @@ public class CalendarActivity extends AppCompatActivity {
     private TextView loadingText;
     private final Set<Date> taskDates = new HashSet<>();
 
+    private RecyclerView standaloneRecycler;
+
 
 
     private TextView loadingPercentage;
@@ -98,6 +100,7 @@ public class CalendarActivity extends AppCompatActivity {
         calendarView = findViewById(R.id.calendarView);
         classRecycler = findViewById(R.id.classRecycler);
         classRecycler.setLayoutManager(new LinearLayoutManager(this));
+        standaloneRecycler = findViewById(R.id.standaloneRecycler);
 
         batchSpinner = findViewById(R.id.batchSpinner);
         sectionSpinner = findViewById(R.id.sectionSpinner);
@@ -566,16 +569,35 @@ public class CalendarActivity extends AppCompatActivity {
         Date stripped = stripTime(date);
         List<ClassWithTasks> classes = classTaskMap.getOrDefault(stripped, new ArrayList<>());
 
+        // Reset UI
         classRecycler.setAdapter(null);
+        standaloneRecycler.setAdapter(null);
         emptyDayContainer.setVisibility(View.GONE);
         classRecycler.setVisibility(View.GONE);
+        standaloneRecycler.setVisibility(View.GONE);
 
-        if (!classes.isEmpty()) {
+        showEmptyDayUI(date);
+
+        boolean hasClasses = !classes.isEmpty();
+        if (hasClasses) {
             showClassesWithTasks(classes);
-            showEmptyDayUI(date);
-        } else {
-            fetchStandaloneTasks(stripped);
+            classRecycler.setVisibility(View.VISIBLE);
         }
+
+        // Always fetch standalone tasks
+        fetchStandaloneTasks(stripped, standaloneTasks -> {
+            boolean hasStandalone = !standaloneTasks.isEmpty();
+
+            if (hasStandalone) {
+                showStandaloneTasks(standaloneTasks);
+                standaloneRecycler.setVisibility(View.VISIBLE);
+            }
+
+//            // Show empty UI only if both are empty
+//            if (!hasClasses && !hasStandalone) {
+//
+//            }
+        });
     }
 
     private void showClassesWithTasks(List<ClassWithTasks> classes) {
@@ -637,7 +659,7 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
 
-    private void fetchStandaloneTasks(Date date) {
+    private void fetchStandaloneTasks(Date date, OnStandaloneTasksFetchedListener listener) {
         db.collection("tasks")
                 .whereEqualTo("date", date)
                 .whereEqualTo("batch", selectedBatch)
@@ -651,43 +673,33 @@ public class CalendarActivity extends AppCompatActivity {
                             standaloneTasks.add(task);
                         }
                     }
-
-                    if (!standaloneTasks.isEmpty()) {
-                        showStandaloneTasks(standaloneTasks);
-                        showEmptyDayUI(date);
-
-                    } else {
-                        showEmptyDayUI(date);
-                    }
+                    listener.onTasksFetched(standaloneTasks);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching standalone tasks", e);
+                    listener.onTasksFetched(new ArrayList<>());
                 });
     }
 
+    interface OnStandaloneTasksFetchedListener {
+        void onTasksFetched(List<UniTask> tasks);
+    }
+
     private void showStandaloneTasks(List<UniTask> tasks) {
-        // Group tasks by time slot
-        Map<String, List<UniTask>> groupedTasks = new HashMap<>();
-        for (UniTask task : tasks) {
-            String timeSlot = task.getClassTime();
-            if (!groupedTasks.containsKey(timeSlot)) {
-                groupedTasks.put(timeSlot, new ArrayList<>());
+        StandaloneTasksAdapter adapter = new StandaloneTasksAdapter(tasks, new StandaloneTasksAdapter.OnTaskClickListener() {
+            @Override
+            public void onTaskClick(UniTask task) {
+                showTaskDetailsDialog(task);
             }
-            groupedTasks.get(timeSlot).add(task);
-        }
 
-        // Convert to ClassWithTasks objects for consistent display
-        List<ClassWithTasks> virtualClasses = new ArrayList<>();
-        for (Map.Entry<String, List<UniTask>> entry : groupedTasks.entrySet()) {
-            ClassWithTasks virtualClass = new ClassWithTasks(
-                    entry.getKey(),
-                    "Click to See the task",
-                    "",
-                    ""
-            );
-            virtualClass.setTasks(entry.getValue());
-            virtualClasses.add(virtualClass);
-        }
+            @Override
+            public void onDeleteClick(UniTask task) {
+                showDeleteTaskConfirmation(task);  // Changed to use confirmation dialog
+            }
+        });
 
-        showClassesWithTasks(virtualClasses);
-
+        standaloneRecycler.setAdapter(adapter);
+        standaloneRecycler.setVisibility(View.VISIBLE);
     }
 
 
@@ -703,6 +715,10 @@ public class CalendarActivity extends AppCompatActivity {
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Task removed", Toast.LENGTH_SHORT).show();
+                    displayClassesForDate(currentSelectedDate);
+                    //updateCalendarAppearance();
+                    displayClassesForDate(currentSelectedDate);
+                    updateCalendarAppearance();
 
                     // ✅ Check if other standalone tasks exist for this date before removing it
                     Date taskDate = stripTime(task.getDate());
@@ -716,7 +732,7 @@ public class CalendarActivity extends AppCompatActivity {
                                 if (querySnapshot.isEmpty()) {
                                     taskDates.remove(taskDate); // Only remove if no standalone tasks exist
                                 }
-                                fetchAllStandaloneTasksAndUpdateCalendar();
+                                //fetchAllStandaloneTasksAndUpdateCalendar();
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Error checking remaining tasks", e));
                 })
@@ -739,12 +755,16 @@ public class CalendarActivity extends AppCompatActivity {
 
         TextView title = dialogView.findViewById(R.id.taskTitle);
         TextView details = dialogView.findViewById(R.id.taskDetails);
+        TextView classTime = dialogView.findViewById(R.id.taskClassTime);
+        TextView instructor = dialogView.findViewById(R.id.taskInstructor);
         TextView date = dialogView.findViewById(R.id.taskDate);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d yyyy • hh:mm a", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d yyyy", Locale.getDefault());
 
         title.setText(task.getTaskTitle());
         details.setText(task.getTaskDetails());
+        classTime.setText("Class Time: " + task.getClassTime());
+        instructor.setText("Instructor: " + task.getInstructorAcronym());
         date.setText(sdf.format(task.getDate()));
 
         builder.setView(dialogView)
@@ -762,6 +782,37 @@ public class CalendarActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+
+
+    private void showDeleteTaskConfirmation(UniTask task) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_delete_class, null);
+        EditText confirmInput = dialogView.findViewById(R.id.confirmEditText);
+        MaterialButton deleteBtn = dialogView.findViewById(R.id.deleteButton);
+        MaterialButton cancelBtn = dialogView.findViewById(R.id.cancelButton);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        deleteBtn.setEnabled(false);
+        confirmInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                deleteBtn.setEnabled(s.toString().equalsIgnoreCase("DELETE"));
+            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        });
+
+        deleteBtn.setOnClickListener(v -> {
+            deleteStandaloneTask(task);
+            dialog.dismiss();
+        });
+
+        cancelBtn.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 
 
@@ -909,12 +960,13 @@ public class CalendarActivity extends AppCompatActivity {
 
     // Add this method for empty day UI
     private void showAddTaskDialogWithoutClass(Date date) {
-
-
+        // 1) Fetch schedule doc for the day
         db.collection("schedules")
                 .document(getDayName(date).toLowerCase())
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
+
+                    // The full list of time slots
                     List<String> allTimeSlots = Arrays.asList(
                             "09:00-10:20AM",
                             "10:20-11:40AM",
@@ -925,7 +977,10 @@ public class CalendarActivity extends AppCompatActivity {
                             "7:00-8:20PM"
                     );
 
+                    // Keep track of all occupied slots (from both classes & tasks)
                     List<String> occupiedSlots = new ArrayList<>();
+
+                    // Fill occupiedSlots from the schedule doc
                     if (documentSnapshot.exists()) {
                         Map<String, Object> dayData = documentSnapshot.getData();
                         if (dayData != null) {
@@ -934,35 +989,53 @@ public class CalendarActivity extends AppCompatActivity {
                                 Map<String, Object> batchMap = (Map<String, Object>) dayData.get(batchKey);
                                 if (batchMap.containsKey(selectedSection)) {
                                     Map<String, Object> sectionMap = (Map<String, Object>) batchMap.get(selectedSection);
+                                    // each key is a time slot occupied by a class
                                     occupiedSlots.addAll(sectionMap.keySet());
                                 }
                             }
                         }
                     }
-// TAUQIR
-                    // TAUQIR// TAUQIR// TAUQIR
-                    // TAUQIR// TAUQIR// TAUQIR
-                    // TAUQIR// TAUQIR// TAUQIR
 
-                    // TAUQIR// TAUQIR// TAUQIR
-                    // TAUQIR// TAUQIR// TAUQIR
-                    // Calculate available slots
-                    List<String> vacantSlots = new ArrayList<>(allTimeSlots);
-                    vacantSlots.removeAll(occupiedSlots);
+                    // 2) Now also fetch tasks for the same batch, section & date
+                    db.collection("tasks")
+                            .whereEqualTo("batch", selectedBatch)
+                            .whereEqualTo("section", selectedSection)
+                            .whereEqualTo("date", date)
+                            .get()
+                            .addOnSuccessListener(taskSnapshots -> {
+                                // Fill occupiedSlots from tasks' classTime
+                                for (QueryDocumentSnapshot doc : taskSnapshots) {
+                                    UniTask task = doc.toObject(UniTask.class);
+                                    if (task.getClassTime() != null && !task.getClassTime().isEmpty()) {
+                                        occupiedSlots.add(task.getClassTime());
+                                    }
+                                }
 
-                    if (vacantSlots.isEmpty()) {
-                        Toast.makeText(this, "No vacant time slots available.", Toast.LENGTH_SHORT).show();
+                                // 3) Remove all occupied from the master list
+                                List<String> vacantSlots = new ArrayList<>(allTimeSlots);
+                                vacantSlots.removeAll(occupiedSlots);
 
-                    } else {
-                        showAddTaskDialogWithAvailableSlots(date, vacantSlots);
-                       }
+                                // Now decide whether to show the “Add Task” dialog
+                                if (vacantSlots.isEmpty()) {
+                                    Toast.makeText(
+                                            this,
+                                            "No vacant time slots available.",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                } else {
+                                    // Pass the free slots to your method
+                                    showAddTaskDialogWithAvailableSlots(date, vacantSlots);
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Failed to load tasks", Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .addOnFailureListener(e -> {
-
                     Toast.makeText(this, "Failed to load time slots", Toast.LENGTH_SHORT).show();
                 });
-
     }
+
 
 
     private void showAddTaskDialogWithAvailableSlots(Date date, List<String> vacantSlots) {
@@ -1234,7 +1307,7 @@ public class CalendarActivity extends AppCompatActivity {
                                     taskDates.remove(taskDate);
                                 }
                                 // Force full calendar refresh
-                                fetchAllStandaloneTasksAndUpdateCalendar();
+                               // fetchAllStandaloneTasksAndUpdateCalendar();
                                 updateCalendarAppearance();
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Error checking remaining tasks", e));
@@ -1359,7 +1432,7 @@ public class CalendarActivity extends AppCompatActivity {
                                 Date taskDate = stripTime(task.getDate());
                                 taskDates.add(taskDate);
                                 updateCalendarAppearance();
-                                fetchAllStandaloneTasksAndUpdateCalendar();
+                                //fetchAllStandaloneTasksAndUpdateCalendar();
                                 loadAllDataForRange();// Immediate fetch
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Failed to update taskId", e));

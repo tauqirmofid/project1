@@ -43,7 +43,7 @@ public class UniTask {
     // Add proper getter for instructorAcronym
     @PropertyName("instructor_acronym")
     public String getInstructorAcronym() {
-        return instructorAcronym;
+        return instructorAcronym != null ? instructorAcronym : "";
     }
 
     @PropertyName("task_title")

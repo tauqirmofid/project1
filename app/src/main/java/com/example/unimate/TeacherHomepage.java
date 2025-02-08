@@ -32,7 +32,7 @@ public class TeacherHomepage extends AppCompatActivity {
     private TextView tvTeacherName, tvDesignation, tvAcronym, tvEmail;
     private RecyclerView carouselRecyclerView;
     private DayAdapter dayAdapter;
-    private CardView task;
+    private CardView task,t_othersRoutineCard;
     private List<DayModel> dayList;
     private ImageView leftNavBarImage;
     private DrawerLayout drawerLayout;
@@ -60,10 +60,16 @@ public class TeacherHomepage extends AppCompatActivity {
         tvAcronym = findViewById(R.id.tv_acronym);
         tvEmail = findViewById(R.id.tv_email);
         task=findViewById(R.id.t_upcomingTaskCard);
+        otherRoutine=findViewById( R.id.t_othersRoutineCard);
         routine=findViewById(R.id.t_routineCardView);
         routine.setOnClickListener(v -> {
             Intent intent = new Intent(TeacherHomepage.this, TeacherRoutineActivity.class);
             intent.putExtra("acronym", teacherAcronym);
+            startActivity(intent);
+        });
+
+        otherRoutine.setOnClickListener(v -> {
+            Intent intent = new Intent(TeacherHomepage.this, OtherCalendar.class);
             startActivity(intent);
         });
 

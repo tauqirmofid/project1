@@ -188,6 +188,14 @@
                 android:padding="10dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/standaloneRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:layout_below="@id/classRecycler"/>
         </LinearLayout>
 
 
