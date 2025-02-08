@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Guest_HomePage">
+
+    <!--
+         1) Main Content Area
+         Place your existing layout inside this FrameLayout
+         so it does not get removed or changed.
+    -->
+    <FrameLayout
+        android:id="@+id/mainContentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- ============================= -->
+        <!--       Your Existing Layout   -->
+        <!--    (NestedScrollView, etc.)  -->
+        <!-- ============================= -->
+        <!--
+             Copy the entire XML you had for the screen into here.
+             Below is your original code, unchanged:
+        -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/main"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/Layout_Background"
+                tools:context=".Guest_HomePage">
+
+                <!-- Top card view start -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/topCardView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="0dp"
+                    app:cardBackgroundColor="@color/Theme_green"
+                    app:cardElevation="8dp"
+                    app:cardPreventCornerOverlap="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/CustomCardShape">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <!-- LEFT NAV IMAGE (click to open drawer) -->
+                        <ImageView
+                            android:id="@+id/leftNavBarImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="@null"
+                            android:src="@drawable/nev_bar"
+                            android:scaleX="1.5"
+                            android:scaleY="1.5"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                        <!-- Center Image -->
+                        <ImageView
+                            android:id="@+id/selectRoleTopImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="-60dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="@null"
+                            android:src="@drawable/new_home_top"
+                            android:scaleX="0.8"
+                            android:scaleY="0.8"
+                            app:layout_constraintStart_toEndOf="@id/leftNavBarImage"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+                <!-- Top card view Ends -->
+
+                <!-- Search bar Start -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/searchBar"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="8dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/topCardView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:background="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="8dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/searchIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="18dp"
+                            android:src="@drawable/ic_search"
+                            android:contentDescription="Search Icon" />
+
+                        <EditText
+                            android:id="@+id/searchEditText"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:hint="Search"
+                            android:textColorHint="#808080"
+                            android:textColor="#000000"
+                            android:background="@android:color/transparent"
+                            android:padding="0dp"
+                            android:gravity="center_vertical" />
+
+                        <ImageView
+                            android:id="@+id/twoDotsIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="18dp"
+                            android:src="@drawable/two_dots"
+                            android:contentDescription="Two Dots Icon" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                <!-- Search bar Ends -->
+
+                <ImageView
+                    android:id="@+id/Divider"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/division"
+                    android:contentDescription="@null"
+                    app:layout_constraintTop_toBottomOf="@id/searchBar"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <LinearLayout
+                    android:layout_width="458dp"
+                    android:layout_height="904dp"
+                    app:layout_constraintTop_toBottomOf="@id/Divider"
+                    tools:ignore="MissingConstraints">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/teacherRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    </androidx.recyclerview.widget.RecyclerView>
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

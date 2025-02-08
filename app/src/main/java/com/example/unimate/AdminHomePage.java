@@ -70,7 +70,11 @@ public class AdminHomePage extends AppCompatActivity {
         });
 
         teacherinfoCardView = findViewById(R.id.admin_teachersInfoCard);
+        teacherinfoCardView.setOnClickListener(v->{
+            Intent intent = new Intent(AdminHomePage.this, UploadTeacherInfoActivity.class);
+            startActivity(intent);
 
+        });
         // Drawer setup
         drawerLayout = findViewById(R.id.drawerLayout);
         leftNavBarImage = findViewById(R.id.leftNavBarImage);

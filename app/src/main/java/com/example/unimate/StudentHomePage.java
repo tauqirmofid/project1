@@ -68,6 +68,12 @@ public class StudentHomePage extends AppCompatActivity {
             startActivity(intent);
 
         });
+        teacherInfo=findViewById(R.id.teachersInfoCard);
+        teacherInfo.setOnClickListener(v->{
+            Intent intent = new Intent(StudentHomePage.this, Teacher_infoActivity.class);
+            startActivity(intent);
+        });
+
         maps=findViewById(R.id.universityMapCard);
         maps.setOnClickListener(v->{
             Intent intent = new Intent(StudentHomePage.this, MapActivity.class);
