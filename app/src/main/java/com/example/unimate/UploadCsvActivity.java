@@ -271,32 +271,46 @@ public class UploadCsvActivity extends AppCompatActivity {
                 if (inputStream == null) {
                     throw new IOException("Cannot open inputStream for: " + uri);
                 }
+
+                // Read full CSV content to handle multi-line quoted fields
+                StringBuilder csvBuilder = new StringBuilder();
                 String line;
+
+                while ((line = reader.readLine()) != null) {
+                    csvBuilder.append(line).append("\n");  // Preserve newlines
+                }
+
+                // Smartly split lines while preserving quoted multi-line values
+                String csvContent = csvBuilder.toString();
+                String[] lines = csvContent.split("\n(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
                 boolean isDataRow = false;
                 Map<String, Map<String, Map<String, Map<String, Object>>>> batches = new HashMap<>();
 
-                while ((line = reader.readLine()) != null) {
-                    // Example of skipping headers or special lines
-                    if (line.startsWith("SUNDAY,Batch") ||
-                            line.startsWith("MONDAY,Batch") ||
-                            line.startsWith("TUESDAY,Batch") ||
-                            line.startsWith("WEDNESDAY,Batch") ||
-                            line.startsWith("THURSDAY,Batch") ||
-                            line.startsWith("FRIDAY,Batch") ||
-                            line.startsWith("SATURDAY,Batch")) {
+                for (String fullLine : lines) {
+                    fullLine = fullLine.trim();
+                    if (fullLine.isEmpty()) continue;
+
+                    // Skip headers
+                    if (fullLine.startsWith("SUNDAY,Batch") ||
+                            fullLine.startsWith("MONDAY,Batch") ||
+                            fullLine.startsWith("TUESDAY,Batch") ||
+                            fullLine.startsWith("WEDNESDAY,Batch") ||
+                            fullLine.startsWith("THURSDAY,Batch") ||
+                            fullLine.startsWith("FRIDAY,Batch") ||
+                            fullLine.startsWith("SATURDAY,Batch")) {
                         isDataRow = true;
                         continue;
                     }
-                    if (!isDataRow || line.trim().isEmpty() || line.contains("BUS TIME")) {
+                    if (!isDataRow || fullLine.contains("BUS TIME")) {
                         continue;
                     }
 
-                    // Split CSV properly
-                    String[] cells = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+                    // Handle CSV splitting while keeping quoted fields intact
+                    String[] cells = fullLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
                     if (cells.length < 10) continue;
 
-                    // columns: 0->Day, 1->Batch, 2->Section, 3->09:00..., 4->10:20..., 5->11:40..., 6->break or empty
-                    // 7->1:30..., 8->2:50..., 9->7:00-8:20
+                    // Extract batch & section
                     String batch = cells[1].trim();
                     String section = cells[2].trim();
                     if (batch.isEmpty() || section.isEmpty()) continue;
@@ -309,26 +323,30 @@ public class UploadCsvActivity extends AppCompatActivity {
                         if (colIndex >= cells.length) continue;
 
                         String cellValue = cells[colIndex].replace("\"", "").trim();
+
+                        // ✅ Fix: Merge multi-line values
+                        if (cellValue.endsWith(",")) {
+                            cellValue += cells[colIndex + 1].replace("\"", "").trim();
+                        }
+
                         if (cellValue.isEmpty() || cellValue.equalsIgnoreCase("B")) {
-                            // break or empty
                             continue;
                         }
 
+                        // Split into components (Course, Instructor, Room)
                         String[] parts = cellValue.split("\\s+");
-                        if (parts.length < 3) {
-                            // Possibly "OL Class 7:00pm-8:20pm" or similar
-                            Map<String, Object> classInfo = new HashMap<>();
+
+                        Map<String, Object> classInfo = new HashMap<>();
+                        if (parts.length >= 3) {
+                            classInfo.put("course", parts[0]);
+                            classInfo.put("instructor", parts[1]);
+                            classInfo.put("room", parts[2]);
+                        } else {
                             classInfo.put("course", "N/A");
                             classInfo.put("instructor", "N/A");
                             classInfo.put("room", cellValue);
-                            sectionData.put(timeSlots[i], classInfo);
-                            continue;
                         }
 
-                        Map<String, Object> classInfo = new HashMap<>();
-                        classInfo.put("course", parts[0]);
-                        classInfo.put("instructor", parts[1]);
-                        classInfo.put("room", parts[2]);
                         sectionData.put(timeSlots[i], classInfo);
                     }
 
@@ -340,7 +358,7 @@ public class UploadCsvActivity extends AppCompatActivity {
                     }
                 }
 
-                // Overwrite data in Firestore
+                // ✅ Upload fixed structured data
                 uploadToFirestore(batches);
 
             } catch (IOException e) {
