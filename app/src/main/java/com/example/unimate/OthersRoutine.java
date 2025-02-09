@@ -1,16 +1,13 @@
 package com.example.unimate;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.AdapterView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,7 +20,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,12 +43,10 @@ public class OthersRoutine extends AppCompatActivity {
     };
 
     private Map<String, Set<String>> batchToSectionsMap = new HashMap<>();
-
     // Firestore
     private FirebaseFirestore db;
 
     // Timeslot keys in Firestore vs. row order in item_day_card.xml
-    // We assume these EXACT strings exist in Firestore:
     private final String[] timeKeys = {
             "09:00-10:20AM",
             "10:20-11:40AM",
@@ -64,8 +58,6 @@ public class OthersRoutine extends AppCompatActivity {
     };
 
     // For easily parsing start/end times, define them in parallel arrays:
-    // "9:00-10:20AM" -> start= "9:00AM", end="10:20AM"
-    // We’ll parse them as 24-hour times to compare with device clock.
     private final String[] timeSlotStart = {
             "09:00AM",
             "10:20AM",
@@ -85,14 +77,10 @@ public class OthersRoutine extends AppCompatActivity {
             "08:20PM"
     };
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_others_routine);
-
 
         db = FirebaseFirestore.getInstance();
 
@@ -100,12 +88,12 @@ public class OthersRoutine extends AppCompatActivity {
         progressDialog.setMessage("Loading schedules...");
         progressDialog.setCancelable(false);
 
-        // 2) The three new TextViews for current/next/previous class
+        // TextViews for current/next/previous class
         tvCurrentClass = findViewById(R.id.tvCurrentClass);
         tvNextClass = findViewById(R.id.tvNextClass);
         tvPreviousClass = findViewById(R.id.tvPreviousClass);
 
-        // 3) Setup the RecyclerView
+        // RecyclerView
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
 
         // Initialize dayList with default "No Class"
@@ -131,27 +119,14 @@ public class OthersRoutine extends AppCompatActivity {
         OverlapDecoration decoration = new OverlapDecoration(300);
         carouselRecyclerView.addItemDecoration(decoration);
 
-        // Spinner listeners
-        AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fetchAllDays();
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        };
-
         spinnerBatch = findViewById(R.id.spinnerBatch);
         spinnerSection = findViewById(R.id.spinnerSection);
         setupSpinners();
         fetchBatchesAndSections();
 
-
-
-        // Fetch initially
+        // Fetch schedule initially
         fetchAllDays();
     }
-
 
     private void setupSpinners() {
         spinnerBatch.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, new ArrayList<>()));
@@ -165,7 +140,6 @@ public class OthersRoutine extends AppCompatActivity {
 
         Set<String> allBatches = new HashSet<>();
         batchToSectionsMap.clear();
-        // Show the loading dialog
         progressDialog.show();
 
         for (String day : days) {
@@ -191,15 +165,13 @@ public class OthersRoutine extends AppCompatActivity {
 
                         if (completedDays.incrementAndGet() == totalDays) {
                             updateSpinners(new ArrayList<>(allBatches));
-                            progressDialog.dismiss(); // Dismiss dialog when done
-
+                            progressDialog.dismiss();
                         }
                     })
                     .addOnFailureListener(e -> {
                         if (completedDays.incrementAndGet() == totalDays) {
                             updateSpinners(new ArrayList<>(allBatches));
-                            progressDialog.dismiss(); // Dismiss dialog on error
-
+                            progressDialog.dismiss();
                         }
                     });
         }
@@ -207,13 +179,10 @@ public class OthersRoutine extends AppCompatActivity {
 
     private void updateSpinners(List<String> batches) {
         Collections.sort(batches);
-        ArrayAdapter<String> batchAdapter = new ArrayAdapter<>(
-                this, R.layout.spinner_item, batches
-        );
+        ArrayAdapter<String> batchAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, batches);
         batchAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinnerBatch.setAdapter(batchAdapter);
 
-        // Set default selection only if batches exist
         if (!batches.isEmpty()) {
             spinnerBatch.setSelection(0);
             updateSectionSpinner(batches.get(0));
@@ -227,10 +196,8 @@ public class OthersRoutine extends AppCompatActivity {
                     updateSectionSpinner(selectedBatch);
                 }
             }
-
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
@@ -239,13 +206,10 @@ public class OthersRoutine extends AppCompatActivity {
         List<String> sectionList = new ArrayList<>(sections);
         Collections.sort(sectionList);
 
-        ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(
-                this, R.layout.spinner_item, sectionList
-        );
+        ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, sectionList);
         sectionAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinnerSection.setAdapter(sectionAdapter);
 
-        // Set default selection only if sections exist
         if (!sectionList.isEmpty()) {
             spinnerSection.setSelection(0);
         }
@@ -257,64 +221,42 @@ public class OthersRoutine extends AppCompatActivity {
                     fetchAllDays();
                 }
             }
-
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // tauqir // tauqir // tauqir // tauqir
-    //tauqir
-    //tauqir
 
     /**
      * Fetch the schedule for all 7 days, for the currently selected batch & section.
      */
     private void fetchAllDays() {
-        // Add null checks for spinner selections
         if (spinnerBatch.getSelectedItem() == null || spinnerSection.getSelectedItem() == null) {
             return;
         }
-        progressDialog.show(); // Show the loading dialog
+        progressDialog.show();
 
         final String selectedBatch = spinnerBatch.getSelectedItem().toString();
         final String selectedSection = spinnerSection.getSelectedItem().toString();
 
-        // Rest of the method remains the same
         dayList = new ArrayList<>();
         for (String dayName : daysOfWeek) {
             dayList.add(new DayModel(dayName));
         }
+        // Start recursion
         fetchDay(0, selectedBatch, selectedSection);
     }
 
     private void fetchDay(int dayIndex, String batch, String section) {
         if (dayIndex >= daysOfWeek.length) {
-            // All done, update adapter & center on current day, then find current/next/previous
+            // All done
             dayAdapter = new DayAdapter(dayList);
             carouselRecyclerView.setAdapter(dayAdapter);
 
             int todayIndex = getCurrentDayIndex();
             centerCarouselOn(todayIndex);
 
-            // After we loaded today's data, let's find current/next/previous
             displayCurrentNextPrev(todayIndex);
-            progressDialog.dismiss(); // Dismiss the loading dialog
-
+            progressDialog.dismiss();
             return;
         }
 
@@ -338,7 +280,6 @@ public class OthersRoutine extends AppCompatActivity {
                                         Map<String, Object> timeslotMap = (Map<String, Object>) sectionVal;
                                         DayModel dayModel = dayList.get(dayIndex);
 
-                                        // Fill each timeslot
                                         for (int i = 0; i < timeKeys.length; i++) {
                                             String tKey = timeKeys[i];
                                             String classInfo = "No Class";
@@ -352,7 +293,6 @@ public class OthersRoutine extends AppCompatActivity {
                                                     classInfo = course + "\n" + instructor + "\n" + room;
                                                 }
                                             }
-                                            // put classInfo in dayModel
                                             switch (i) {
                                                 case 0: dayModel.setClass1(classInfo); break;
                                                 case 1: dayModel.setClass2(classInfo); break;
@@ -368,7 +308,6 @@ public class OthersRoutine extends AppCompatActivity {
                             }
                         }
                     }
-                    // Move on to next day
                     fetchDay(dayIndex + 1, batch, section);
                 })
                 .addOnFailureListener(e -> {
@@ -377,8 +316,6 @@ public class OthersRoutine extends AppCompatActivity {
                 });
     }
 
-    // --- Time & Day Utils ---
-
     /** Scroll the carousel to the infinite-mid position for dayIndex. */
     private void centerCarouselOn(int dayIndex) {
         int halfMaxValue = Integer.MAX_VALUE / 2;
@@ -386,9 +323,7 @@ public class OthersRoutine extends AppCompatActivity {
         int targetPos = midPos + dayIndex;
 
         carouselRecyclerView.scrollToPosition(targetPos);
-        carouselRecyclerView.post(() -> {
-            carouselRecyclerView.smoothScrollToPosition(targetPos);
-        });
+        carouselRecyclerView.post(() -> carouselRecyclerView.smoothScrollToPosition(targetPos));
     }
 
     /**
@@ -406,16 +341,16 @@ public class OthersRoutine extends AppCompatActivity {
         return (val == null) ? "N/A" : val.toString();
     }
 
-    /**
-     * Once we know today's day data, let's parse the time slots and see
-     * which slot is "current" (if any), next, and previous.
-     */
+    // -----------------------------------------
+    //    SHOW CURRENT, NEXT, AND PREVIOUS
+    // -----------------------------------------
     private void displayCurrentNextPrev(int todayIndex) {
         DayModel todayModel = dayList.get(todayIndex);
         Calendar now = Calendar.getInstance();
         int currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
         int currentSlotIndex = -1;
 
+        // Figure out which slot is current
         for (int i = 0; i < timeSlotStart.length; i++) {
             int startMins = parseTimeToMinutes(timeSlotStart[i]);
             int endMins = parseTimeToMinutes(timeSlotEnd[i]);
@@ -426,43 +361,60 @@ public class OthersRoutine extends AppCompatActivity {
         }
 
         if (currentSlotIndex >= 0) {
-            String currentClass = getClassInfoByIndex(todayModel, currentSlotIndex);
-            tvCurrentClass.setText(currentClass);
+            // We are within a slot
+            tvCurrentClass.setText(
+                    buildClassDisplay(daysOfWeek[todayIndex],
+                            0, // 0-day offset (today)
+                            currentSlotIndex,
+                            getClassInfoByIndex(todayModel, currentSlotIndex))
+            );
 
+            // Next
             int nextSlot = findNextNonEmptySlot(todayModel, currentSlotIndex + 1);
             if (nextSlot != -1) {
-                tvNextClass.setText(getClassInfoByIndex(todayModel, nextSlot));
+                tvNextClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
+                        0, nextSlot, getClassInfoByIndex(todayModel, nextSlot)));
             } else {
                 checkNextDaysForClass(todayIndex);
             }
 
+            // Previous
             int prevSlot = findPreviousNonEmptySlot(todayModel, currentSlotIndex - 1);
             if (prevSlot != -1) {
-                tvPreviousClass.setText(getClassInfoByIndex(todayModel, prevSlot));
+                tvPreviousClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
+                        0, prevSlot, getClassInfoByIndex(todayModel, prevSlot)));
             } else {
                 checkPreviousDaysForClass(todayIndex);
             }
+
         } else {
+            // No ongoing class
             tvCurrentClass.setText("No ongoing class");
 
             if (currentMinutes < parseTimeToMinutes(timeSlotStart[0])) {
+                // All future slots
                 int nextSlot = findNextNonEmptySlot(todayModel, 0);
                 if (nextSlot != -1) {
-                    tvNextClass.setText(getClassInfoByIndex(todayModel, nextSlot));
+                    tvNextClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
+                            0, nextSlot, getClassInfoByIndex(todayModel, nextSlot)));
                 } else {
                     checkNextDaysForClass(todayIndex);
                 }
-                // Check previous days for the last class
-                checkPreviousDaysForClass(todayIndex); // Added line
+                checkPreviousDaysForClass(todayIndex);
+
             } else if (currentMinutes >= parseTimeToMinutes(timeSlotEnd[timeSlotEnd.length - 1])) {
+                // We are past the last slot
                 int prevSlot = findPreviousNonEmptySlot(todayModel, timeSlotEnd.length - 1);
                 if (prevSlot != -1) {
-                    tvPreviousClass.setText(getClassInfoByIndex(todayModel, prevSlot));
+                    tvPreviousClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
+                            0, prevSlot, getClassInfoByIndex(todayModel, prevSlot)));
                 } else {
                     checkPreviousDaysForClass(todayIndex);
                 }
                 tvNextClass.setText("None");
+
             } else {
+                // Between two slots
                 int nextSlot = -1;
                 for (int i = 0; i < timeSlotStart.length; i++) {
                     int sMins = parseTimeToMinutes(timeSlotStart[i]);
@@ -474,7 +426,9 @@ public class OthersRoutine extends AppCompatActivity {
                 if (nextSlot != -1) {
                     int actualNextSlot = findNextNonEmptySlot(todayModel, nextSlot);
                     if (actualNextSlot != -1) {
-                        tvNextClass.setText(getClassInfoByIndex(todayModel, actualNextSlot));
+                        tvNextClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
+                                0, actualNextSlot,
+                                getClassInfoByIndex(todayModel, actualNextSlot)));
                     } else {
                         checkNextDaysForClass(todayIndex);
                     }
@@ -482,11 +436,13 @@ public class OthersRoutine extends AppCompatActivity {
                     tvNextClass.setText("None");
                 }
 
+                // For previous day
                 int prevDayIndex = (todayIndex - 1 + 7) % 7;
                 DayModel prevDay = dayList.get(prevDayIndex);
                 int prevSlot = findPreviousNonEmptySlot(prevDay, timeSlotEnd.length - 1);
                 if (prevSlot != -1) {
-                    tvPreviousClass.setText(getClassInfoByIndex(prevDay, prevSlot));
+                    tvPreviousClass.setText(buildClassDisplay(daysOfWeek[prevDayIndex],
+                            -1, prevSlot, getClassInfoByIndex(prevDay, prevSlot)));
                 } else {
                     checkPreviousDaysForClass(todayIndex);
                 }
@@ -494,35 +450,55 @@ public class OthersRoutine extends AppCompatActivity {
         }
     }
 
+    /**
+     * Look up to 7 days ahead to find the next day/slot that has a class.
+     */
     private void checkNextDaysForClass(int todayIndex) {
-        int nextDayIndex = (todayIndex + 1) % 7;
-        for (int i = 0; i < 7; i++) {
+        // We'll check from 1 to 7 days ahead
+        for (int offset = 1; offset <= 7; offset++) {
+            int nextDayIndex = (todayIndex + offset) % 7;
             DayModel nextDay = dayList.get(nextDayIndex);
+
             int nextSlot = findNextNonEmptySlot(nextDay, 0);
             if (nextSlot != -1) {
-                tvNextClass.setText(getClassInfoByIndex(nextDay, nextSlot));
+                tvNextClass.setText(buildClassDisplay(
+                        daysOfWeek[nextDayIndex],
+                        offset,
+                        nextSlot,
+                        getClassInfoByIndex(nextDay, nextSlot)
+                ));
                 return;
             }
-            nextDayIndex = (nextDayIndex + 1) % 7;
         }
         tvNextClass.setText("None");
     }
 
+    /**
+     * Look up to 7 days behind to find the previous day/slot that had a class.
+     */
     private void checkPreviousDaysForClass(int todayIndex) {
-        int prevDayIndex = (todayIndex - 1 + 7) % 7;
-        for (int i = 0; i < 7; i++) {
+        // We'll check from 1 to 7 days behind
+        for (int offset = 1; offset <= 7; offset++) {
+            int prevDayIndex = (todayIndex - offset + 7) % 7;
             DayModel prevDay = dayList.get(prevDayIndex);
+
             int prevSlot = findPreviousNonEmptySlot(prevDay, timeSlotEnd.length - 1);
             if (prevSlot != -1) {
-                tvPreviousClass.setText(getClassInfoByIndex(prevDay, prevSlot));
+                tvPreviousClass.setText(buildClassDisplay(
+                        daysOfWeek[prevDayIndex],
+                        -offset,
+                        prevSlot,
+                        getClassInfoByIndex(prevDay, prevSlot)
+                ));
                 return;
             }
-            prevDayIndex = (prevDayIndex - 1 + 7) % 7;
         }
         tvPreviousClass.setText("None");
     }
 
-
+    /**
+     * Used to find the next slot that is not "No Class", starting from 'startIndex'.
+     */
     private int findNextNonEmptySlot(DayModel dayModel, int startIndex) {
         for (int i = startIndex; i < timeSlotStart.length; i++) {
             String classInfo = getClassInfoByIndex(dayModel, i);
@@ -533,6 +509,9 @@ public class OthersRoutine extends AppCompatActivity {
         return -1;
     }
 
+    /**
+     * Used to find the previous slot that is not "No Class", going backwards from 'startIndex'.
+     */
     private int findPreviousNonEmptySlot(DayModel dayModel, int startIndex) {
         for (int i = startIndex; i >= 0; i--) {
             String classInfo = getClassInfoByIndex(dayModel, i);
@@ -544,8 +523,35 @@ public class OthersRoutine extends AppCompatActivity {
     }
 
     /**
+     * Build a display string showing:
+     *   - Day name
+     *   - Date (based on offset from today)
+     *   - Time slot (e.g. "09:00-10:20AM")
+     *   - Class info (course, instructor, room)
+     */
+    private String buildClassDisplay(String dayName, int dayOffset, int slotIndex, String classInfo) {
+        // Format the date for the offset from "today"
+        String dateStr = getDateWithOffset(dayOffset);
+
+        // e.g. "Monday, 02 Feb 2025\n09:00-10:20AM\nCourse...\nInstructor..."
+        return dayName + ", " + dateStr
+                + "\n" + timeKeys[slotIndex]
+                + "\n" + classInfo;
+    }
+
+    /**
+     * Returns a string representing today's date plus the given offset (can be negative).
+     * Example format: "02 Feb 2025"
+     */
+    private String getDateWithOffset(int offsetDays) {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DAY_OF_YEAR, offsetDays);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+        return sdf.format(c.getTime());
+    }
+
+    /**
      * Parse times like "09:00AM", "10:20AM", "01:00PM", "07:00PM" into minutes from midnight.
-     * We'll use a SimpleDateFormat with "hh:mma".
      */
     private int parseTimeToMinutes(String timeStr) {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mma", Locale.US);
@@ -565,8 +571,7 @@ public class OthersRoutine extends AppCompatActivity {
     }
 
     /**
-     * Return dayModel.getClassX by index:
-     *   0->getClass1(), 1->getClass2()...
+     * Returns the correct class info field from the model by slot index.
      */
     private String getClassInfoByIndex(DayModel model, int slotIndex) {
         switch (slotIndex) {
