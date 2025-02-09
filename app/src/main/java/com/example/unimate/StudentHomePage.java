@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,7 +38,7 @@ public class StudentHomePage extends AppCompatActivity {
     private RecyclerView carouselRecyclerView;
     private List<DayModel> dayList;
     private DayAdapter dayAdapter;
-    private CardView rooms,otherRoutine,task,maps,teacherInfo,routine;
+    private CardView rooms,otherRoutine,task,maps,teacherInfo,profile;
 
     private TextView studentNameText, studentBatchText, studentSectionText;
     private DrawerLayout drawerLayout;
@@ -47,6 +48,7 @@ public class StudentHomePage extends AppCompatActivity {
     }; private FirebaseFirestore db;
 
     // The time slot keys you use in Firestore
+    private LinearLayout routine;
     private final String[] timeKeys = {
             "09:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
             "1:00-1:30PM", "1:30-2:50PM", "2:50-4:10PM", "7:00-8:20PM"
@@ -56,38 +58,7 @@ public class StudentHomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_home_page);
         db = FirebaseFirestore.getInstance();
-        routine=findViewById(R.id.st_routineCardView);
 
-        routine.setOnClickListener(v -> {
-            NestedScrollView nestedScrollView = findViewById(R.id.nestedScrollView);
-            final View targetView = findViewById(R.id.carouselRecyclerView);
-
-            if (nestedScrollView != null && targetView != null) {
-                // Use ViewTreeObserver to wait for layout
-                targetView.getViewTreeObserver().addOnGlobalLayoutListener(
-                        new ViewTreeObserver.OnGlobalLayoutListener() {
-                            @Override
-                            public void onGlobalLayout() {
-                                // Remove the listener to avoid multiple calls
-                                targetView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                                // Calculate the position to scroll to
-                                int[] location = new int[2];
-                                targetView.getLocationInWindow(location);
-                                int targetY = location[1];
-
-                                // Adjust for any toolbar or system UI offsets if necessary
-                                nestedScrollView.smoothScrollTo(0, targetY);
-                            }
-                        });
-            }
-        });
-
-
-
-
-
-        setContentView(R.layout.activity_student_home_page);
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
 
         studentNameText = findViewById(R.id.std_nameText);
@@ -96,11 +67,34 @@ public class StudentHomePage extends AppCompatActivity {
         leftNavBarImage = findViewById(R.id.leftNavBarImage);
         drawerLayout = findViewById(R.id.drawerLayout);
         otherRoutine=findViewById(R.id.othersRoutineCard);
+
         otherRoutine.setOnClickListener(v->{
             Intent intent = new Intent(StudentHomePage.this, OthersRoutine.class);
             startActivity(intent);
 
         });
+        routine=findViewById(R.id.routineCardView);
+
+        routine.setOnClickListener(v -> {
+            // Scroll to the position of carouselRecyclerView
+            NestedScrollView nestedScrollView = findViewById(R.id.nestedScrollView); // Ensure this is the correct ID
+            View carouselRecyclerView = findViewById(R.id.carouselRecyclerView); // Ensure this is the correct ID
+
+            if (nestedScrollView != null && carouselRecyclerView != null) {
+                // Calculate the Y position of carouselRecyclerView relative to the parent NestedScrollView
+                int targetScrollY = carouselRecyclerView.getTop();
+
+                // Scroll smoothly to the calculated Y position
+                nestedScrollView.post(() -> nestedScrollView.smoothScrollTo(0, targetScrollY));
+            }
+        });
+
+        profile =findViewById(R.id.statusCardView);
+//        profile.setOnClickListener(v->{
+//            Intent intent = new Intent(StudentHomePage.this, StdEditProfileActivity.class);
+//            startActivity(intent);
+//        });
+
         teacherInfo=findViewById(R.id.teachersInfoCard);
         teacherInfo.setOnClickListener(v->{
             Intent intent = new Intent(StudentHomePage.this, Teacher_infoActivity.class);
