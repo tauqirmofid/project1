@@ -2,6 +2,7 @@ package com.example.unimate;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -59,6 +60,8 @@ public class OtherCalendar extends AppCompatActivity {
     private TextView loadingText;
     private final Set<Date> taskDates = new HashSet<>();
     private RecyclerView standaloneRecycler;
+    private String userBatch;
+    private String userSection;
 
 
 
@@ -87,6 +90,14 @@ public class OtherCalendar extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_other_calendar);
+
+
+        // 1) Read from SharedPreferences (or from an Intent, if you like)
+        //    "UnimatePrefs" is your existing SharedPreferences name
+        SharedPreferences sp = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+        userBatch = sp.getString("studentBatch", "64"); // default to "64" if missing
+        userSection = sp.getString("studentSection", "B"); // default to "B" if missing
+
 
         emptyDayContainer = findViewById(R.id.emptyDayContainer);
 
@@ -191,6 +202,7 @@ public class OtherCalendar extends AppCompatActivity {
     }
 
     private void updateSpinners(Set<String> allBatches, Map<String, Set<String>> batchToSections) {
+        // Convert to sorted lists
         List<String> batchList = new ArrayList<>(allBatches);
         Collections.sort(batchList);
 
@@ -200,29 +212,42 @@ public class OtherCalendar extends AppCompatActivity {
         batchAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         batchSpinner.setAdapter(batchAdapter);
 
+        // 1) Check if the user’s batch is in the list
         if (!batchList.isEmpty()) {
-            selectedBatch = batchList.get(0);
-            batchSpinner.setSelection(0);
+            if (batchList.contains(userBatch)) {
+                // if userBatch is "64" and it's in batchList, select it:
+                int indexOfUserBatch = batchList.indexOf(userBatch);
+                batchSpinner.setSelection(indexOfUserBatch);
+                selectedBatch = userBatch; // So your code knows it's selected
+            } else {
+                // If it doesn't exist, just pick the first one or do something else
+                selectedBatch = batchList.get(0);
+            }
+        }
 
-            // Set up batch selection listener
-            batchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    selectedBatch = parent.getItemAtPosition(position).toString();
-                    updateSectionSpinner(batchToSections.get(selectedBatch));
-                }
+        // Then attach the listener
+        batchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedBatch = parent.getItemAtPosition(position).toString();
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
+                // Now update the sections for that batch
+                updateSectionSpinner(batchToSections.get(selectedBatch));
+            }
 
-            // Initial section spinner setup
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // If userBatch existed, we update the section spinner for userBatch
+        if (!batchList.isEmpty()) {
             updateSectionSpinner(batchToSections.get(selectedBatch));
         }
     }
 
+
     private void updateSectionSpinner(Set<String> sections) {
+        // Convert to sorted list
         List<String> sectionList = new ArrayList<>(sections != null ? sections : Collections.emptyList());
         Collections.sort(sectionList);
 
@@ -232,24 +257,31 @@ public class OtherCalendar extends AppCompatActivity {
         sectionAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         sectionSpinner.setAdapter(sectionAdapter);
 
+        // 2) Auto-select userSection if it’s in sectionList
         if (!sectionList.isEmpty()) {
-            selectedSection = sectionList.get(0);
-            sectionSpinner.setSelection(0);
+            if (sectionList.contains(userSection)) {
+                int idx = sectionList.indexOf(userSection);
+                sectionSpinner.setSelection(idx);
+                selectedSection = userSection;
+            } else {
+                selectedSection = sectionList.get(0); // fallback
+            }
+        }
 
-            // Set up section selection listener
-            sectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    selectedSection = parent.getItemAtPosition(position).toString();
-                    loadAllDataForRange();
-                }
+        // Then attach a listener so changing the spinner calls loadAllDataForRange()
+        sectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedSection = parent.getItemAtPosition(position).toString();
+                loadAllDataForRange();
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
-            // Load data for initial section
+        // Finally, load data with the currently selected batch & section
+        if (!sectionList.isEmpty()) {
             loadAllDataForRange();
         }
     }
