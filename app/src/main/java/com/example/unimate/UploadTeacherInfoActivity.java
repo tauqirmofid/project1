@@ -41,7 +41,6 @@ public class UploadTeacherInfoActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -66,19 +65,13 @@ public class UploadTeacherInfoActivity extends AppCompatActivity {
                         String[] fields = line.split(",");
 
                         // Ensure the line has at least the expected number of columns
-                        if (fields.length >= 6) {
+                        if (fields.length >= 8) {
                             String acronym = fields[2].trim().isEmpty() ? "empty" : fields[2].trim();
                             String fullName = fields[3].trim().isEmpty() ? "empty" : fields[3].trim();
-
-                            // Handle multi-part Department fields
                             String department = fields[4].trim();
-                            if (fields.length > 7) {
-                                department += ", " + fields[5].trim();
-                            }
-
-                            String designation = fields.length > 7 ? fields[6].trim() : fields[5].trim();
-                            String cell = fields.length > 7 ? fields[7].trim() : fields[6].trim();
-                            String email = fields.length > 8 ? fields[8].trim() : fields[7].trim();
+                            String designation = fields[5].trim(); // Corrected to take the 6th column
+                            String cell = fields[6].trim();       // Corrected to take the 7th column
+                            String email = fields[7].trim();      // Corrected to take the 8th column
 
                             // Upload valid rows to Firestore
                             if (!acronym.equals("empty")) {
@@ -99,6 +92,32 @@ public class UploadTeacherInfoActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    /**
+     * Parses a CSV line respecting quoted fields.
+     */
+    private String[] parseCSVLine(String line) {
+        boolean inQuotes = false;
+        StringBuilder fieldBuilder = new StringBuilder();
+        java.util.List<String> fields = new java.util.ArrayList<>();
+
+        for (char ch : line.toCharArray()) {
+            if (ch == '"') {
+                inQuotes = !inQuotes; // Toggle the state
+            } else if (ch == ',' && !inQuotes) {
+                // Comma outside quotes indicates a field boundary
+                fields.add(fieldBuilder.toString().trim());
+                fieldBuilder.setLength(0); // Clear the builder
+            } else {
+                fieldBuilder.append(ch);
+            }
+        }
+
+        // Add the last field
+        fields.add(fieldBuilder.toString().trim());
+
+        return fields.toArray(new String[0]);
     }
 
     private void uploadTeacherInfoToFirestore(String acronym, String fullName, String department, String designation, String cell, String email) {

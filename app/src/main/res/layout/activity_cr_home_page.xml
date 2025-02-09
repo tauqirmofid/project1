@@ -475,7 +475,7 @@
                         android:orientation="horizontal">
 
                         <androidx.cardview.widget.CardView
-                            android:id="@+id/admin_teachersInfoCard"
+                            android:id="@+id/cr_teachersInfoCard"
                             android:layout_width="100dp"
                             android:layout_height="150dp"
                             android:layout_weight="1"

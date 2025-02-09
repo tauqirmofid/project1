@@ -4,6 +4,8 @@ package com.example.unimate;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,13 +48,43 @@ public class StudentHomePage extends AppCompatActivity {
 
     // The time slot keys you use in Firestore
     private final String[] timeKeys = {
-            "9:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
+            "09:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
             "1:00-1:30PM", "1:30-2:50PM", "2:50-4:10PM", "7:00-8:20PM"
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_student_home_page);
         db = FirebaseFirestore.getInstance();
+        routine=findViewById(R.id.st_routineCardView);
+
+        routine.setOnClickListener(v -> {
+            NestedScrollView nestedScrollView = findViewById(R.id.nestedScrollView);
+            final View targetView = findViewById(R.id.carouselRecyclerView);
+
+            if (nestedScrollView != null && targetView != null) {
+                // Use ViewTreeObserver to wait for layout
+                targetView.getViewTreeObserver().addOnGlobalLayoutListener(
+                        new ViewTreeObserver.OnGlobalLayoutListener() {
+                            @Override
+                            public void onGlobalLayout() {
+                                // Remove the listener to avoid multiple calls
+                                targetView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                                // Calculate the position to scroll to
+                                int[] location = new int[2];
+                                targetView.getLocationInWindow(location);
+                                int targetY = location[1];
+
+                                // Adjust for any toolbar or system UI offsets if necessary
+                                nestedScrollView.smoothScrollTo(0, targetY);
+                            }
+                        });
+            }
+        });
+
+
+
 
 
         setContentView(R.layout.activity_student_home_page);
@@ -243,9 +276,11 @@ public class StudentHomePage extends AppCompatActivity {
                                         // Fill timeslots
                                         for (int i = 0; i < timeKeys.length; i++) {
                                             String tKey = timeKeys[i];
+                                            String normalizedKey = tKey.trim(); // Remove trailing/leading spaces
+
                                             String classInfo = "No Class";
-                                            if (timeslotMap.containsKey(tKey)) {
-                                                Object slotVal = timeslotMap.get(tKey);
+                                            if (timeslotMap.containsKey(normalizedKey)) {
+                                                Object slotVal = timeslotMap.get(normalizedKey);
                                                 if (slotVal instanceof Map) {
                                                     Map<String, Object> cMap = (Map<String, Object>) slotVal;
                                                     String course = safeGetString(cMap, "course");

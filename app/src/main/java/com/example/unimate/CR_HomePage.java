@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +27,7 @@ public class CR_HomePage extends AppCompatActivity {
     private ImageView leftNavBarImage;
     private DrawerLayout drawerLayout;
     private RecyclerView carouselRecyclerView;
+    private CardView teacherInfo,othersRoutine,rooms,map,task;
     private DayAdapter dayAdapter;
     private List<DayModel> dayList;
 
@@ -51,6 +53,32 @@ public class CR_HomePage extends AppCompatActivity {
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
 
+        teacherInfo=findViewById(R.id.cr_teachersInfoCard);
+        teacherInfo.setOnClickListener(v->{
+            Intent i=new Intent(CR_HomePage.this,Teacher_infoActivity.class);
+            startActivity(i);
+        });
+
+        rooms=findViewById(R.id.CR_roomsCardView);
+        rooms.setOnClickListener(v->{
+            Intent i=new Intent(CR_HomePage.this,RoomsActivity.class);
+            startActivity(i);
+
+        });
+
+        map=findViewById(R.id.universityMapCard);
+
+        map.setOnClickListener(v->{
+            Intent i=new Intent(CR_HomePage.this,MapActivity.class);
+            startActivity(i);
+        });
+
+        task=findViewById(R.id.upcomingTaskCard);
+
+        task.setOnClickListener(v->{
+            Intent i=new Intent(CR_HomePage.this,OtherCalendar.class);
+            startActivity(i);
+        });
         // Bind UI elements
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
         TextView crNameTextView = findViewById(R.id.CR_nameText);

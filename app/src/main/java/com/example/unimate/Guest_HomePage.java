@@ -24,13 +24,30 @@ public class Guest_HomePage extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ImageView leftNavBarImage;
 
-    private CardView routinecard;
+    private CardView routinecard,rooms,teachersInfo,maps;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guest_home_page);
+
+        rooms=findViewById(R.id.guest_roomsCardView);
+        rooms.setOnClickListener(v -> {
+            Intent intent = new Intent(Guest_HomePage.this, RoomsActivity.class);
+            startActivity(intent);
+        });
+        teachersInfo=findViewById(R.id.guest_teachersInfoCard);
+        teachersInfo.setOnClickListener(v -> {
+            Intent intent = new Intent(Guest_HomePage.this, Teacher_infoActivity.class);
+            startActivity(intent);
+        });
+        maps=findViewById(R.id.university_map);
+        maps.setOnClickListener(v->{
+            Intent intent = new Intent(Guest_HomePage.this, MapActivity.class);
+            startActivity(intent);
+        });
+
         drawerLayout = findViewById(R.id.drawerLayout);
         leftNavBarImage = findViewById(R.id.leftNavBarImage);
 
