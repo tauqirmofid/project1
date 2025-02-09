@@ -29,8 +29,9 @@
 
             <ImageView
                 android:id="@+id/statusIcon"
-                android:layout_width="65dp"
-                android:layout_height="65dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:paddingEnd="8dp"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/student_icon"
                 android:contentDescription="Status Icon" />
@@ -40,21 +41,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
 
-                android:gravity="start"
-                android:layout_marginLeft="5dp"
+                android:gravity="start|center_vertical"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:orientation="vertical">
-
-
-
-                <TextView
-                    android:id="@+id/teacher_nameText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textColor="#006A00"
-                    android:textSize="12sp"
-                     />
-
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -71,29 +61,43 @@
                         android:layout_height="wrap_content"
 
                         android:text="acronym"
-                        android:textSize="18sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"
-                        android:textColor="#006A00" />
+                        android:textColor="@color/black" />
                 </LinearLayout>
-                <LinearLayout
+
+                <TextView
+                    android:id="@+id/teacher_nameText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintTop_toBottomOf="@id/Divider"
-                    app:layout_constraintStart_toStartOf="parent">
+                    android:text="Name"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                     />
+
+
 
 
 
                     <TextView
-                        android:id="@+id/teacher_email"
+                        android:id="@+id/Designation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
                         android:text="Email"
                         android:textSize="12sp"
+                        android:textStyle="bold"
 
-                        android:textColor="#006A00" />
-                </LinearLayout>
+                        android:textColor="@color/black" />
+                <TextView
+                    android:id="@+id/dept"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NO Task today"
+                    android:textColor="#006A00"
+                    android:visibility="gone"
+                    android:textSize="16sp" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -101,32 +105,27 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="end"
+                android:layout_marginStart="5dp"
                 android:layout_gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/Designation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Today"
-                    android:textColor="#006A00"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="4dp" />
 
                 <TextView
                     android:id="@+id/Cell"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="NO Class today"
-                    android:textColor="#006A00"
+                    android:text="phone"
+                    android:textColor="@color/black"
                     android:textSize="16sp" />
                 <TextView
-                    android:id="@+id/dept"
+                    android:id="@+id/teacher_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="NO Task today"
-                    android:textColor="#006A00"
-                    android:textSize="16sp" />
+                    android:text="Email"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+
+                    android:layout_marginBottom="4dp" />
+
+
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
