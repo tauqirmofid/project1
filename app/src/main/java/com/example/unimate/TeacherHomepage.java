@@ -82,6 +82,7 @@ public class TeacherHomepage extends AppCompatActivity {
             intent.putExtra("acronym", teacherAcronym);
             startActivity(intent);
         });
+
         profile=findViewById(R.id.statusCardView);
         profile.setOnClickListener(v -> {
             Intent intent = new Intent(TeacherHomepage.this, TeacherProfileActivity.class);

@@ -292,7 +292,6 @@ public class TeacherProfileActivity extends AppCompatActivity {
                                                     updateemailfirestore(updatedEmail);
                                                     Intent intent = new Intent(TeacherProfileActivity.this, TeacherLoginActivity.class);
                                                     startActivity(intent);
-
                                                 })
                                                 .addOnFailureListener(e -> {
                                                     Toast.makeText(TeacherProfileActivity.this, "Failed to update email.", Toast.LENGTH_SHORT).show();

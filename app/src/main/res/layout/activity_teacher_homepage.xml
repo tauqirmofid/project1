@@ -213,7 +213,6 @@
                         android:text="Welcome to"
                         android:textSize="16sp"
                         android:textColor="#006A00" />
-
                     <TextView
                         android:id="@+id/unimateText"
                         android:layout_width="wrap_content"
