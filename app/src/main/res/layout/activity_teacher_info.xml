@@ -8,11 +8,7 @@
     android:layout_height="match_parent"
     tools:context=".Guest_HomePage">
 
-    <!--
-         1) Main Content Area
-         Place your existing layout inside this FrameLayout
-         so it does not get removed or changed.
-    -->
+
     <FrameLayout
         android:id="@+id/mainContentContainer"
         android:layout_width="match_parent"
