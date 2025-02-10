@@ -318,6 +318,14 @@ public class OthersRoutine extends AppCompatActivity {
 
     /** Scroll the carousel to the infinite-mid position for dayIndex. */
     private void centerCarouselOn(int dayIndex) {
+
+        if (dayIndex < 0 || dayIndex >= dayList.size()) {
+
+
+            // ...Or default to 0 (Monday):
+            dayIndex = 0;
+        }
+
         int halfMaxValue = Integer.MAX_VALUE / 2;
         int midPos = halfMaxValue - (halfMaxValue % dayList.size());
         int targetPos = midPos + dayIndex;
