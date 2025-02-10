@@ -153,7 +153,7 @@ public class StudentHomePage extends AppCompatActivity {
         String stdSection = intent.getStringExtra("STUDENT_SECTION");
         String stemail = intent.getStringExtra("STUDENT_EMAIL");
         // If null, get from SharedPreferences
-        if (stdName == null || stdBatch == null || stdSection == null) {
+        if (stdName == null || stdBatch == null || stdSection == null || stemail == null) {
             SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
             stdName = sharedPreferences.getString("studentName", "Student");
             stdBatch = sharedPreferences.getString("studentBatch", "N/A");
@@ -161,10 +161,21 @@ public class StudentHomePage extends AppCompatActivity {
         }
 
         profile =findViewById(R.id.statusCardView);
-        profile.setOnClickListener(v->{
+        profile.setOnClickListener(v -> {
             Intent intent2 = new Intent(StudentHomePage.this, StudentProfile.class);
+
+            // Retrieve email from SharedPreferences if needed
+            SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+            String storedEmail = sharedPreferences.getString("studentEmail", null);
+
+            // Pass email to StudentProfile
+            if (storedEmail != null) {
+                intent2.putExtra("STUDENT_EMAIL", storedEmail);
+            } else {
+                Toast.makeText(this, "No email found!", Toast.LENGTH_SHORT).show();
+            }
+
             startActivity(intent2);
-            intent.putExtra("STUDENT_EMAIL", stemail);
         });
 
         // Set UI

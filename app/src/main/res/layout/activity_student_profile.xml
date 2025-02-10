@@ -76,70 +76,135 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Student ID -->
-                <TextView
-                    android:id="@+id/studentIdTextView"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/default_student_id"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="8dp" />
+                    android:orientation="horizontal"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Student Id: "
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+                    <!-- Student ID -->
+                    <TextView
+                        android:id="@+id/studentIdTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_student_id"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Department: "
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+                    <!-- Student ID -->
+                    <TextView
+                        android:id="@+id/departmentTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_department"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Batch: "
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+                    <!-- Student ID -->
+                    <!-- Batch -->
+                    <TextView
+                        android:id="@+id/batchTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_batch"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
 
                 <!-- Department -->
-                <TextView
-                    android:id="@+id/departmentTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/default_department"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="8dp" />
 
-                <!-- Batch -->
-                <TextView
-                    android:id="@+id/batchTextView"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/default_batch"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="8dp" />
+                    android:orientation="horizontal"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Section: "
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+                    <!-- Student ID -->
 
-                <!-- Section -->
-                <TextView
-                    android:id="@+id/sectionTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/default_section"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="8dp" />
+                    <!-- Section -->
+                    <TextView
+                        android:id="@+id/sectionTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_section"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
+
+
+
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <!-- Edit Profile Button -->
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/editProfileButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Edit Profile"
-            android:layout_marginBottom="16dp"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:backgroundTint="@color/green_button_color"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="10dp"
             android:textColor="@android:color/white"
-            android:padding="12dp" />
+            android:background="@drawable/button"
+            android:padding="12dp"
+            android:textStyle="bold"
+            android:textSize="16sp" >
+        </androidx.appcompat.widget.AppCompatButton>
+
 
         <!-- Log Out Button -->
-        <Button
-            android:id="@+id/logoutButton"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/change_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Logout"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:backgroundTint="@android:color/holo_red_light"
+            android:visibility="gone"
+            android:text="Change Password"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="16dp"
             android:textColor="@android:color/white"
-            android:padding="12dp" />
-
+            android:background="@drawable/button"
+            android:padding="12dp"
+            android:textStyle="bold"
+            android:textSize="16sp" >
+        </androidx.appcompat.widget.AppCompatButton>
     </LinearLayout>
 
 </ScrollView>
