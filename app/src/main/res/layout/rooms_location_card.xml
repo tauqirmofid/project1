@@ -30,6 +30,7 @@
                     android:id="@+id/room_pic"
                     android:layout_width="65dp"
                     android:layout_height="65dp"
+
                     android:contentDescription="Room Image"
                     android:src="@drawable/loading_pic" />
 
@@ -53,6 +54,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Room Number"
+                        android:textSize="14sp"
+                        android:textColor="#000000" />
+                    <TextView
+                        android:id="@+id/floor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Floor Number"
                         android:textSize="14sp"
                         android:textColor="#000000" />
                 </LinearLayout>

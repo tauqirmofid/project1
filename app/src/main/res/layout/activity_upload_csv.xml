@@ -17,25 +17,42 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
-    <!-- Button to manually check data -->
-    <Button
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnCheckData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Check Data"
         app:layout_constraintTop_toBottomOf="@id/spinnerDays"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button"
+        android:padding="12dp"
+        android:textStyle="bold"
+        android:textSize="16sp" >
+    </androidx.appcompat.widget.AppCompatButton>
+
 
     <!-- Button to upload CSV -->
-    <Button
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnUploadCsv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Upload CSV File"
         app:layout_constraintTop_toBottomOf="@id/spinnerDays"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button"
+        android:padding="12dp"
+        android:textStyle="bold"
+        android:textSize="16sp" >
+    </androidx.appcompat.widget.AppCompatButton>
+
 
     <!-- Status message -->
     <TextView
