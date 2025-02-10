@@ -16,6 +16,10 @@
 
     <string name="hi_user"><![CDATA[Hi, <b>User</b>]]></string>
     <string name="welcome_unimate"><![CDATA[Welcome to <b>Unimate</b>]]></string>
+    <string name="email_action_title">Email address: %s</string>
+    <string name="phone_action_title">Phone number: %s</string>
+    <string name="email_action">Send Email</string>
+    <string name="call_action">Make Call</string>
 
 
     <string name="lorem_ipsum">

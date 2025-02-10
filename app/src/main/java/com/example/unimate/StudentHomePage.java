@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -161,10 +162,28 @@ public class StudentHomePage extends AppCompatActivity {
         }
 
         profile =findViewById(R.id.statusCardView);
-        profile.setOnClickListener(v->{
+        profile.setOnClickListener(v -> {
             Intent intent2 = new Intent(StudentHomePage.this, StudentProfile.class);
+
+            // Retrieve email from SharedPreferences if needed
+            SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+            String storedEmail = sharedPreferences.getString("studentEmail", null);
+
+            // Pass email to StudentProfile
+            if (storedEmail != null) {
+                intent2.putExtra("STUDENT_EMAIL", storedEmail);
+            } else {
+                Toast.makeText(this, "No email found!", Toast.LENGTH_SHORT).show();
+            }
+
             startActivity(intent2);
-            intent.putExtra("STUDENT_EMAIL", stemail);
+        });
+
+
+
+        ImageView searchEditText = findViewById(R.id.searchIcon);
+        searchEditText.setOnClickListener(v -> {
+            startActivity(new Intent(StudentHomePage.this, UniversalSearchActivity.class));
         });
 
         // Set UI
