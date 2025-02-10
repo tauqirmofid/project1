@@ -16,6 +16,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,12 +33,12 @@ public class TeacherHomepage extends AppCompatActivity {
     private TextView tvTeacherName, tvDesignation, tvAcronym, tvEmail;
     private RecyclerView carouselRecyclerView;
     private DayAdapter dayAdapter;
-    private CardView task,t_othersRoutineCard;
+    private CardView task,t_othersRoutineCard,profile;
     private List<DayModel> dayList;
-    private ImageView leftNavBarImage;
+    private ImageView leftNavBarImage, ProfileImage;
     private DrawerLayout drawerLayout;
     private CardView routine,rooms,otherRoutine,teacherInfo;
-
+    private DatabaseReference databaseReference;
     private final String[] daysOfWeek = {
             "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
     };
@@ -55,6 +56,7 @@ public class TeacherHomepage extends AppCompatActivity {
         setContentView(R.layout.activity_teacher_homepage);
 
         // Initialize UI elements
+        ProfileImage=findViewById(R.id.statusIcon);
         tvTeacherName = findViewById(R.id.tv_teacher_name);
         tvDesignation = findViewById(R.id.tv_designation);
         tvAcronym = findViewById(R.id.tv_acronym);
@@ -62,6 +64,8 @@ public class TeacherHomepage extends AppCompatActivity {
         task=findViewById(R.id.t_upcomingTaskCard);
         otherRoutine=findViewById( R.id.t_othersRoutineCard);
         routine=findViewById(R.id.t_routineCardView);
+       // teacherAcronym = getIntent().getStringExtra("acronym");
+
         routine.setOnClickListener(v -> {
             Intent intent = new Intent(TeacherHomepage.this, TeacherRoutineActivity.class);
             intent.putExtra("acronym", teacherAcronym);
@@ -75,6 +79,12 @@ public class TeacherHomepage extends AppCompatActivity {
 
         task.setOnClickListener(v -> {
             Intent intent = new Intent(TeacherHomepage.this, TeacherCalendarActivity.class);
+            intent.putExtra("acronym", teacherAcronym);
+            startActivity(intent);
+        });
+        profile=findViewById(R.id.statusCardView);
+        profile.setOnClickListener(v -> {
+            Intent intent = new Intent(TeacherHomepage.this, TeacherProfileActivity.class);
             intent.putExtra("acronym", teacherAcronym);
             startActivity(intent);
         });
@@ -112,8 +122,7 @@ public class TeacherHomepage extends AppCompatActivity {
         for (String dayName : daysOfWeek) {
             dayList.add(new DayModel(dayName));
         }
-
-        // Setup adapter & carousel
+             // Setup adapter & carousel
         dayAdapter = new DayAdapter(dayList);
         carouselRecyclerView.setAdapter(dayAdapter);
 
@@ -149,6 +158,7 @@ public class TeacherHomepage extends AppCompatActivity {
         }
     }
 
+
     private void fetchTeacherDetailsFromRealtimeDB(String email) {
         DatabaseReference teachersRef = FirebaseDatabase.getInstance().getReference("AcceptedRequests").child("Teachers");
 
@@ -164,24 +174,36 @@ public class TeacherHomepage extends AppCompatActivity {
                         String name = teacherSnapshot.child("name").getValue(String.class);
                         String designation = teacherSnapshot.child("designation").getValue(String.class);
                         teacherAcronym = teacherSnapshot.child("acronym").getValue(String.class);
+                        String imageUrl = teacherSnapshot.child("imageUrl").getValue(String.class);
 
                         tvTeacherName.setText(name != null ? name : "N/A");
                         tvDesignation.setText(designation != null ? designation : "N/A");
                         tvAcronym.setText(teacherAcronym != null ? teacherAcronym : "N/A");
                         tvEmail.setText(storedEmail);
 
-                       // Toast.makeText(TeacherHomepage.this, "Teacher found: " + name, Toast.LENGTH_SHORT).show();
+                        // Load the profile image into the statusIcon
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            Glide.with(TeacherHomepage.this)
+                                    .load(imageUrl)
+                                    .placeholder(R.drawable.teacher_info) // Add a default placeholder
+                                    .error(R.drawable.teacher_info) // Add an error image if loading fails
+                                    .into(ProfileImage);
+                            Log.d("ImageLoad", "Profile image loaded: " + imageUrl);
+                        } else {
+                            Log.e("ImageLoad", "No image URL found for teacher: " + teacherAcronym);
+                        }
 
+                        // Fetch and store routine if acronym exists
                         if (teacherAcronym != null) {
                             fetchRoutineAndStoreInTeacherSchedule(teacherAcronym);
                         } else {
-                           // Toast.makeText(TeacherHomepage.this, "Acronym not found for the teacher", Toast.LENGTH_SHORT).show();
+                            Log.e("AcronymError", "Acronym not found for the teacher.");
                         }
-                        return;
+                        return; // Exit the loop once the teacher is found
                     }
                 }
 
-               // Toast.makeText(TeacherHomepage.this, "No teacher found with email: " + email, Toast.LENGTH_SHORT).show();
+                Log.e("TeacherDetails", "No teacher found with email: " + email);
             }
 
             @Override
