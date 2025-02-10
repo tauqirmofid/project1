@@ -56,13 +56,25 @@ public class StudentLoginActivity extends AppCompatActivity {
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
 
-        // Login button
         lgnButton = findViewById(R.id.lgnButton);
         lgnButton.setOnClickListener(v -> {
-            // Show the LoadingActivity
-            startActivity(new Intent(StudentLoginActivity.this, LoadingActivity.class));
+            // Validate fields first
+            String email = emailEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
 
-            // Immediately override the transition
+            if (email.isEmpty()) {
+                emailEditText.setError("Email is required!");
+                emailEditText.requestFocus();
+                return;
+            }
+            if (password.isEmpty()) {
+                passwordEditText.setError("Password is required!");
+                passwordEditText.requestFocus();
+                return;
+            }
+
+            // Show LoadingActivity only after validation
+            startActivity(new Intent(StudentLoginActivity.this, LoadingActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
             // Attempt login
@@ -82,29 +94,12 @@ public class StudentLoginActivity extends AppCompatActivity {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        if (email.isEmpty()) {
-            sendCloseLoadingBroadcast();
-
-            emailEditText.setError("Email is required!");
-            emailEditText.requestFocus();
-
-            return;
-        }
-        if (password.isEmpty()) {
-            sendCloseLoadingBroadcast();
-
-            passwordEditText.setError("Password is required!");
-            passwordEditText.requestFocus();
-
-            return;
-        }
-
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                             checkVerificationInDatabase(user);
+                            checkVerificationInDatabase(user);
                             sendCloseLoadingBroadcast();
                         }
                     } else {
@@ -119,7 +114,6 @@ public class StudentLoginActivity extends AppCompatActivity {
 
                 });
     }
-
     private void checkVerificationInDatabase(FirebaseUser user) {
         String email = user.getEmail();
         mDatabase.orderByChild("email").equalTo(email)
