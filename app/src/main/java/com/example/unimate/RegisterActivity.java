@@ -46,9 +46,9 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
 
     // Lists for pseudo-spinners
-    private List<String> batchList = Arrays.asList("53", "54", "55", "56", "58", "59", "60", "61", "62", "63", "64", "65");
+    private List<String> batchList = Arrays.asList("57","58","59", "60", "61","62","63","64","65");
+    private List<String> sectionList = Arrays.asList("A", "B", "C","D","E","F","G","H","I","A+B","B+C");
     private List<String> departmentList = Arrays.asList("CSE");
-    private List<String> sectionList = Arrays.asList("A", "B", "C", "D", "E", "F", "I");
 
     // Firebase references
     private FirebaseAuth mAuth;
@@ -146,9 +146,10 @@ public class RegisterActivity extends AppCompatActivity {
         String selectedDepartment = departmentTextView.getText().toString();
         String selectedSection = sectionTextView.getText().toString();
 
-        if (TextUtils.isEmpty(email)) {
-            showError(emailEditText, "Email is required!");
-            return;
+        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailEditText.setError("Valid email is required");
+            emailEditText.requestFocus();
+            return ;
         }
         if (TextUtils.isEmpty(name)) {
             showError(nameEditText, "Name is required!");
@@ -220,7 +221,7 @@ public class RegisterActivity extends AppCompatActivity {
                     // User already exists
                     Toast.makeText(this, "User already exists. Please log in.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "Registration failed: " + authTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "" + authTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });

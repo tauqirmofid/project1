@@ -2,6 +2,7 @@ package com.example.unimate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +29,7 @@ public class CR_HomePage extends AppCompatActivity {
     private ImageView leftNavBarImage;
     private DrawerLayout drawerLayout;
     private RecyclerView carouselRecyclerView;
-    private CardView teacherInfo,othersRoutine,rooms,map,task,editRoutine,tcrRtn;
+    private CardView teacherInfo,teacher_routine,rooms,map,task,editRoutine,routine;
     private DayAdapter dayAdapter;
     private List<DayModel> dayList;
 
@@ -57,6 +59,24 @@ public class CR_HomePage extends AppCompatActivity {
         teacherInfo.setOnClickListener(v->{
             Intent i=new Intent(CR_HomePage.this,Teacher_infoActivity.class);
             startActivity(i);
+        });
+        teacher_routine=findViewById(R.id.tcrRoutineCard);
+        teacher_routine.setOnClickListener(v->{
+            Intent i=new Intent(CR_HomePage.this,TeacherRoutineActivity.class);
+            startActivity(i);
+        });
+        routine=findViewById(R.id.cr_routineCardView);
+        routine.setOnClickListener(v->{
+            NestedScrollView nestedScrollView = findViewById(R.id.nestedScrollView); // Ensure this is the correct ID
+            View carouselRecyclerView = findViewById(R.id.carouselRecyclerView); // Ensure this is the correct ID
+
+            if (nestedScrollView != null && carouselRecyclerView != null) {
+                // Calculate the Y position of carouselRecyclerView relative to the parent NestedScrollView
+                int targetScrollY = carouselRecyclerView.getTop();
+
+                // Scroll smoothly to the calculated Y position
+                nestedScrollView.post(() -> nestedScrollView.smoothScrollTo(0, targetScrollY));
+            }
         });
 
         rooms=findViewById(R.id.CR_roomsCardView);
@@ -177,15 +197,15 @@ public class CR_HomePage extends AppCompatActivity {
             });
         }
 
-        LinearLayout editRoutineLayout = findViewById(R.id.tcrRoutine);
-        if (editRoutineLayout != null) {
-            editRoutineLayout.setOnClickListener(v -> {
-                Intent i = new Intent(CR_HomePage.this, CrCalendar.class);
-                i.putExtra("CR_BATCH", crBatch.replace("batch_", "")); // Remove "batch_"
-                i.putExtra("CR_SECTION", crSection);
-                startActivity(i);
-            });
-        }
+//        LinearLayout editRoutineLayout = findViewById(R.id.tcrRoutine);
+//        if (editRoutineLayout != null) {
+//            editRoutineLayout.setOnClickListener(v -> {
+//                Intent i = new Intent(CR_HomePage.this, CrCalendar.class);
+//                i.putExtra("CR_BATCH", crBatch.replace("batch_", "")); // Remove "batch_"
+//                i.putExtra("CR_SECTION", crSection);
+//                startActivity(i);
+//            });
+//        }
     }
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);

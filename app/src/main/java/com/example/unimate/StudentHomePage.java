@@ -34,7 +34,7 @@ public class StudentHomePage extends AppCompatActivity {
     private DayAdapter dayAdapter;
     private LinearLayout routine;
     private DrawerLayout drawerLayout;
-    private CardView rooms,otherRoutine,task,maps,teacherInfo,profile;
+    private CardView rooms,otherRoutine,task,maps,teacherInfo,profile,teacherRoutine;
 
     // Cards / UI elements
     private TextView studentNameText, studentBatchText, studentSectionText;
@@ -78,6 +78,11 @@ public class StudentHomePage extends AppCompatActivity {
         leftNavBarImage = findViewById(R.id.leftNavBarImage);
         drawerLayout = findViewById(R.id.drawerLayout);
         routine = findViewById(R.id.routineCardView);
+        teacherRoutine=findViewById(R.id.teachersroutine);
+        teacherRoutine.setOnClickListener(v->{
+            Intent intent = new Intent(StudentHomePage.this, TeacherRoutineActivity.class);
+            startActivity(intent);
+        });
 
         // The TextViews for showing student info
         studentNameText = findViewById(R.id.std_nameText);
@@ -116,11 +121,7 @@ public class StudentHomePage extends AppCompatActivity {
 
         });
 
-        profile =findViewById(R.id.statusCardView);
-//        profile.setOnClickListener(v->{
-//            Intent intent = new Intent(StudentHomePage.this, StdEditProfileActivity.class);
-//            startActivity(intent);
-//        });
+
 
         teacherInfo=findViewById(R.id.teachersInfoCard);
         teacherInfo.setOnClickListener(v->{
@@ -149,7 +150,7 @@ public class StudentHomePage extends AppCompatActivity {
         String stdName = intent.getStringExtra("STUDENT_NAME");
         String stdBatch = intent.getStringExtra("STUDENT_BATCH");
         String stdSection = intent.getStringExtra("STUDENT_SECTION");
-
+        String stemail = intent.getStringExtra("STUDENT_EMAIL");
         // If null, get from SharedPreferences
         if (stdName == null || stdBatch == null || stdSection == null) {
             SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
@@ -158,11 +159,18 @@ public class StudentHomePage extends AppCompatActivity {
             stdSection = sharedPreferences.getString("studentSection", "N/A");
         }
 
+        profile =findViewById(R.id.statusCardView);
+        profile.setOnClickListener(v->{
+            Intent intent2 = new Intent(StudentHomePage.this, StudentProfile.class);
+            startActivity(intent2);
+            intent.putExtra("STUDENT_EMAIL", stemail);
+        });
+
         // Set UI
         studentNameText.setText(stdName);
         studentBatchText.setText(stdBatch);
         studentSectionText.setText(stdSection);
-        Toast.makeText(this, "Welcome, " + stdName, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Welcome, " + stdName, Toast.LENGTH_SHORT).show();
 
         // Nav Drawer image
         if (leftNavBarImage != null) {

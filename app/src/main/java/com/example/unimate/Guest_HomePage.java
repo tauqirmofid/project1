@@ -24,7 +24,7 @@ public class Guest_HomePage extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ImageView leftNavBarImage;
 
-    private CardView routinecard,rooms,teachersInfo,maps;
+    private CardView routinecard,rooms,teachersInfo,maps,teacherRoutine;
 
 
     @Override
@@ -47,6 +47,12 @@ public class Guest_HomePage extends AppCompatActivity {
             Intent intent = new Intent(Guest_HomePage.this, MapActivity.class);
             startActivity(intent);
         });
+        teacherRoutine=findViewById(R.id.teacherRoutine);
+        teacherRoutine.setOnClickListener(v -> {
+            Intent intent = new Intent(Guest_HomePage.this, TeacherRoutineActivity.class);
+            startActivity(intent);
+        });
+
 
         drawerLayout = findViewById(R.id.drawerLayout);
         leftNavBarImage = findViewById(R.id.leftNavBarImage);
