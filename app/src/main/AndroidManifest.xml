@@ -19,6 +19,9 @@
             android:name=".TeacherProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".CrCalendar"
+            android:exported="false" />
+        <activity
             android:name=".Teacher_infoActivity"
             android:exported="false" />
         <activity

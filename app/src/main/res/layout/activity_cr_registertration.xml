@@ -53,7 +53,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Student ID"
+                android:text="Name"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:layout_marginTop="16dp"
@@ -64,7 +64,7 @@
                 android:id="@+id/CRNameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:hint="enter student Name"
+                android:hint="Enter student Name"
                 android:background="@xml/edit_text_bg"
                 android:padding="12dp"
                 android:textColorHint="#808080"
@@ -109,7 +109,7 @@
                 android:background="@xml/edit_text_bg"
                 android:padding="12dp"
                 android:textColorHint="#808080"
-                android:inputType="number" />
+                android:inputType="phone" />
 
             <!-- Department -->
             <TextView

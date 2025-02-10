@@ -40,8 +40,8 @@ public class CR_Registertration extends AppCompatActivity {
     private ScrollView scrollView;
 
     private List<String> departmentList = Arrays.asList("CSE", "EEE", "BBA");
-    private List<String> batchList = Arrays.asList("59th", "60th", "61st");
-    private List<String> sectionList = Arrays.asList("A", "B", "C");
+    private List<String> batchList = Arrays.asList("57","58","59", "60", "61","62","63","64","65");
+    private List<String> sectionList = Arrays.asList("A", "B", "C","D","E","F","G","H","I","A+B","B+C");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

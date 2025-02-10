@@ -27,7 +27,7 @@ public class CR_HomePage extends AppCompatActivity {
     private ImageView leftNavBarImage;
     private DrawerLayout drawerLayout;
     private RecyclerView carouselRecyclerView;
-    private CardView teacherInfo,othersRoutine,rooms,map,task;
+    private CardView teacherInfo,othersRoutine,rooms,map,task,editRoutine,tcrRtn;
     private DayAdapter dayAdapter;
     private List<DayModel> dayList;
 
@@ -41,7 +41,7 @@ public class CR_HomePage extends AppCompatActivity {
 
     // The time slot keys you use in Firestore
     private final String[] timeKeys = {
-            "9:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
+            "09:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
             "1:00-1:30PM", "1:30-2:50PM", "2:50-4:10PM", "7:00-8:20PM"
     };
 
@@ -77,8 +77,22 @@ public class CR_HomePage extends AppCompatActivity {
 
         task.setOnClickListener(v->{
             Intent i=new Intent(CR_HomePage.this,OtherCalendar.class);
+            i.putExtra("CR_BATCH", crBatch.replace("batch_", "")); // Remove "batch_"
+            i.putExtra("CR_SECTION", crSection);
             startActivity(i);
         });
+
+
+        editRoutine=findViewById(R.id.editRtncard);
+
+        task.setOnClickListener(v->{
+            Intent i=new Intent(CR_HomePage.this,CrCalendar.class);
+            i.putExtra("CR_BATCH", crBatch.replace("batch_", "")); // Remove "batch_"
+            i.putExtra("CR_SECTION", crSection);
+            startActivity(i);
+        });
+
+
         // Bind UI elements
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
         TextView crNameTextView = findViewById(R.id.CR_nameText);
@@ -156,7 +170,19 @@ public class CR_HomePage extends AppCompatActivity {
         LinearLayout otherRoutineLayout = findViewById(R.id.otherRoutine);
         if (otherRoutineLayout != null) {
             otherRoutineLayout.setOnClickListener(v -> {
-                Intent i = new Intent(CR_HomePage.this, OtherCalendar.class);
+                Intent i = new Intent(CR_HomePage.this, CrCalendar.class);
+                i.putExtra("CR_BATCH", crBatch.replace("batch_", "")); // Remove "batch_"
+                i.putExtra("CR_SECTION", crSection);
+                startActivity(i);
+            });
+        }
+
+        LinearLayout editRoutineLayout = findViewById(R.id.tcrRoutine);
+        if (editRoutineLayout != null) {
+            editRoutineLayout.setOnClickListener(v -> {
+                Intent i = new Intent(CR_HomePage.this, CrCalendar.class);
+                i.putExtra("CR_BATCH", crBatch.replace("batch_", "")); // Remove "batch_"
+                i.putExtra("CR_SECTION", crSection);
                 startActivity(i);
             });
         }

@@ -1,5 +1,6 @@
 package com.example.unimate;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -49,9 +50,9 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class OtherCalendar extends AppCompatActivity {
-    private static final String TAG = "OtherCalendar";
-    private TasksAdapterOther TasksAdapterOther;
+public class CrCalendar extends AppCompatActivity {
+    private static final String TAG = "CrCalendarActivity";
+    private TasksAdapter tasksAdapter;
     private CalendarView calendarView;
     private RecyclerView classRecycler;
     private Spinner batchSpinner, sectionSpinner;
@@ -59,9 +60,10 @@ public class OtherCalendar extends AppCompatActivity {
     private ProgressBar loadingProgressBar;
     private TextView loadingText;
     private final Set<Date> taskDates = new HashSet<>();
+
     private RecyclerView standaloneRecycler;
-    private String userBatch;
-    private String userSection;
+    private String userBatch=null;
+    private String userSection=null;
 
 
 
@@ -70,8 +72,8 @@ public class OtherCalendar extends AppCompatActivity {
 
 
     private FirebaseFirestore db;
-    String selectedBatch = "64";   // default
-    String selectedSection = "B";  // default
+    String selectedBatch = null;   // default
+    String selectedSection = null;  // default
 
     // This map will link a specific Date -> list of ClassWithTasks (for that day).
     // We'll fill this for the next 60 days from "today".
@@ -82,6 +84,7 @@ public class OtherCalendar extends AppCompatActivity {
     private static final int COLOR_CLASS_ONLY = R.color.green_button_color;
     private static final int COLOR_CLASS_AND_TASK = R.drawable.taskclass;
     private LinearLayout emptyDayContainer;
+    private boolean isCrUser = false;
 
 
 
@@ -89,23 +92,20 @@ public class OtherCalendar extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_other_calendar);
+        setContentView(R.layout.activity_cr_calendar);
 
-
-        // 1) Read from SharedPreferences (or from an Intent, if you like)
-        //    "UnimatePrefs" is your existing SharedPreferences name
-        // Get CR details from Intent (if sent from CR_HomePage)
         Intent intent = getIntent();
         if (intent.hasExtra("CR_BATCH") && intent.hasExtra("CR_SECTION")) {
             userBatch = intent.getStringExtra("CR_BATCH");
             userSection = intent.getStringExtra("CR_SECTION");
+            isCrUser = true;
         } else {
-            // Fallback to SharedPreferences (if CR info not sent)
-            SharedPreferences sp = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
-            userBatch = sp.getString("studentBatch", "64");
-            userSection = sp.getString("studentSection", "B");
+            // Redirect to OtherCalendar if CR info is missing
+            Toast.makeText(this, "Network error. Please visit Other Calendar.", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(CrCalendar.this, OtherCalendar.class));
+            finish();
+            return;
         }
-
 
         emptyDayContainer = findViewById(R.id.emptyDayContainer);
 
@@ -128,7 +128,6 @@ public class OtherCalendar extends AppCompatActivity {
         loadingProgressBar = findViewById(R.id.loadingProgressBar);
         loadingPercentage = findViewById(R.id.loadingPercentage);
         loadingText = findViewById(R.id.loadingText);
-
 
         setupSpinners();
         setupCalendar();
@@ -159,12 +158,31 @@ public class OtherCalendar extends AppCompatActivity {
     /**
      * Setup the batch & section spinners
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void setupSpinners() {
-        // Initialize with empty adapters
-        batchSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, new ArrayList<>()));
-        sectionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, new ArrayList<>()));
+        if (isCrUser) {
+            // CR can only manage their own batch and section
+            List<String> batchList = new ArrayList<>();
+            batchList.add(userBatch);
+            ArrayAdapter<String> batchAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, batchList);
+            batchSpinner.setAdapter(batchAdapter);
+            batchSpinner.setEnabled(false);
 
-        fetchBatchesAndSections();
+            List<String> sectionList = new ArrayList<>();
+            sectionList.add(userSection);
+            ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, sectionList);
+            sectionSpinner.setAdapter(sectionAdapter);
+            sectionSpinner.setEnabled(false);
+
+            selectedBatch = userBatch;
+            selectedSection = userSection;
+
+            // Load data immediately
+            loadAllDataForRange();
+        } else {
+            // Existing code for non-CR users (if any)
+            fetchBatchesAndSections();
+        }
     }
 
     private void fetchBatchesAndSections() {
@@ -253,7 +271,6 @@ public class OtherCalendar extends AppCompatActivity {
         }
     }
 
-
     private void updateSectionSpinner(Set<String> sections) {
         // Convert to sorted list
         List<String> sectionList = new ArrayList<>(sections != null ? sections : Collections.emptyList());
@@ -302,7 +319,6 @@ public class OtherCalendar extends AppCompatActivity {
     private void setupCalendar() {
         calendarView.setOnDayClickListener(eventDay -> {
             Calendar clicked = eventDay.getCalendar();
-            // Convert clicked date to local timezone
             Calendar localCal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Dhaka"));
             localCal.setTimeInMillis(clicked.getTimeInMillis());
             Date normalized = stripTime(localCal.getTime());
@@ -616,7 +632,7 @@ public class OtherCalendar extends AppCompatActivity {
         classRecycler.setVisibility(View.GONE);
         standaloneRecycler.setVisibility(View.GONE);
 
-
+        showEmptyDayUI(date);
 
         boolean hasClasses = !classes.isEmpty();
         if (hasClasses) {
@@ -659,7 +675,7 @@ public class OtherCalendar extends AppCompatActivity {
                 )
         );
 
-        ClassAdapterOther ClassAdapterOther = new ClassAdapterOther(classes, new ClassAdapterOther.OnClassClickListener() {
+        ClassAdapter classAdapter = new ClassAdapter(classes, new ClassAdapter.OnClassClickListener() {
             @Override
             public void onClassClick(ClassWithTasks classItem) {
                 handleClassClick(classItem);
@@ -667,22 +683,39 @@ public class OtherCalendar extends AppCompatActivity {
 
             @Override
             public void onDeleteClass(ClassWithTasks classItem) {
-
+                showDeleteClassConfirmation(classItem);
             }
         }, this);
 
-        classRecycler.setAdapter(ClassAdapterOther);
+        classRecycler.setAdapter(classAdapter);
         classRecycler.setVisibility(View.VISIBLE);
     }
 
     private void handleClassClick(ClassWithTasks classItem) {
         if (classItem.hasTasks()) {
             showTasksDialog(classItem);
+        } else {
+            // Show add task dialog for this class
+            TasksAdapter tasksAdapter = new TasksAdapter(classItem.getTasks(),
+                    taskToRemove -> removeTaskFromFirestore(taskToRemove, classItem),
+                    new TasksAdapter.OnTaskClickListener() {
+                        @Override
+                        public void onTaskClick(UniTask task) {
+                            showTaskDetailsDialog(task);
+                        }
+
+                        @Override
+                        public void onDeleteClick(UniTask task) {
+                            removeTaskFromFirestore(task, classItem);
+                        }
+                    });
+
+            showAddTaskDialog(classItem, tasksAdapter);
         }
     }
 
 
-    private void fetchStandaloneTasks(Date date, CalendarActivity.OnStandaloneTasksFetchedListener listener) {
+    private void fetchStandaloneTasks(Date date, OnStandaloneTasksFetchedListener listener) {
         db.collection("tasks")
                 .whereEqualTo("date", date)
                 .whereEqualTo("batch", selectedBatch)
@@ -704,8 +737,12 @@ public class OtherCalendar extends AppCompatActivity {
                 });
     }
 
+    interface OnStandaloneTasksFetchedListener {
+        void onTasksFetched(List<UniTask> tasks);
+    }
+
     private void showStandaloneTasks(List<UniTask> tasks) {
-        StandaloneTasksAdapterOther adapter = new StandaloneTasksAdapterOther(tasks, new StandaloneTasksAdapterOther.OnTaskClickListener() {
+        StandaloneTasksAdapter adapter = new StandaloneTasksAdapter(tasks, new StandaloneTasksAdapter.OnTaskClickListener() {
             @Override
             public void onTaskClick(UniTask task) {
                 showTaskDetailsDialog(task);
@@ -713,7 +750,7 @@ public class OtherCalendar extends AppCompatActivity {
 
             @Override
             public void onDeleteClick(UniTask task) {
-                //showDeleteTaskConfirmation(task);  // Changed to use confirmation dialog
+                showDeleteTaskConfirmation(task);  // Changed to use confirmation dialog
             }
         });
 
@@ -734,6 +771,10 @@ public class OtherCalendar extends AppCompatActivity {
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Task removed", Toast.LENGTH_SHORT).show();
+                    displayClassesForDate(currentSelectedDate);
+                    //updateCalendarAppearance();
+                    displayClassesForDate(currentSelectedDate);
+                    updateCalendarAppearance();
 
                     // ✅ Check if other standalone tasks exist for this date before removing it
                     Date taskDate = stripTime(task.getDate());
@@ -747,7 +788,7 @@ public class OtherCalendar extends AppCompatActivity {
                                 if (querySnapshot.isEmpty()) {
                                     taskDates.remove(taskDate); // Only remove if no standalone tasks exist
                                 }
-                                fetchAllStandaloneTasksAndUpdateCalendar();
+                                //fetchAllStandaloneTasksAndUpdateCalendar();
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Error checking remaining tasks", e));
                 })
@@ -801,16 +842,125 @@ public class OtherCalendar extends AppCompatActivity {
 
 
 
+    private void showDeleteTaskConfirmation(UniTask task) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_delete_class, null);
+        EditText confirmInput = dialogView.findViewById(R.id.confirmEditText);
+        MaterialButton deleteBtn = dialogView.findViewById(R.id.deleteButton);
+        MaterialButton cancelBtn = dialogView.findViewById(R.id.cancelButton);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        deleteBtn.setEnabled(false);
+        confirmInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                deleteBtn.setEnabled(s.toString().equalsIgnoreCase("DELETE"));
+            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        });
+
+        deleteBtn.setOnClickListener(v -> {
+            deleteStandaloneTask(task);
+            dialog.dismiss();
+        });
+
+        cancelBtn.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
 
 
 
 
 
+    private void showDeleteClassConfirmation(ClassWithTasks classItem) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_delete_class, null);
+        EditText confirmInput = dialogView.findViewById(R.id.confirmEditText);
+        MaterialButton deleteBtn = dialogView.findViewById(R.id.deleteButton);
+        MaterialButton cancelBtn = dialogView.findViewById(R.id.cancelButton);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        deleteBtn.setEnabled(false);
+        confirmInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                deleteBtn.setEnabled(s.toString().equalsIgnoreCase("DELETE"));
+            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        });
+
+        deleteBtn.setOnClickListener(v -> {
+            deleteClassFromFirestore(classItem);
+            dialog.dismiss();
+        });
+
+        cancelBtn.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
 
 
 
+    void deleteClassFromFirestore(ClassWithTasks classItem) {
+        String dayName = getDayName(currentSelectedDate).toLowerCase();
+
+        Map<String, Object> updates = new HashMap<>();
+        String path = "batch_" + selectedBatch + "."
+                + selectedSection + "."
+                + classItem.getTimeSlot();
+
+        updates.put(path, FieldValue.delete());
+
+        db.collection("schedules").document(dayName)
+                .update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Class deleted", Toast.LENGTH_SHORT).show();
+                    loadAllDataForRange();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
 
 
+    private void showEmptyDayUI(Date date) {
+        View emptyView = getLayoutInflater().inflate(R.layout.empty_day_layout, null);
+        TextView dateTextView = emptyView.findViewById(R.id.dateTextView);
+        Button addClassButton = emptyView.findViewById(R.id.addClassButton);
+        Button addTaskButton = emptyView.findViewById(R.id.addTaskButton);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault());
+        dateTextView.setText("Add classes or tasks on " + dateFormat.format(date));
+
+        // Check available slots before deciding visibility
+        checkAvailableSlots(date, isVacant -> {
+            if (isVacant) {
+                addClassButton.setVisibility(View.VISIBLE);
+                addClassButton.setOnClickListener(v -> showAddClassDialog(date));
+            } else {
+                addClassButton.setVisibility(View.GONE);
+            }
+        });
+        checkAvailableSlots(date, isVacant -> {
+            if (isVacant) {
+                addTaskButton.setVisibility(View.VISIBLE);
+                addTaskButton.setOnClickListener(v -> showAddTaskDialogWithoutClass(date));
+            } else {
+                addTaskButton.setVisibility(View.GONE);
+            }
+        });
+
+        // addTaskButton.setOnClickListener(v -> showAddTaskDialogWithoutClass(date));
+
+        LinearLayout container = findViewById(R.id.emptyDayContainer);
+        container.removeAllViews();
+        container.addView(emptyView);
+        container.setVisibility(View.VISIBLE);
+    }
 
 
     private void checkAvailableSlots(Date date, OnSlotCheckListener listener) {
@@ -864,10 +1014,148 @@ public class OtherCalendar extends AppCompatActivity {
 
 
 
+    // Add this method for empty day UI
+    private void showAddTaskDialogWithoutClass(Date date) {
+        // 1) Fetch schedule doc for the day
+        db.collection("schedules")
+                .document(getDayName(date).toLowerCase())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+
+                    // The full list of time slots
+                    List<String> allTimeSlots = Arrays.asList(
+                            "09:00-10:20AM",
+                            "10:20-11:40AM",
+                            "11:40-1:00PM",
+                            "1:00-1:30PM",
+                            "1:30-2:50PM",
+                            "2:50-4:10PM",
+                            "7:00-8:20PM"
+                    );
+
+                    // Keep track of all occupied slots (from both classes & tasks)
+                    List<String> occupiedSlots = new ArrayList<>();
+
+                    // Fill occupiedSlots from the schedule doc
+                    if (documentSnapshot.exists()) {
+                        Map<String, Object> dayData = documentSnapshot.getData();
+                        if (dayData != null) {
+                            String batchKey = "batch_" + selectedBatch;
+                            if (dayData.containsKey(batchKey)) {
+                                Map<String, Object> batchMap = (Map<String, Object>) dayData.get(batchKey);
+                                if (batchMap.containsKey(selectedSection)) {
+                                    Map<String, Object> sectionMap = (Map<String, Object>) batchMap.get(selectedSection);
+                                    // each key is a time slot occupied by a class
+                                    occupiedSlots.addAll(sectionMap.keySet());
+                                }
+                            }
+                        }
+                    }
+
+                    // 2) Now also fetch tasks for the same batch, section & date
+                    db.collection("tasks")
+                            .whereEqualTo("batch", selectedBatch)
+                            .whereEqualTo("section", selectedSection)
+                            .whereEqualTo("date", date)
+                            .get()
+                            .addOnSuccessListener(taskSnapshots -> {
+                                // Fill occupiedSlots from tasks' classTime
+                                for (QueryDocumentSnapshot doc : taskSnapshots) {
+                                    UniTask task = doc.toObject(UniTask.class);
+                                    if (task.getClassTime() != null && !task.getClassTime().isEmpty()) {
+                                        occupiedSlots.add(task.getClassTime());
+                                    }
+                                }
+
+                                // 3) Remove all occupied from the master list
+                                List<String> vacantSlots = new ArrayList<>(allTimeSlots);
+                                vacantSlots.removeAll(occupiedSlots);
+
+                                // Now decide whether to show the “Add Task” dialog
+                                if (vacantSlots.isEmpty()) {
+                                    Toast.makeText(
+                                            this,
+                                            "No vacant time slots available.",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                } else {
+                                    // Pass the free slots to your method
+                                    showAddTaskDialogWithAvailableSlots(date, vacantSlots);
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Failed to load tasks", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load time slots", Toast.LENGTH_SHORT).show();
+                });
+    }
 
 
 
+    private void showAddTaskDialogWithAvailableSlots(Date date, List<String> vacantSlots) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task_without_class, null);
 
+        Spinner timeSlotSpinner = dialogView.findViewById(R.id.timeSlotSpinner);
+        EditText taskTitle = dialogView.findViewById(R.id.taskTitle);
+        EditText taskDetails = dialogView.findViewById(R.id.taskDetails);
+        EditText instructorEditText = dialogView.findViewById(R.id.instructorEditText);
+
+        // Populate time slots
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, vacantSlots);
+        timeSlotSpinner.setAdapter(adapter);
+        instructorEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String current = s.toString();
+                if (!current.isEmpty() && !current.equals(current.toUpperCase())) {
+                    instructorEditText.setText(current.toUpperCase());
+                    instructorEditText.setSelection(current.length());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        builder.setView(dialogView)
+                .setPositiveButton("Add Task", (dialog, which) -> {
+                    String instructor = instructorEditText.getText().toString().trim();
+
+                    if (instructor.isEmpty()) {
+                        Toast.makeText(this, "Instructor acronym is required", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    UniTask newTask = new UniTask(
+                            taskTitle.getText().toString(),
+                            taskDetails.getText().toString(),
+                            timeSlotSpinner.getSelectedItem().toString(), // Get selected time slot
+                            selectedBatch,
+                            selectedSection,
+                            instructor
+
+                    );
+                    newTask.setDate(date);
+                    saveTaskToFirestore(newTask);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+
+
+
+    }
+
+
+    private boolean checkForStandaloneTasks(Date date) {
+        // Implement logic to check if there are tasks without classes
+        // This might require querying tasks collection directly
+        return false; // Replace with actual implementation
+    }
 
     private void showAddClassDialog(Date date) {
         db.collection("schedules")
@@ -996,8 +1284,6 @@ public class OtherCalendar extends AppCompatActivity {
         View closeIcon = dialogView.findViewById(R.id.closeIcon);
         View addTaskButton = dialogView.findViewById(R.id.addTaskButton);
 
-        addTaskButton.setVisibility(View.GONE);
-
         // ✅ Remove duplicate tasks before displaying them
         List<UniTask> uniqueTasks = new ArrayList<>();
         for (UniTask task : classItem.getTasks()) {
@@ -1014,14 +1300,17 @@ public class OtherCalendar extends AppCompatActivity {
         }
 
         // ✅ Use unique tasks for the RecyclerView
-        TasksAdapterOther = new TasksAdapterOther(uniqueTasks, taskToRemove -> {
-            
+        tasksAdapter = new TasksAdapter(uniqueTasks, taskToRemove -> {
+            removeTaskFromFirestore(taskToRemove, classItem);
         });
 
         tasksRecycler.setLayoutManager(new LinearLayoutManager(this));
-        tasksRecycler.setAdapter(TasksAdapterOther);
+        tasksRecycler.setAdapter(tasksAdapter);
 
-
+        // Add new task button
+        addTaskButton.setOnClickListener(v -> {
+            showAddTaskDialog(classItem, tasksAdapter);
+        });
 
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
@@ -1037,6 +1326,57 @@ public class OtherCalendar extends AppCompatActivity {
 
 
 
+    private void removeTaskFromFirestore(UniTask task, ClassWithTasks classItem) {
+        String docId = task.getTaskId();
+        if (docId == null || docId.isEmpty()) {
+            Toast.makeText(this, "Can't remove task without doc ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        db.collection("tasks")
+                .document(docId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Task removed", Toast.LENGTH_SHORT).show();
+
+                    // Remove from local memory
+                    classItem.getTasks().removeIf(t -> t.getTaskId().equals(task.getTaskId()));
+
+                    // Update RecyclerView
+                    if (tasksAdapter != null) {
+                        runOnUiThread(() -> {
+                            tasksAdapter.removeTask(task);
+                            tasksAdapter.notifyDataSetChanged();
+                        });
+                    }
+
+                    // Check if any tasks remain for this date
+                    Date taskDate = stripTime(task.getDate());
+                    db.collection("tasks")
+                            .whereEqualTo("date", taskDate)
+                            .whereEqualTo("batch", selectedBatch)
+                            .whereEqualTo("section", selectedSection)
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                if (querySnapshot.isEmpty()) {
+                                    // No tasks left - update taskDates
+                                    taskDates.remove(taskDate);
+                                }
+                                // Force full calendar refresh
+                                // fetchAllStandaloneTasksAndUpdateCalendar();
+                                updateCalendarAppearance();
+                            })
+                            .addOnFailureListener(e -> Log.e(TAG, "Error checking remaining tasks", e));
+
+                    // Refresh current view
+                    displayClassesForDate(currentSelectedDate);
+                    loadAllDataForRange();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error removing task", e);
+                    Toast.makeText(this, "Failed to remove task", Toast.LENGTH_SHORT).show();
+                });
+    }
 
 
 
@@ -1054,11 +1394,111 @@ public class OtherCalendar extends AppCompatActivity {
      */
 
     //need to make auth for cr to add tasks
+    private void showAddTaskDialog(ClassWithTasks classItem, TasksAdapter adapter) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task, null);
+
+        // Get views
+        TextView taskDateView = dialogView.findViewById(R.id.taskDate);
+        TextView taskTimeSlotView = dialogView.findViewById(R.id.taskTimeSlot);
+        TextView taskCourseView = dialogView.findViewById(R.id.taskCourse);
+
+
+        EditText taskTitle = dialogView.findViewById(R.id.taskTitle);
+        EditText taskDetails = dialogView.findViewById(R.id.taskDetails);
+        // Get instructor from the class item
+        String instructorAcronym = classItem.getInstructor();
+
+        // ✅ Format and set the selected date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault());
+        String formattedDate = dateFormat.format(currentSelectedDate);
+        taskDateView.setText("Date: " + formattedDate);
+
+        // ✅ Set time slot and course name
+        taskTimeSlotView.setText("Time Slot: " + classItem.getTimeSlot());
+        taskCourseView.setText("Course: " + classItem.getCourse());
+
+        builder.setView(dialogView)
+                .setPositiveButton("Add Task", (dialog, which) -> {
+                    UniTask newTask = new UniTask(
+                            taskTitle.getText().toString(),
+                            taskDetails.getText().toString(),
+                            classItem.getTimeSlot(),
+                            selectedBatch,
+                            selectedSection,
+                            instructorAcronym
+                    );
+                    newTask.setDate(stripTime(currentSelectedDate));
+
+                    db.collection("tasks")
+                            .add(newTask)
+                            .addOnSuccessListener(docRef -> {
+                                String newId = docRef.getId();
+                                newTask.setTaskId(newId);
+
+                                // Update Firestore with the taskId and instructor
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put("taskId", newId);
+                                updates.put("instructorAcronym", instructorAcronym);
+
+
+                                // Update Firestore with the taskId
+                                db.collection("tasks").document(newId)
+                                        .update(updates)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d(TAG, "Task ID updated");
+                                            classItem.addTask(newTask);
+                                            adapter.notifyDataSetChanged();
+
+                                            Date taskDate = stripTime(newTask.getDate());
+                                            taskDates.add(taskDate);
+                                            updateCalendarAppearance();
+
+                                            // Fetch standalone tasks immediately after update
+                                            fetchAllStandaloneTasksAndUpdateCalendar();
+                                            loadAllDataForRange();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "Update taskId failed", e);
+                                            Toast.makeText(this, "Failed to add task", Toast.LENGTH_SHORT).show();
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error adding task", e);
+                                Toast.makeText(this, "Failed to add task", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
 
 
 
+    private void saveTaskToFirestore(UniTask task) {
+        db.collection("tasks")
+                .add(task)
+                .addOnSuccessListener(docRef -> {
+                    String newId = docRef.getId();
+                    task.setTaskId(newId);
 
-
+                    db.collection("tasks").document(newId)
+                            .update("taskId", newId)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "Task ID updated in Firestore");
+                                Date taskDate = stripTime(task.getDate());
+                                taskDates.add(taskDate);
+                                updateCalendarAppearance();
+                                //fetchAllStandaloneTasksAndUpdateCalendar();
+                                loadAllDataForRange();// Immediate fetch
+                            })
+                            .addOnFailureListener(e -> Log.e(TAG, "Failed to update taskId", e));
+                    showToast("Task added");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error adding task", e);
+                    showToast("Failed to add task");
+                });
+    }
 
     private void fetchAllStandaloneTasksAndUpdateCalendar() {
         Set<Date> tempDates = new HashSet<>(taskDates);

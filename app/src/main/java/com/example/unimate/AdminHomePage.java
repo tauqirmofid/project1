@@ -26,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AdminHomePage extends AppCompatActivity {
@@ -161,19 +162,23 @@ public class AdminHomePage extends AppCompatActivity {
                 requestList.clear();
 
                 if (currentRole.equals("CR")) {
-                    // CRs have nested data (Batch -> Section -> CRs)
+                    // Flatten CR data
                     for (DataSnapshot batchSnapshot : snapshot.getChildren()) {
                         for (DataSnapshot sectionSnapshot : batchSnapshot.getChildren()) {
                             for (DataSnapshot userSnapshot : sectionSnapshot.getChildren()) {
                                 RequestModel request = userSnapshot.getValue(RequestModel.class);
                                 if (request != null && !request.isVerified()) {
-                                    request.setId(userSnapshot.getKey()); // Set Firebase key as ID
+                                    // Flatten the structure
+                                    request.setId(userSnapshot.getKey()); // Firebase key as ID
+                                    request.setBatch(batchSnapshot.getKey()); // Set batch from parent node
+                                    request.setSection(sectionSnapshot.getKey()); // Set section from parent node
                                     requestList.add(request);
                                 }
                             }
                         }
                     }
-                } else {
+                }
+                else {
                     // Teachers are stored directly under "Teachers/{teacherId}"
                     for (DataSnapshot teacherSnapshot : snapshot.getChildren()) {
                         RequestModel request = teacherSnapshot.getValue(RequestModel.class);
@@ -239,24 +244,36 @@ public class AdminHomePage extends AppCompatActivity {
     private void moveRequestToAnotherDatabase(RequestModel request, boolean isAccepted) {
         DatabaseReference currentRef = FirebaseDatabase.getInstance()
                 .getReference(currentRole.equals("CR") ? "CR" : "Teachers")
-                .child(currentRole.equals("CR") ? request.getBatch() : request.getId()); // Adjust to Teacher's structure
+                .child(currentRole.equals("CR") ? request.getBatch() + "/" + request.getSection() + "/" + request.getId() : request.getId()); // Adjust for CR structure
 
         DatabaseReference targetRef = FirebaseDatabase.getInstance()
                 .getReference(isAccepted ? "AcceptedRequests" : "RejectedRequests")
                 .child(currentRole.equals("CR") ? "CR" : "Teachers")
-                .child(request.getId()); // Save Teacher/CR under their unique ID
+                .child(request.getId()); // Store directly under ID
 
         currentRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    // Copy data to the target location
-                    targetRef.setValue(snapshot.getValue()).addOnSuccessListener(aVoid -> {
-                        // Remove the original data after successfully copying
+                    // Flatten data
+                    HashMap<String, Object> flattenedData = new HashMap<>();
+                    for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                        flattenedData.put(childSnapshot.getKey(), childSnapshot.getValue());
+                    }
+
+                    // Add batch and section explicitly for CR
+                    if (currentRole.equals("CR")) {
+                        flattenedData.put("batch", request.getBatch());
+                        flattenedData.put("section", request.getSection());
+                    }
+
+                    // Save flattened data
+                    targetRef.setValue(flattenedData).addOnSuccessListener(aVoid -> {
+                        // Remove from the original location
                         currentRef.removeValue().addOnSuccessListener(aVoid1 -> {
                             Toast.makeText(AdminHomePage.this, isAccepted ? "Request approved and moved!" : "Request rejected and moved!", Toast.LENGTH_SHORT).show();
-                            requestList.remove(request); // Remove from local list
-                            requestAdapter.notifyDataSetChanged(); // Update the adapter
+                            requestList.remove(request);
+                            requestAdapter.notifyDataSetChanged();
                         });
                     });
                 } else {
@@ -270,4 +287,6 @@ public class AdminHomePage extends AppCompatActivity {
             }
         });
     }
+
+
 }
