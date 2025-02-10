@@ -4,12 +4,16 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,14 +31,17 @@ public class RoomsActivity extends AppCompatActivity {
 
     private static final String TAG = "RoomsActivity";
     private FirebaseFirestore db;
+    private NestedScrollView scrollView;
 
     // UI elements for RKB floors
     private ImageView rkbG, rkb1, rkb2, rkb3, rabG, rab1, rab2, rab3;
     private EditText searchEditText;
     private RecyclerView roomRecyclerView;
+    private LinearLayout rkbs;
 
     // Adapter and list for search results
     private RoomAdapter roomAdapter;
+    private Button gotoFloor,gotoSearch;
     private List<RoomModel> roomList = new ArrayList<>();
 
     @Override
@@ -45,7 +52,7 @@ public class RoomsActivity extends AppCompatActivity {
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
 
-        // Bind UI elements
+//        // Bind UI elements
         rkbG = findViewById(R.id.rkb_g);
         rkb1 = findViewById(R.id.rkb_1);
         rkb2 = findViewById(R.id.rkb_2);
@@ -54,33 +61,78 @@ public class RoomsActivity extends AppCompatActivity {
         rab1 = findViewById(R.id.rab_1);
         rab2 = findViewById(R.id.rab_2);
         rab3 = findViewById(R.id.rab_3);
+
+        scrollView=findViewById(R.id.scrollView);
+        rkbs=findViewById(R.id.rkbs);
+
+        gotoSearch=findViewById(R.id.gototop);
+        gotoSearch.setOnClickListener(v->{
+            if (scrollView != null && searchEditText != null) {
+                int targetScrollY = searchEditText.getTop();
+
+                // Scroll smoothly to the calculated Y position
+                scrollView.post(() -> scrollView.smoothScrollTo(0, targetScrollY));
+            }
+
+        });
+
+
+        gotoFloor=findViewById(R.id.gotoFloor);
+        gotoFloor.setOnClickListener(v->{
+
+            if (scrollView != null && rkbs != null) {
+                // Calculate the Y position of carouselRecyclerView relative to the parent NestedScrollView
+                int targetScrollY = rkbs.getTop();
+
+                // Scroll smoothly to the calculated Y position
+                scrollView.post(() -> scrollView.smoothScrollTo(0, targetScrollY));
+            }
+
+        });
+
+        // Bind UI elements
         searchEditText = findViewById(R.id.searchEditText);
-        roomRecyclerView = findViewById(R.id.recyclerViewSearchResults);
-
-        // Set up RecyclerView for search results
-        roomRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        roomAdapter = new RoomAdapter(this, roomList);
-        roomRecyclerView.setAdapter(roomAdapter);
-
-        // Fetch and display RKB and RAB floors
-        fetchRabFloors();
-        fetchRkbFloors();
-
-        // Set up search functionality
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                fetchRooms(s.toString().trim());
+                filterRooms(s.toString().trim());
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
-    }
+        roomRecyclerView = findViewById(R.id.RecyclerView);
 
+        // Set up RecyclerView for search results
+        roomRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        roomAdapter = new RoomAdapter(this, roomList);
+        roomRecyclerView.setAdapter(roomAdapter);
+
+
+
+        // Fetch and display RKB and RAB floors
+        fetchRabFloors();
+        fetchRkbFloors();
+
+
+        // Fetch rooms for both buildings
+        fetchAllRooms();
+
+    }
+    private void filterRooms(String query) {
+        List<RoomModel> filteredList = new ArrayList<>();
+        String lowerCaseQuery = query.toLowerCase(); // Convert the query to lowercase
+
+        for (RoomModel room : roomList) {
+            if (room.getRoomNumber().toLowerCase().contains(lowerCaseQuery)) {
+                filteredList.add(room);
+            }
+        }
+        roomAdapter.updateList(filteredList);
+    }
     private void fetchRabFloors() {
         String[] floors = {"G", "1st", "2nd", "3rd"};
 
@@ -146,6 +198,42 @@ public class RoomsActivity extends AppCompatActivity {
                     });
         }
     }
+    private void fetchAllRooms() {
+        // Define the buildings and floors
+        String[] buildings = {"RAB", "RKB"};
+        String[] floors = {"G", "1st", "2nd", "3rd"};
+
+        // Loop through each building and floor
+        for (String building : buildings) {
+            for (String floor : floors) {
+                fetchRoomsForBuildingAndFloor(building, floor);
+            }
+        }
+    }
+
+    private void fetchRoomsForBuildingAndFloor(String building, String floor) {
+        db.collection("rooms").document(building).collection(floor)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (DocumentSnapshot roomDoc : queryDocumentSnapshots) {
+                        String roomNumber = roomDoc.getId();
+                        String imageKey = roomDoc.getString("description");
+
+                        if (imageKey != null && !imageKey.isEmpty()) {
+                            RoomModel room = new RoomModel(building, floor, roomNumber, imageKey);
+                            roomList.add(room);
+                            Log.d(TAG, "Room added: " + roomNumber + " in " + building + " floor " + floor);
+                        } else {
+                            Log.w(TAG, "Room " + roomNumber + " in " + building + " floor " + floor + " has no image key.");
+                        }
+                    }
+                    // Update the RecyclerView after fetching all rooms for the current floor
+                    roomAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching rooms for building: " + building + ", floor: " + floor, e);
+                });
+    }
 
     private void loadImageIntoView(String imageKey, ImageView imageView) {
         String imageUrl = "https://res.cloudinary.com/dp4ha5cws/image/upload/" + imageKey;
@@ -157,41 +245,5 @@ public class RoomsActivity extends AppCompatActivity {
                 .into(imageView);
     }
 
-    private void fetchRooms(String query) {
-        roomList.clear();
-        if (query.isEmpty()) {
-            roomAdapter.notifyDataSetChanged();
-            return;
-        }
 
-        db.collection("rooms").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot buildingDoc : task.getResult()) {
-                    String building = buildingDoc.getId();
-                    buildingDoc.getReference().get().addOnCompleteListener(floorTask -> {
-                        if (floorTask.isSuccessful() && floorTask.getResult().exists()) {
-                            for (String floor : floorTask.getResult().getData().keySet()) {
-                                buildingDoc.getReference().collection(floor)
-                                        .get()
-                                        .addOnCompleteListener(roomTask -> {
-                                            if (roomTask.isSuccessful()) {
-                                                for (QueryDocumentSnapshot roomDoc : roomTask.getResult()) {
-                                                    String roomNumber = roomDoc.getId();
-                                                    if (roomNumber.contains(query)) {
-                                                        String imageKey = roomDoc.getString("imageKey");
-                                                        roomList.add(new RoomModel(building, floor, roomNumber, imageKey));
-                                                    }
-                                                }
-                                                roomAdapter.notifyDataSetChanged();
-                                            }
-                                        });
-                            }
-                        }
-                    });
-                }
-            } else {
-                Toast.makeText(RoomsActivity.this, "Error fetching data.", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }

@@ -3,6 +3,7 @@ package com.example.unimate;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,11 +35,11 @@ public class TeacherHomepage extends AppCompatActivity {
     private TextView tvTeacherName, tvDesignation, tvAcronym, tvEmail;
     private RecyclerView carouselRecyclerView;
     private DayAdapter dayAdapter;
-    private CardView task,t_othersRoutineCard,profile;
+    private CardView task,maps,profile;
     private List<DayModel> dayList;
     private ImageView leftNavBarImage, ProfileImage;
     private DrawerLayout drawerLayout;
-    private CardView routine,rooms,otherRoutine,teacherInfo;
+    private CardView all_teacher_routine, routine,rooms,otherRoutine,teacherInfo;
     private DatabaseReference databaseReference;
     private final String[] daysOfWeek = {
             "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
@@ -65,11 +67,39 @@ public class TeacherHomepage extends AppCompatActivity {
         otherRoutine=findViewById( R.id.t_othersRoutineCard);
         routine=findViewById(R.id.t_routineCardView);
        // teacherAcronym = getIntent().getStringExtra("acronym");
-
-        routine.setOnClickListener(v -> {
-            Intent intent = new Intent(TeacherHomepage.this, TeacherRoutineActivity.class);
-            intent.putExtra("acronym", teacherAcronym);
+        maps=findViewById(R.id.universityMapCard);
+        maps.setOnClickListener(v->{
+            Intent intent = new Intent(TeacherHomepage.this, MapActivity.class);
             startActivity(intent);
+
+        });
+        all_teacher_routine=findViewById(R.id.teachersroutine);
+        all_teacher_routine.setOnClickListener(v->{
+            Intent intent = new Intent(TeacherHomepage.this, TeacherRoutineActivity.class);
+            startActivity(intent);
+        });
+        teacherInfo=findViewById(R.id.teachersInfoCard);
+        teacherInfo.setOnClickListener(v->{
+            Intent intent = new Intent(TeacherHomepage.this, Teacher_infoActivity.class);
+            startActivity(intent);
+        });
+        rooms=findViewById(R.id.t_roomsCardView);
+        rooms.setOnClickListener(v->{
+            Intent intent = new Intent(TeacherHomepage.this, RoomsActivity.class);
+            startActivity(intent);
+        });
+        routine.setOnClickListener(v -> {
+            // Scroll to the position of carouselRecyclerView
+            NestedScrollView nestedScrollView = findViewById(R.id.nestedScrollView); // Ensure this is the correct ID
+            View carouselRecyclerView = findViewById(R.id.carouselRecyclerView); // Ensure this is the correct ID
+
+            if (nestedScrollView != null && carouselRecyclerView != null) {
+                // Calculate the Y position of carouselRecyclerView relative to the parent NestedScrollView
+                int targetScrollY = carouselRecyclerView.getTop();
+
+                // Scroll smoothly to the calculated Y position
+                nestedScrollView.post(() -> nestedScrollView.smoothScrollTo(0, targetScrollY));
+            }
         });
 
         otherRoutine.setOnClickListener(v -> {

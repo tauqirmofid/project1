@@ -1,19 +1,20 @@
 package com.example.unimate;
+
 public class RoomModel {
-    private String building;
+    private String buildingName;
     private String floor;
     private String roomNumber;
     private String imageKey;
 
-    public RoomModel(String building, String floor, String roomNumber, String imageKey) {
-        this.building = building;
+    public RoomModel(String buildingName, String floor, String roomNumber, String imageKey) {
+        this.buildingName = buildingName;
         this.floor = floor;
         this.roomNumber = roomNumber;
         this.imageKey = imageKey;
     }
 
     public String getBuilding() {
-        return building;
+        return buildingName;
     }
 
     public String getFloor() {

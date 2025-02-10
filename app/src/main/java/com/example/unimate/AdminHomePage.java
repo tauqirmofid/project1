@@ -34,7 +34,7 @@ public class AdminHomePage extends AppCompatActivity {
     private RecyclerView requestsRecyclerView;
     private RequestAdapter requestAdapter;
     private List<RequestModel> requestList;
-    private CardView roomCardView, routineCardView,teacherinfoCardView,universityCardView;
+    private CardView roomCardView, routineCardView,teacherinfoCardView,taskCardView;
 
     // Drawer references
     private DrawerLayout drawerLayout;
@@ -59,6 +59,12 @@ public class AdminHomePage extends AppCompatActivity {
                 Intent intent = new Intent(AdminHomePage.this, RoomCSVUpload.class);
                 startActivity(intent);
             }
+        });
+
+        taskCardView = findViewById(R.id.calendarCard);
+        taskCardView.setOnClickListener(v->{
+            Intent intent = new Intent(AdminHomePage.this, CalendarActivity.class);
+            startActivity(intent);
         });
 
         routineCardView = findViewById(R.id.routineCardView);
