@@ -3,6 +3,7 @@ package com.example.unimate;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -556,7 +557,10 @@ public class StudentHomePage extends AppCompatActivity {
                         nextSlot,
                         getClassInfoByIndex(todayModel, nextSlot)));
             } else {
+
+
                 checkNextDaysForClass(todayIndex);
+                Log.d("TAUQIR", "checkNextDaysForClass: " + todayIndex);
             }
 
             // Previous
@@ -573,6 +577,8 @@ public class StudentHomePage extends AppCompatActivity {
 
         } else {
             // No ongoing class right now
+            Log.d("TAUQIR", "No ongoing class: " + todayIndex);
+
             tvCurrentClass.setText("No ongoing class");
 
             // If it's before the first slot
@@ -586,6 +592,8 @@ public class StudentHomePage extends AppCompatActivity {
                             nextSlot,
                             getClassInfoByIndex(todayModel, nextSlot)));
                 } else {
+                    Log.d("TAUQIR", "checkNextDaysForClass: " + todayIndex);
+
                     checkNextDaysForClass(todayIndex);
                 }
                 checkPreviousDaysForClass(todayIndex);
@@ -603,8 +611,8 @@ public class StudentHomePage extends AppCompatActivity {
                 } else {
                     checkPreviousDaysForClass(todayIndex);
                 }
-                tvNextClass.setText("None");
-
+                // Check for the next class in subsequent days
+                checkNextDaysForClass(todayIndex);
             }
             // Otherwise, we are between two slots
             else {
@@ -626,9 +634,12 @@ public class StudentHomePage extends AppCompatActivity {
                                 actualNextSlot,
                                 getClassInfoByIndex(todayModel, actualNextSlot)));
                     } else {
+                        Log.d("TAUQIR", "checkNextDaysForClass: " + todayIndex);
+
                         checkNextDaysForClass(todayIndex);
                     }
                 } else {
+
                     tvNextClass.setText("None");
                 }
 
@@ -648,7 +659,6 @@ public class StudentHomePage extends AppCompatActivity {
             }
         }
     }
-
     /**
      * Look up to 7 days ahead to find the next day/slot that has a class.
      */
