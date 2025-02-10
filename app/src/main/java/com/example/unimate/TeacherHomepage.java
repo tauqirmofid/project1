@@ -43,7 +43,7 @@ public class TeacherHomepage extends AppCompatActivity {
             "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
     };
     private final String[] timeKeys = {
-            "9:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
+            "09:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
             "1:00-1:30PM", "1:30-2:50PM", "2:50-4:10PM", "7:00-8:20PM"
     };
 
