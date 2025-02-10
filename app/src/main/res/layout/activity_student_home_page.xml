@@ -90,7 +90,7 @@
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="65dp"
+            android:layout_marginTop="40dp"
             android:fillViewport="true"
             >
 
@@ -98,6 +98,7 @@
                 android:id="@+id/main"
 
                 android:paddingTop="10dp"
+                android:layout_marginTop="25dp"
                 android:layout_width="match_parent"
 
                 android:layout_height="wrap_content"
@@ -116,6 +117,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:paddingTop="5dp"
 
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -494,6 +496,7 @@
                         android:layout_height="wrap_content"
                         android:text="Others"
                         android:textSize="18sp"
+                        android:layout_marginStart="10dp"
                         android:textColor="@color/Theme_green"
                         android:textStyle="bold"
                         android:layout_marginBottom="4dp" />

@@ -19,9 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools">
+            >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/main"
@@ -388,7 +386,7 @@
                 <LinearLayout
                     android:id="@+id/routineRoomLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="130dp"
                     android:orientation="horizontal"
                     android:gravity="center"
                     android:layout_marginTop="0dp"
@@ -399,11 +397,11 @@
                     <androidx.cardview.widget.CardView
                         android:id="@+id/routineCardView"
                         android:layout_width="0dp"
-                        android:layout_height="150dp"
+                        android:layout_height="110dp"
                         android:layout_weight="1"
                         android:layout_margin="8dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp">
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -414,18 +412,18 @@
 
                             <ImageView
                                 android:id="@+id/routineIcon"
-                                android:layout_width="90dp"
-                                android:layout_height="90dp"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:src="@drawable/routine"
                                 android:contentDescription="Routine Icon"
-                                android:layout_marginBottom="8dp" />
+                                android:layout_marginBottom="0dp" />
 
                             <TextView
                                 android:id="@+id/routineText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Routine"
-                                android:textSize="30sp"
+                                android:textSize="20sp"
                                 android:textColor="@color/Theme_green"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -434,11 +432,11 @@
                     <androidx.cardview.widget.CardView
                         android:id="@+id/roomsCardView"
                         android:layout_width="0dp"
-                        android:layout_height="150dp"
+                        android:layout_height="110dp"
                         android:layout_weight="1"
                         android:layout_margin="8dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp">
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -449,18 +447,18 @@
 
                             <ImageView
                                 android:id="@+id/roomsIcon"
-                                android:layout_width="90dp"
-                                android:layout_height="90dp"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:src="@drawable/rooms"
                                 android:contentDescription="Rooms Icon"
-                                android:layout_marginBottom="8dp" />
+                                android:layout_marginBottom="0dp" />
 
                             <TextView
                                 android:id="@+id/roomsText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Rooms"
-                                android:textSize="30sp"
+                                android:textSize="20sp"
                                 android:textColor="@color/Theme_Lightgreen"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -483,18 +481,18 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="180dp"
+                        android:layout_height="130dp"
                         android:layout_marginBottom="10dp"
                         android:orientation="horizontal">
 
                         <androidx.cardview.widget.CardView
-                            android:id="@+id/admin_teachersInfoCard"
+                            android:id="@+id/calendarCard"
                             android:layout_width="100dp"
-                            android:layout_height="150dp"
+                            android:layout_height="110dp"
                             android:layout_weight="1"
                             android:layout_margin="8dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="8dp">
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="2dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -504,21 +502,22 @@
                                 android:gravity="center">
 
                                 <ImageView
-                                    android:id="@+id/teachersInfoIcon"
-                                    android:layout_width="100dp"
-                                    android:layout_height="100dp"
-                                    android:layout_marginLeft="10dp"
-                                    android:src="@drawable/teacher_info"
+                                    android:id="@+id/calIcon"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_marginEnd="10dp"
+                                    android:src="@drawable/task_icon"
+                                    app:tint="@color/Theme_Lightgreen"
                                     android:contentDescription="Teachers Info Icon"
-                                    android:layout_marginBottom="8dp" />
+                                    android:layout_marginBottom="0dp" />
 
                                 <TextView
-                                    android:id="@+id/teachersInfoText"
+                                    android:id="@+id/calText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginRight="15dp"
-                                    android:text="Teachers Info"
-                                    android:textSize="25sp"
+                                    android:text="Tasks/Class"
+                                    android:textSize="20sp"
                                     android:textAlignment="center"
                                     android:textColor="@color/Theme_Lightgreen"
                                     android:textStyle="bold" />
@@ -526,13 +525,13 @@
                         </androidx.cardview.widget.CardView>
 
                         <androidx.cardview.widget.CardView
-                            android:id="@+id/othersRoutineCard"
+                            android:id="@+id/admin_teachersInfoCard"
                             android:layout_width="0dp"
-                            android:layout_height="150dp"
+                            android:layout_height="110dp"
                             android:layout_weight="1"
                             android:layout_margin="8dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="8dp">
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="2dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -542,20 +541,20 @@
                                 android:gravity="center">
 
                                 <ImageView
-                                    android:id="@+id/othersRoutineIcon"
+                                    android:id="@+id/teachersInfoIcon"
                                     android:layout_width="60dp"
                                     android:layout_height="60dp"
-                                    android:src="@drawable/map_icon"
+                                    android:src="@drawable/teacher_info"
                                     android:contentDescription="Others Routine Icon"
-                                    android:layout_marginBottom="8dp" />
+                                    android:layout_marginBottom="0dp" />
 
                                 <TextView
-                                    android:id="@+id/othersRoutineText"
+                                    android:id="@+id/teachersInfoText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="University Map"
+                                    android:text="Teachers Info"
                                     android:textAlignment="center"
-                                    android:textSize="25sp"
+                                    android:textSize="15sp"
                                     android:textColor="@color/Theme_green"
                                     android:textStyle="bold" />
                             </LinearLayout>

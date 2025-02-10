@@ -40,6 +40,7 @@ public class AdminHomePage extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ImageView leftNavBarImage;
 
+
     // Approval section toggle buttons
     private Button teacherToggleButton, crToggleButton;
 
