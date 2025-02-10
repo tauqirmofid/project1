@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -153,7 +154,7 @@ public class StudentHomePage extends AppCompatActivity {
         String stdSection = intent.getStringExtra("STUDENT_SECTION");
         String stemail = intent.getStringExtra("STUDENT_EMAIL");
         // If null, get from SharedPreferences
-        if (stdName == null || stdBatch == null || stdSection == null || stemail == null) {
+        if (stdName == null || stdBatch == null || stdSection == null) {
             SharedPreferences sharedPreferences = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
             stdName = sharedPreferences.getString("studentName", "Student");
             stdBatch = sharedPreferences.getString("studentBatch", "N/A");
@@ -176,6 +177,13 @@ public class StudentHomePage extends AppCompatActivity {
             }
 
             startActivity(intent2);
+        });
+
+
+
+        ImageView searchEditText = findViewById(R.id.searchIcon);
+        searchEditText.setOnClickListener(v -> {
+            startActivity(new Intent(StudentHomePage.this, UniversalSearchActivity.class));
         });
 
         // Set UI

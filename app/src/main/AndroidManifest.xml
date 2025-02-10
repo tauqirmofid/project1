@@ -16,6 +16,9 @@
         android:theme="@style/Theme.Unimate"
         tools:targetApi="31">
         <activity
+            android:name=".UniversalSearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".TeacherProfileActivity"
             android:exported="false" />
         <activity

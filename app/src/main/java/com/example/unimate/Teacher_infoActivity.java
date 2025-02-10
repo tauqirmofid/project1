@@ -1,10 +1,23 @@
 package com.example.unimate;
 
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Teacher_infoActivity extends AppCompatActivity {
+public class Teacher_infoActivity extends AppCompatActivity implements FacultyAdapter.OnTeacherClickListener {
 
     private RecyclerView teacherRecyclerView;
     private FacultyAdapter teacherAdapter;
@@ -37,7 +50,7 @@ public class Teacher_infoActivity extends AppCompatActivity {
 
         // Setup RecyclerView
         teacherRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        teacherAdapter = new FacultyAdapter(filteredList); // Pass the filtered list
+        teacherAdapter = new FacultyAdapter(filteredList, this); // Pass the filtered list
         teacherRecyclerView.setAdapter(teacherAdapter);
 
         // Initialize Firestore
@@ -48,6 +61,116 @@ public class Teacher_infoActivity extends AppCompatActivity {
 
         // Setup search functionality
         setupSearch();
+    }
+    @Override
+    public void onTeacherClick(DocumentSnapshot teacherDoc) {
+        showTeacherDialog(teacherDoc);
+    }
+
+    private void showTeacherDialog(DocumentSnapshot teacherDoc) {
+        // Manually extract fields to match Firestore document structure
+        TeacherData teacher = new TeacherData(
+                teacherDoc.getString("full_name"),  // Map Firestore's 'full_name' to TeacherData.name
+                teacherDoc.getString("email"),
+                teacherDoc.getId(),                  // Acronym is document ID
+                teacherDoc.getString("teacherId"),
+                teacherDoc.getString("cell"),       // Map Firestore's 'cell' to TeacherData.phone
+                teacherDoc.getString("department"),
+                teacherDoc.getString("designation"),
+                "",                                  // Password not needed
+                teacherDoc.getBoolean("isVerified") != null ? teacherDoc.getBoolean("isVerified") : false
+        );
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_teacher_details, null);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+
+
+        TextView name = dialogView.findViewById(R.id.dialog_teacher_name);
+        TextView acronym = dialogView.findViewById(R.id.dialog_teacher_acronym);
+        TextView email = dialogView.findViewById(R.id.dialog_teacher_email);
+        TextView phone = dialogView.findViewById(R.id.dialog_teacher_phone);
+        TextView department = dialogView.findViewById(R.id.dialog_teacher_department);
+        TextView designation = dialogView.findViewById(R.id.dialog_teacher_designation);
+
+        // Set all fields
+        name.setText(teacher.name);
+        acronym.setText(teacher.acronym);
+        email.setText(teacher.email);
+        phone.setText(teacher.phone);
+        department.setText(teacher.department);
+        designation.setText(teacher.designation);
+
+
+        // Make links clickable
+        // email.setMovementMethod(LinkMovementMethod.getInstance());
+        //   phone.setMovementMethod(LinkMovementMethod.getInstance());
+
+        // Add click actions
+
+        email.setOnClickListener(v -> {
+            if(teacher.email != null && !teacher.email.isEmpty()) {
+                showActionDialog("Email address:", teacher.email, "email");
+            }
+        });
+
+        phone.setOnClickListener(v -> {
+            if(teacher.phone != null && !teacher.phone.isEmpty()) {
+                showActionDialog("Phone number:", teacher.phone, "phone");
+            }
+        });
+
+        dialogView.findViewById(R.id.dialog_close_button).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    private void showActionDialog(String title, String value, String actionType) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_action_choice, null);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+
+        TextView titleView = dialogView.findViewById(R.id.dialog_title);
+        ImageView actionIcon = dialogView.findViewById(R.id.action_execute);
+        TextView actionLabel = dialogView.findViewById(R.id.action_label);
+
+        // Set dynamic content based on action type
+        if(actionType.equals("email")) {
+            titleView.setText(getString(R.string.email_action_title, value));
+            actionIcon.setImageResource(R.drawable.ic_email);
+            actionLabel.setText(R.string.email_action);
+        } else {
+            titleView.setText(getString(R.string.phone_action_title, value));
+            actionIcon.setImageResource(R.drawable.ic_call);
+            actionLabel.setText(R.string.call_action);
+        }
+
+        dialogView.findViewById(R.id.action_copy).setOnClickListener(v -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("contact_info", value);
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        dialogView.findViewById(R.id.action_execute).setOnClickListener(v -> {
+            Intent intent = new Intent();
+            if(actionType.equals("email")) {
+                intent.setAction(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:" + value));
+            } else {
+                intent.setAction(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + value));
+            }
+            startActivity(intent);
+            dialog.dismiss();
+        });
+
+        dialogView.findViewById(R.id.action_cancel).setOnClickListener(v -> dialog.dismiss());
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
     }
 
     private void loadTeacherData() {

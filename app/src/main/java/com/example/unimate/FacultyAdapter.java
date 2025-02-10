@@ -15,9 +15,14 @@ import java.util.List;
 public class FacultyAdapter extends RecyclerView.Adapter<FacultyAdapter.FacultyViewHolder> {
 
     private List<DocumentSnapshot> facultyList;
+    private OnTeacherClickListener listener;
+    public interface OnTeacherClickListener {
+        void onTeacherClick(DocumentSnapshot teacherDoc);
+    }
 
-    public FacultyAdapter(List<DocumentSnapshot> facultyList) {
+    public FacultyAdapter(List<DocumentSnapshot> facultyList, OnTeacherClickListener listener) {
         this.facultyList = facultyList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,6 +43,12 @@ public class FacultyAdapter extends RecyclerView.Adapter<FacultyAdapter.FacultyV
         holder.facultyDesignation.setText(faculty.getString("designation"));
         holder.facultyCell.setText(faculty.getString("cell"));
         holder.facultyDept.setText(faculty.getString("department"));
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTeacherClick(faculty);
+            }
+        });
     }
 
 
