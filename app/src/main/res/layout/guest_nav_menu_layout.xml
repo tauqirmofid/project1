@@ -82,99 +82,98 @@
 
 
     </androidx.cardview.widget.CardView>
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/NavRooms"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:cardCornerRadius="12dp"-->
+<!--        app:cardElevation="6dp"-->
+<!--        app:cardBackgroundColor="#006A00"-->
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/NavRooms"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="6dp"
-        app:cardBackgroundColor="#006A00"
+<!--        app:cardUseCompatPadding="true">-->
 
-        app:cardUseCompatPadding="true">
-
-        <Button
-            android:id="@+id/navRoom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Rooms"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:backgroundTint="#006A00"
-            android:padding="12dp" />
-
-
-    </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView
-        android:id="@+id/navRoutineCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="6dp"
-        app:cardBackgroundColor="#006A00"
-
-        app:cardUseCompatPadding="true">
-
-        <Button
-            android:id="@+id/navRoutine"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Routines"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:backgroundTint="#006A00"
-            android:padding="12dp" />
+<!--        <Button-->
+<!--            android:id="@+id/navRoom"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Rooms"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:textSize="16sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:backgroundTint="#006A00"-->
+<!--            android:padding="12dp" />-->
 
 
-    </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView
-        android:id="@+id/TeachersCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="6dp"
-        app:cardBackgroundColor="#006A00"
+<!--    </androidx.cardview.widget.CardView>-->
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/navRoutineCard"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:cardCornerRadius="12dp"-->
+<!--        app:cardElevation="6dp"-->
+<!--        app:cardBackgroundColor="#006A00"-->
 
-        app:cardUseCompatPadding="true">
+<!--        app:cardUseCompatPadding="true">-->
 
-        <Button
-            android:id="@+id/TeachersInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Teachers Info"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:backgroundTint="#006A00"
-            android:padding="12dp" />
-
-
-    </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView
-        android:id="@+id/unimapCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="6dp"
-        app:cardBackgroundColor="#006A00"
-
-        app:cardUseCompatPadding="true">
-
-        <Button
-            android:id="@+id/unimap"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="University Map"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:backgroundTint="#006A00"
-            android:padding="12dp" />
+<!--        <Button-->
+<!--            android:id="@+id/navRoutine"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Routines"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:textSize="16sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:backgroundTint="#006A00"-->
+<!--            android:padding="12dp" />-->
 
 
-    </androidx.cardview.widget.CardView>
+<!--    </androidx.cardview.widget.CardView>-->
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/TeachersCard"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:cardCornerRadius="12dp"-->
+<!--        app:cardElevation="6dp"-->
+<!--        app:cardBackgroundColor="#006A00"-->
+
+<!--        app:cardUseCompatPadding="true">-->
+
+<!--        <Button-->
+<!--            android:id="@+id/TeachersInfo"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Teachers Info"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:textSize="16sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:backgroundTint="#006A00"-->
+<!--            android:padding="12dp" />-->
+
+
+<!--    </androidx.cardview.widget.CardView>-->
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/unimapCard"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:cardCornerRadius="12dp"-->
+<!--        app:cardElevation="6dp"-->
+<!--        app:cardBackgroundColor="#006A00"-->
+
+<!--        app:cardUseCompatPadding="true">-->
+
+<!--        <Button-->
+<!--            android:id="@+id/unimap"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="University Map"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:textSize="16sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:backgroundTint="#006A00"-->
+<!--            android:padding="12dp" />-->
+
+
+<!--    </androidx.cardview.widget.CardView>-->
 
 
 
@@ -202,6 +201,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hi,"
+        android:layout_marginTop="100dp"
+        android:textSize="14sp"
+        android:textColor="#006A00" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to UniMate!
+"
+        android:textSize="14sp"
+        android:textColor="#006A00" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Our app is your one-stop solution for finding rooms and exploring campus facilities with ease. Please log in to unlock more features and stay connected!"
         android:textSize="14sp"
         android:textColor="#006A00" />
 

@@ -83,13 +83,19 @@ public class StudentLoginActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString().trim();
 
         if (email.isEmpty()) {
+            sendCloseLoadingBroadcast();
+
             emailEditText.setError("Email is required!");
             emailEditText.requestFocus();
+
             return;
         }
         if (password.isEmpty()) {
+            sendCloseLoadingBroadcast();
+
             passwordEditText.setError("Password is required!");
             passwordEditText.requestFocus();
+
             return;
         }
 
@@ -170,6 +176,7 @@ public class StudentLoginActivity extends AppCompatActivity {
         intent.putExtra("STUDENT_NAME", stdName);
         intent.putExtra("STUDENT_BATCH", stdBatch);
         intent.putExtra("STUDENT_SECTION", stdSection);
+        intent.putExtra("STUDENT_EMAIL", mAuth.getCurrentUser().getEmail());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         startActivity(intent);
