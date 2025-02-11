@@ -483,6 +483,7 @@ public class StudentHomePage extends AppCompatActivity {
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);
         Button navLogoutButton = findViewById(R.id.navLogoutButton);
+        Button contacUs = findViewById(R.id.contacUs);
 
         if (navHomeButton != null) {
             navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
@@ -499,6 +500,13 @@ public class StudentHomePage extends AppCompatActivity {
                 Intent intent = new Intent(StudentHomePage.this, MainActivity.class);
                 startActivity(intent);
                 finish();
+            });
+        }
+        if (contacUs != null) {
+            contacUs.setOnClickListener(v ->{
+                Intent intent = new Intent(StudentHomePage.this, ContactDevelopersActivity.class);
+                startActivity(intent);
+                drawerLayout.closeDrawer(GravityCompat.START);
             });
         }
     }

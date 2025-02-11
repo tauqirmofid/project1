@@ -49,6 +49,10 @@ public class RoomsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rooms);
 
+        ImageView backButton = findViewById(R.id.leftNavBarImage);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
+
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
 

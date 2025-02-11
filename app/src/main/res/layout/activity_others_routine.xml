@@ -37,7 +37,7 @@
 
                 <!-- ImageView for nav_bar on the left -->
                 <ImageView
-                    android:id="@+id/leftNavBarImage"
+                    android:id="@+id/backButton"
                     android:layout_width="26dp"
                     android:layout_height="22dp"
                     android:layout_marginStart="20dp"
@@ -63,7 +63,7 @@
                     android:src="@drawable/new_home_top"
                     android:scaleX="0.8"
                     android:scaleY="0.8"
-                    app:layout_constraintStart_toEndOf="@id/leftNavBarImage"
+                    app:layout_constraintStart_toEndOf="@id/backButton"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"

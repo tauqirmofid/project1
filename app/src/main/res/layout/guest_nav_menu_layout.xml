@@ -196,6 +196,9 @@
         android:contentDescription="@null"
         />
 
+
+
+
     <TextView
         android:id="@+id/hiText"
         android:layout_width="wrap_content"
@@ -214,9 +217,29 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Our app is your one-stop solution for finding rooms and exploring campus facilities with ease. Please log in to unlock more features and stay connected!"
+        android:text="Never miss a class or deadline again! Our app helps you find rooms, explore campus facilities, and stay organized with a smart routine and task calendar. Log in now to stay on track and make campus life easier!"
         android:textSize="14sp"
         android:textColor="#006A00" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/contacUscrd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        android:layout_gravity="end"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="#006A00"
+        app:cardUseCompatPadding="true">
+        <Button
+            android:id="@+id/contacUs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contact Us"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:backgroundTint="#006A00"
+            android:padding="6dp" />
+    </androidx.cardview.widget.CardView>
 
 
 

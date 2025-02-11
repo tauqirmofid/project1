@@ -13,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -87,6 +88,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Register button click
         registerButton.setOnClickListener(v -> validateInputs());
+
+
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     private void showCustomDialog(String title, List<String> items, TextView targetView) {

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -60,6 +61,9 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
         designationTextView.setOnClickListener(v -> showCustomDialog("Select Designation", designationList, designationTextView));
 
         findViewById(R.id.Teacher_register_Button).setOnClickListener(v -> validateAndRegister());
+
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     private void validateAndRegister() {

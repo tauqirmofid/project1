@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -43,6 +44,9 @@ public class TeacherRoutineActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_routine);
+
+        ImageView backButton = findViewById(R.id.leftNavBarImage);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         // Initialize Firestore and UI elements
         firestore = FirebaseFirestore.getInstance();

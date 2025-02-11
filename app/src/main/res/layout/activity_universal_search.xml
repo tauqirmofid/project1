@@ -8,55 +8,66 @@
     >
 
 
+    <!-- Top card view start (now inside AppBarLayout) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/topCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginTop="0dp"
+        app:layout_scrollFlags="scroll|enterAlways"
         app:cardBackgroundColor="@color/Theme_green"
         app:cardElevation="8dp"
-        android:background="@color/Layout_Background"
         app:cardPreventCornerOverlap="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/CustomCardShape">
 
+        <!-- ConstraintLayout for your two images (left nav_bar and center new_home_top) -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
+            <!-- ImageView for nav_bar on the left -->
+            <ImageView
+                android:id="@+id/leftNavBarImage"
+                android:layout_width="26dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="20dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                android:src="@drawable/back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- ImageView for new_home_top in the center -->
             <ImageView
                 android:id="@+id/selectRoleTopImage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="-60dp"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
                 android:contentDescription="@null"
                 android:src="@drawable/new_home_top"
                 android:scaleX="1"
                 android:scaleY="1"
-
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/leftNavBarImage"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintVertical_bias="0.5" />
+                app:layout_constraintHorizontal_bias="0.5" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
     </com.google.android.material.card.MaterialCardView>
-
+    <!-- Top card view ends -->
     <!-- Search Header -->
 
 
     <androidx.cardview.widget.CardView
         android:id="@+id/searchBar"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="48dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="4dp"
         android:layout_marginTop="10dp"
@@ -88,8 +99,8 @@
 
             <ImageButton
                 android:id="@+id/closeButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="49dp"
+                android:layout_height="49dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"

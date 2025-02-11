@@ -48,6 +48,12 @@ public class UniversalSearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_universal_search);
 
+
+        ImageView backButton = findViewById(R.id.leftNavBarImage);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
+
+
         db = FirebaseFirestore.getInstance();
         searchEditText = findViewById(R.id.searchEditText);
         recyclerView = findViewById(R.id.recyclerView);

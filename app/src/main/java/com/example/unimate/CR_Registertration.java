@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -63,6 +64,11 @@ public class CR_Registertration extends AppCompatActivity {
         batchTextView.setOnClickListener(v -> showCustomDialog("Select Batch", batchList, batchTextView));
         departmentTextView.setOnClickListener(v -> showCustomDialog("Select Department", departmentList, departmentTextView));
         sectionTextView.setOnClickListener(v -> showCustomDialog("Select Section", sectionList, sectionTextView));
+
+
+
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     private void scrollToView(View view) {

@@ -73,11 +73,36 @@ public class Guest_HomePage extends AppCompatActivity {
             Intent intent = new Intent(Guest_HomePage.this, OthersRoutine.class);
             startActivity(intent);
         });
+
+
+        animateCards();
+
+    }
+    private void animateCards() {
+        CardView[] cards = {
+                findViewById(R.id.guest_routineCardView),
+                findViewById(R.id.teacherRoutine),
+                findViewById(R.id.guest_teachersInfoCard),
+                findViewById(R.id.university_map),
+                findViewById(R.id.guest_roomsCardView)
+        };
+
+        for (int i = 0; i < cards.length; i++) {
+            cards[i].setAlpha(0);
+            cards[i].setTranslationY(50);
+            cards[i].animate()
+                    .alpha(1)
+                    .translationY(0)
+                    .setStartDelay(i * 150)
+                    .setDuration(500)
+                    .start();
+        }
     }
 
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);
         Button navLoginButton = findViewById(R.id.navChooseRoleButton);
+        Button contacUs = findViewById(R.id.contacUs);
         if (navHomeButton != null) {
             navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
         }
@@ -86,6 +111,13 @@ public class Guest_HomePage extends AppCompatActivity {
                     Intent intent = new Intent(Guest_HomePage.this, MainActivity.class);
                     startActivity(intent);
                     drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
+        if (contacUs != null) {
+            contacUs.setOnClickListener(v ->{
+                Intent intent = new Intent(Guest_HomePage.this, ContactDevelopersActivity.class);
+                startActivity(intent);
+                drawerLayout.closeDrawer(GravityCompat.START);
             });
         }
 

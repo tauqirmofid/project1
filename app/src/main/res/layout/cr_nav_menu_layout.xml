@@ -3,27 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navMenuRoot"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#97C93C"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:weightSum="1">
 
     <!-- Home Card -->
     <ImageView
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
         android:adjustViewBounds="true"
         android:src="@drawable/unimate_logo_green"
-        android:layout_above="@+id/bottomLayout"
-
-
-        android:layout_marginBottom="00dp"
-        android:layout_marginTop="0dp"
         android:scaleX=".8"
-        android:scaleY=".8"
-        />
+        android:scaleY=".8" />
 
     <ImageView
         android:id="@+id/Divider4"
@@ -33,8 +28,7 @@
         android:layout_marginTop="10dp"
         android:layout_gravity="center"
         android:src="@drawable/division"
-        android:contentDescription="@null"
-        />
+        android:contentDescription="@null" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/navHomeCard"
@@ -68,7 +62,6 @@
         app:cardCornerRadius="12dp"
         app:cardElevation="6dp"
         app:cardBackgroundColor="#006A00"
-
         app:cardUseCompatPadding="true">
 
         <Button
@@ -91,17 +84,45 @@
         android:layout_marginTop="10dp"
         android:layout_gravity="center"
         android:src="@drawable/division"
-        android:contentDescription="@null"
-        />
+        android:contentDescription="@null" />
 
+    <!-- Empty View to Push Content to Bottom -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Footer Content (Always at Bottom) -->
     <TextView
         android:id="@+id/hiText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hi,"
+        android:layout_gravity="center_horizontal"
+        android:text="Developed by Tauqir, Anindita and Nuri"
         android:textSize="14sp"
         android:textColor="#006A00" />
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/contacUscrd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        android:layout_gravity="center_horizontal"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="#006A00"
+        app:cardUseCompatPadding="true"
+        android:layout_marginTop="6dp">
 
+        <Button
+            android:id="@+id/contacUs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contact Us"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:backgroundTint="#006A00"
+            android:padding="6dp" />
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>

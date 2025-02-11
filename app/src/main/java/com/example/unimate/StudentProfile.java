@@ -40,6 +40,9 @@ public class StudentProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_profile);
 
+        ImageView backButton = findViewById(R.id.leftNavBarImage);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
         // Initialize views
         profileImageView = findViewById(R.id.profileImageView);
         userNameTextView = findViewById(R.id.userNameTextView);

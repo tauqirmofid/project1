@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,6 +13,9 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        ImageView backButton = findViewById(R.id.leftNavBarImage);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         WebView webView = findViewById(R.id.webview);
         WebSettings webSettings = webView.getSettings();
@@ -22,5 +26,6 @@ public class MapActivity extends AppCompatActivity {
         // Load Google Maps with the location
         String mapUrl = "https://www.google.com/maps/place/Leading+University/@24.8693875,91.8049219,17z";
         webView.loadUrl(mapUrl);
+
     }
 }

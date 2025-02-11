@@ -12,7 +12,8 @@
     <FrameLayout
         android:id="@+id/mainContentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/Layout_Background">
 
         <!-- Scrollable content -->
         <androidx.core.widget.NestedScrollView
@@ -201,9 +202,9 @@
                                 android:id="@+id/unknownText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="UNKNOWN"
+                                android:text="UniMate User"
                                 android:textColor="#006A00"
-                                android:textSize="18sp"
+                                android:textSize="16sp"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -236,18 +237,18 @@
                                 android:id="@+id/noClassText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="NO class to show"
+                                android:text="Login to see classes"
                                 android:textColor="#006A00"
-                                android:textSize="16sp"
+                                android:textSize="12sp"
                                 android:layout_marginBottom="4dp" />
 
                             <TextView
                                 android:id="@+id/noTaskText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="NO task to show"
+                                android:text="Log in to see tasks"
                                 android:textColor="#006A00"
-                                android:textSize="16sp" />
+                                android:textSize="12sp" />
                         </LinearLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>

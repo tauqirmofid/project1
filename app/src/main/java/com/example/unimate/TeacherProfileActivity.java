@@ -63,6 +63,9 @@ public class TeacherProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_profile);
 
+        ImageView backButton = findViewById(R.id.leftNavBarImage);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
         profileImageView = findViewById(R.id.profileImageView);
 
         // Initialize TextViews

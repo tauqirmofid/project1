@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -87,6 +88,9 @@ public class TeacherCalendarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_calendar);
         teacherAcronym = getIntent().getStringExtra("acronym");
+
+        ImageView backButton = findViewById(R.id.leftNavBarImage);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         emptyDayContainer = findViewById(R.id.emptyDayContainer);
 
@@ -787,7 +791,7 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                                 if (querySnapshot.isEmpty()) {
                                     taskDates.remove(taskDate); // Only remove if no standalone tasks exist
                                 }
-                               // fetchAllStandaloneTasksAndUpdateCalendar();
+                                // fetchAllStandaloneTasksAndUpdateCalendar();
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Error checking remaining tasks", e));
                 })
@@ -1340,7 +1344,7 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                                     taskDates.remove(taskDate);
                                 }
                                 // Force full calendar refresh
-                              //  fetchAllStandaloneTasksAndUpdateCalendar();
+                                //  fetchAllStandaloneTasksAndUpdateCalendar();
                                 updateCalendarAppearance();
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Error checking remaining tasks", e));
@@ -1455,7 +1459,7 @@ public class TeacherCalendarActivity extends AppCompatActivity {
                                 Date taskDate = stripTime(task.getDate());
                                 taskDates.add(taskDate);
                                 updateCalendarAppearance();
-                               // fetchAllStandaloneTasksAndUpdateCalendar();
+                                // fetchAllStandaloneTasksAndUpdateCalendar();
                                 loadAllDataForRange();// Immediate fetch
                             })
                             .addOnFailureListener(e -> Log.e(TAG, "Failed to update taskId", e));

@@ -44,6 +44,10 @@ public class Teacher_infoActivity extends AppCompatActivity implements FacultyAd
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_info);
 
+
+        ImageView backButton = findViewById(R.id.leftNavBarImage);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
         // Initialize views
         searchEditText = findViewById(R.id.searchEditText);
         teacherRecyclerView = findViewById(R.id.teacherRecyclerView);

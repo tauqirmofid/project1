@@ -165,11 +165,17 @@ public class TeacherHomepage extends AppCompatActivity {
 
         OverlapDecoration decoration = new OverlapDecoration(300);
         carouselRecyclerView.addItemDecoration(decoration);
+
+        ImageView searchEditText = findViewById(R.id.searchIcon);
+        searchEditText.setOnClickListener(v -> {
+            startActivity(new Intent(TeacherHomepage.this, UniversalSearchActivity.class));
+        });
     }
 
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);
         Button navLogoutButton = findViewById(R.id.navLogoutButton);
+        Button contacUs = findViewById(R.id.contacUs);
 
         if (navHomeButton != null) {
             navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
@@ -185,6 +191,14 @@ public class TeacherHomepage extends AppCompatActivity {
                 Intent intent = new Intent(TeacherHomepage.this, MainActivity.class);
                 startActivity(intent);
                 finish();
+            });
+        }
+
+        if (contacUs != null) {
+            contacUs.setOnClickListener(v ->{
+                Intent intent = new Intent(TeacherHomepage.this, ContactDevelopersActivity.class);
+                startActivity(intent);
+                drawerLayout.closeDrawer(GravityCompat.START);
             });
         }
     }
