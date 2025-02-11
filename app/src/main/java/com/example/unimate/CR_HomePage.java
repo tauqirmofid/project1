@@ -206,7 +206,7 @@ public class CR_HomePage extends AppCompatActivity {
         LinearLayout otherRoutineLayout = findViewById(R.id.otherRoutine);
         if (otherRoutineLayout != null) {
             otherRoutineLayout.setOnClickListener(v -> {
-                Intent i = new Intent(CR_HomePage.this, CrCalendar.class);
+                Intent i = new Intent(CR_HomePage.this, OthersRoutine.class);
                 i.putExtra("CR_BATCH", crBatch.replace("batch_", "")); // Remove "batch_"
                 i.putExtra("CR_SECTION", crSection);
                 startActivity(i);
@@ -231,6 +231,12 @@ public class CR_HomePage extends AppCompatActivity {
         st_today = findViewById(R.id.st_today);
         st_class = findViewById(R.id.st_class);
         st_task  = findViewById(R.id.st_task);
+
+
+        ImageView searchEditText = findViewById(R.id.searchIcon);
+        searchEditText.setOnClickListener(v -> {
+            startActivity(new Intent(CR_HomePage.this, UniversalSearchActivity.class));
+        });
     }
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);

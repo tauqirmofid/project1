@@ -212,7 +212,7 @@
                                 android:id="@+id/CR_nameText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Anindita"
+                                android:text="User_name"
                                 android:textColor="#006A00"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -237,7 +237,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="5dp"
-                                    android:text="59"
+                                    android:text="00"
                                     android:textSize="18sp"
                                     android:textStyle="bold"
                                     android:textColor="#006A00" />
@@ -261,7 +261,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="5dp"
-                                    android:text="B"
+                                    android:text="XX"
                                     android:textSize="18sp"
                                     android:textStyle="bold"
                                     android:textColor="#006A00" />
@@ -495,15 +495,16 @@
                                     android:layout_height="45dp"
                                     android:layout_marginBottom="8dp"
                                     android:contentDescription="Others Routine Icon"
-                                    android:src="@drawable/others_routine" />
+                                    android:src="@drawable/teacher_rtn" />
 
                                 <TextView
                                     android:id="@+id/tcrRoutineText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Teachers Routine"
-                                    android:textColor="@color/white"
-                                    android:textSize="14dp"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/Theme_Lightgreen"
+                                    android:textSize="12dp"
                                     android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
@@ -544,8 +545,8 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="University Map"
-                                    android:textColor="@color/white"
-                                    android:textSize="14dp"
+                                    android:textColor="@color/Theme_Lightgreen"
+                                    android:textSize="12dp"
                                     android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
@@ -572,7 +573,7 @@
                                     android:id="@+id/upcomingTaskIcon"
                                     android:layout_width="45dp"
                                     android:layout_height="45dp"
-                                    android:layout_marginEnd="15dp"
+                                    android:layout_marginEnd="8dp"
                                     android:layout_marginBottom="0dp"
                                     android:contentDescription="Upcoming Task Icon"
 
@@ -660,15 +661,15 @@
                                     android:layout_height="45dp"
                                     android:src="@drawable/others_routine"
                                     android:contentDescription="Others Routine Icon"
-                                    android:layout_marginBottom="8dp" />
+                                    android:layout_marginBottom="0dp" />
 
                                 <TextView
                                     android:id="@+id/othersRoutineText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Others Routine"
-                                    android:textSize="14dp"
-                                    android:textColor="@color/white"
+                                    android:textSize="12dp"
+                                    android:textColor="@color/Theme_Lightgreen"
                                     android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
