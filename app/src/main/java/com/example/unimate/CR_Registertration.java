@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -33,6 +34,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CR_Registertration extends AppCompatActivity {
     private EditText nameEditText, emailEditText, studentIdEditText, phoneEditText;
@@ -40,14 +49,23 @@ public class CR_Registertration extends AppCompatActivity {
     private TextView departmentTextView, batchTextView, sectionTextView;
     private ScrollView scrollView;
 
-    private List<String> departmentList = Arrays.asList("CSE", "EEE", "BBA");
-    private List<String> batchList = Arrays.asList("57","58","59", "60", "61","62","63","64","65");
-    private List<String> sectionList = Arrays.asList("A", "B", "C","D","E","F","G","H","I","A+B","B+C");
+
+  //  private List<String> departmentList = Arrays.asList("CSE", "EEE", "BBA");
+  //  private List<String> batchList = Arrays.asList("57","58","59", "60", "61","62","63","64","65");
+   // private List<String> sectionList = Arrays.asList("A", "B", "C","D","E","F","G","H","I","A+B","B+C");
+
+    private List<String> departmentList = Arrays.asList("CSE");
+    private List<String> batchList = new ArrayList<>();
+    private List<String> sectionList = new ArrayList<>();
+    private FirebaseFirestore db;
+    private Map<String, Set<String>> batchToSectionsMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cr_registertration);
+        db = FirebaseFirestore.getInstance();
+
         scrollView = findViewById(R.id.register_scroll);
         nameEditText = findViewById(R.id.CRNameEditText);
         emailEditText = findViewById(R.id.CRemailEditText);
@@ -69,6 +87,71 @@ public class CR_Registertration extends AppCompatActivity {
 
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
+        fetchBatchesAndSections();
+
+    }
+
+    private void fetchBatchesAndSections() {
+        List<String> days = Arrays.asList("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday");
+        int totalDays = days.size();
+        AtomicInteger completedDays = new AtomicInteger(0);
+
+        // We'll use this local set to collect all batches
+        Set<String> allBatches = new HashSet<>();
+
+        // Use your class-level batchToSectionsMap (FIX: do not redefine it here)
+        // batchToSectionsMap = new HashMap<>();  // If you want to reset it each time, uncomment this.
+
+        for (String day : days) {
+            db.collection("schedules").document(day)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            Map<String, Object> dayData = documentSnapshot.getData();
+                            if (dayData != null) {
+                                for (String key : dayData.keySet()) {
+                                    if (key.startsWith("batch_")) {
+                                        String batchName = key.substring(6);
+                                        allBatches.add(batchName);
+
+                                        // Extract sections
+                                        Map<String, Object> batchData = (Map<String, Object>) dayData.get(key);
+                                        Set<String> sections = batchToSectionsMap.computeIfAbsent(batchName, k -> new HashSet<>());
+                                        sections.addAll(batchData.keySet());
+                                    }
+                                }
+                            }
+                        }
+
+                        if (completedDays.incrementAndGet() == totalDays) {
+                            // After all days are fetched, update the batch list
+                            batchList.clear();
+                            batchList.addAll(allBatches);
+
+                            // Update the section spinner using the first batch in the list
+                            if (!batchList.isEmpty()) {
+                                updateSectionSpinner(batchList.get(0), batchToSectionsMap);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        if (completedDays.incrementAndGet() == totalDays) {
+                            batchList.clear();
+                            batchList.addAll(allBatches);
+
+                            if (!batchList.isEmpty()) {
+                                updateSectionSpinner(batchList.get(0), batchToSectionsMap);
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void updateSectionSpinner(String batch, Map<String, Set<String>> batchToSectionsMap) {
+        Set<String> sections = batchToSectionsMap.getOrDefault(batch, new HashSet<>());
+        sectionList.clear();
+        sectionList.addAll(sections);
     }
 
     private void scrollToView(View view) {
@@ -173,9 +256,7 @@ public class CR_Registertration extends AppCompatActivity {
                     CRData crData = new CRData(name, email, studentId, phone, department, batch, section, hashedPassword, false); // isVerified = false
 
                     crRef.child(studentId).setValue(crData).addOnSuccessListener(aVoid -> {
-                        Toast.makeText(CR_Registertration.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(CR_Registertration.this, CrLoginActivity.class));
-                        finish();
+                        showRegistrationSuccessDialog();
                     }).addOnFailureListener(e -> {
                         Toast.makeText(CR_Registertration.this, "Registration Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
@@ -188,6 +269,42 @@ public class CR_Registertration extends AppCompatActivity {
             }
         });
     }
+
+    private void showRegistrationSuccessDialog() {
+        // Create the dialog
+        Dialog dialog = new Dialog(CR_Registertration.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_registration_success);
+
+        // Make background transparent if you want rounded corners or custom style
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT);
+        }
+
+        // Find the TextView and Button in the dialog
+      //  TextView dialogMessage = dialog.findViewById(R.id.dialogMessage);
+        Button okButton = dialog.findViewById(R.id.okButton);
+
+        // Optional: If you need to set text at runtime
+        // dialogMessage.setText("Registration Successful!\nPlease wait for admin approval.");
+
+        // OK button click listener
+        okButton.setOnClickListener(v -> {
+            // Close dialog
+            dialog.dismiss();
+
+            // Navigate to MainActivity
+            Intent intent = new Intent(CR_Registertration.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        // Show the dialog
+        dialog.show();
+    }
+
 
     private String hashPassword(String password) {
         try {
@@ -241,10 +358,14 @@ public class CR_Registertration extends AppCompatActivity {
             dialog.dismiss();
             String selectedItem = items.get(position);
             targetView.setText(selectedItem);
+
+            if (title.equals("Select Batch")) {
+                // Update sections based on the selected batch
+                updateSectionSpinner(selectedItem, batchToSectionsMap);
+            }
         });
 
         closeDialog.setOnClickListener(v -> dialog.dismiss());
-
         dialog.show();
     }
 }

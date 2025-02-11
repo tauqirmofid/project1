@@ -39,6 +39,14 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -47,9 +55,14 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
 
     // Lists for pseudo-spinners
-    private List<String> batchList = Arrays.asList("57","58","59", "60", "61","62","63","64","65");
-    private List<String> sectionList = Arrays.asList("A", "B", "C","D","E","F","G","H","I","A+B","B+C");
+   // private List<String> batchList = Arrays.asList("57","58","59", "60", "61","62","63","64","65");
+   // private List<String> sectionList = Arrays.asList("A", "B", "C","D","E","F","G","H","I","A+B","B+C");
+
     private List<String> departmentList = Arrays.asList("CSE");
+    private List<String> batchList = new ArrayList<>();
+    private List<String> sectionList = new ArrayList<>();
+    private FirebaseFirestore db;
+    private Map<String, Set<String>> batchToSectionsMap = new HashMap<>();
 
     // Firebase references
     private FirebaseAuth mAuth;
@@ -59,6 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        db = FirebaseFirestore.getInstance();
 
         // Firebase references
         mAuth = FirebaseAuth.getInstance();
@@ -92,6 +106,70 @@ public class RegisterActivity extends AppCompatActivity {
 
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
+        fetchBatchesAndSections();
+
+    }
+
+    private void fetchBatchesAndSections() {
+        List<String> days = Arrays.asList("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday");
+        int totalDays = days.size();
+        AtomicInteger completedDays = new AtomicInteger(0);
+
+        // We'll use this local set to collect all batches
+        Set<String> allBatches = new HashSet<>();
+
+        // Use your class-level batchToSectionsMap (FIX: do not redefine it here)
+        // batchToSectionsMap = new HashMap<>();  // If you want to reset it each time, uncomment this.
+
+        for (String day : days) {
+            db.collection("schedules").document(day)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            Map<String, Object> dayData = documentSnapshot.getData();
+                            if (dayData != null) {
+                                for (String key : dayData.keySet()) {
+                                    if (key.startsWith("batch_")) {
+                                        String batchName = key.substring(6);
+                                        allBatches.add(batchName);
+
+                                        // Extract sections
+                                        Map<String, Object> batchData = (Map<String, Object>) dayData.get(key);
+                                        Set<String> sections = batchToSectionsMap.computeIfAbsent(batchName, k -> new HashSet<>());
+                                        sections.addAll(batchData.keySet());
+                                    }
+                                }
+                            }
+                        }
+
+                        if (completedDays.incrementAndGet() == totalDays) {
+                            // After all days are fetched, update the batch list
+                            batchList.clear();
+                            batchList.addAll(allBatches);
+
+                            // Update the section spinner using the first batch in the list
+                            if (!batchList.isEmpty()) {
+                                updateSectionSpinner(batchList.get(0), batchToSectionsMap);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        if (completedDays.incrementAndGet() == totalDays) {
+                            batchList.clear();
+                            batchList.addAll(allBatches);
+
+                            if (!batchList.isEmpty()) {
+                                updateSectionSpinner(batchList.get(0), batchToSectionsMap);
+                            }
+                        }
+                    });
+        }
+    }
+    private void updateSectionSpinner(String batch, Map<String, Set<String>> batchToSectionsMap) {
+        Set<String> sections = batchToSectionsMap.getOrDefault(batch, new HashSet<>());
+        sectionList.clear();
+        sectionList.addAll(sections);
     }
 
     private void showCustomDialog(String title, List<String> items, TextView targetView) {
@@ -121,6 +199,11 @@ public class RegisterActivity extends AppCompatActivity {
             dialog.dismiss();
             String selectedItem = items.get(position);
             targetView.setText(selectedItem);
+
+            if (title.equals("Select Batch")) {
+                // Update sections based on the selected batch
+                updateSectionSpinner(selectedItem, batchToSectionsMap);
+            }
         });
 
         closeDialog.setOnClickListener(v -> dialog.dismiss());
@@ -176,12 +259,14 @@ public class RegisterActivity extends AppCompatActivity {
             showError(departmentTextView, "Please select a department!");
             return;
         }
-        if ("Select Batch".equals(selectedBatch)) {
-            showError(batchTextView, "Please select a batch!");
+        if (TextUtils.isEmpty(selectedBatch) || selectedBatch.equals("Select Batch")) {
+            showError(batchTextView, "Please select a batch");
+            scrollToView(batchTextView);
             return;
         }
-        if ("Select Section".equals(selectedSection)) {
-            showError(sectionTextView, "Please select a section!");
+        if (TextUtils.isEmpty(selectedSection) || selectedSection.equals("Select Section")) {
+            showError(sectionTextView, "Please select a section");
+            scrollToView(sectionTextView);
             return;
         }
         if (TextUtils.isEmpty(password)) {

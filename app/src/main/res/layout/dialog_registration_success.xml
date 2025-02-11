@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@drawable/bg_drawer_rounded">
+
+    <!-- A prominent title -->
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Registration Successful!"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/Theme_green"
+        android:gravity="center"/>
+
+    <!-- Explanation message -->
+    <TextView
+        android:id="@+id/dialogSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your request has been received and is awaiting admin approval.\nYou will receive an email once your account is approved."
+        android:textSize="16sp"
+        android:layout_marginTop="12dp"
+        android:textColor="@android:color/black"
+        android:gravity="center"/>
+
+    <!-- OK Button -->
+    <Button
+        android:id="@+id/okButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OK"
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"
+        android:textAllCaps="false"
+        android:textColor="@color/Layout_Background"
+        android:backgroundTint="@color/Theme_green"/>
+</LinearLayout>

@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -161,9 +162,7 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
                     TeacherData teacherData = new TeacherData(name, email,acronym, teacherId, phone, department, designation, hashedPassword, false);
 
                     teacherRef.setValue(teacherData).addOnSuccessListener(aVoid -> {
-                        Toast.makeText(TeacherRegistrationActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(TeacherRegistrationActivity.this, TeacherLoginActivity.class));
-                        finish();
+                        showRegistrationSuccessDialog();
                     }).addOnFailureListener(e -> {
                         Toast.makeText(TeacherRegistrationActivity.this, "Registration Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
@@ -175,6 +174,41 @@ public class TeacherRegistrationActivity extends AppCompatActivity {
                 Toast.makeText(TeacherRegistrationActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showRegistrationSuccessDialog() {
+        // Create the dialog
+        Dialog dialog = new Dialog(TeacherRegistrationActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_registration_success);
+
+        // Make background transparent if you want rounded corners or custom style
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT);
+        }
+
+        // Find the TextView and Button in the dialog
+        //  TextView dialogMessage = dialog.findViewById(R.id.dialogMessage);
+        Button okButton = dialog.findViewById(R.id.okButton);
+
+        // Optional: If you need to set text at runtime
+        // dialogMessage.setText("Registration Successful!\nPlease wait for admin approval.");
+
+        // OK button click listener
+        okButton.setOnClickListener(v -> {
+            // Close dialog
+            dialog.dismiss();
+
+            // Navigate to MainActivity
+            Intent intent = new Intent(TeacherRegistrationActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        // Show the dialog
+        dialog.show();
     }
 
     private void showError(View view, String errorMessage) {

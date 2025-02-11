@@ -28,6 +28,15 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class AdminHomePage extends AppCompatActivity {
 
@@ -281,6 +290,7 @@ public class AdminHomePage extends AppCompatActivity {
                             Toast.makeText(AdminHomePage.this, isAccepted ? "Request approved and moved!" : "Request rejected and moved!", Toast.LENGTH_SHORT).show();
                             requestList.remove(request);
                             requestAdapter.notifyDataSetChanged();
+                            sendEmailToUser(request.getEmail(), isAccepted);
                         });
                     });
                 } else {
@@ -294,6 +304,62 @@ public class AdminHomePage extends AppCompatActivity {
             }
         });
     }
+
+
+    private void sendEmailToUser(String recipientEmail, boolean isAccepted) {
+        new Thread(() -> {
+            try {
+                // Replace with your actual Gmail and app password
+                String fromEmail = "info.teamunimate@gmail.com";
+                String fromPassword = "zojc tfga rhrj cxvk";
+
+                Properties properties = new Properties();
+                properties.put("mail.smtp.auth", "true");
+                properties.put("mail.smtp.starttls.enable", "true");
+                properties.put("mail.smtp.host", "smtp.gmail.com");
+                properties.put("mail.smtp.port", "587");
+
+                Session session = Session.getInstance(properties, new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(fromEmail, fromPassword);
+                    }
+                });
+
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(fromEmail));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
+
+                // Decide subject and body based on acceptance
+                if (isAccepted) {
+                    message.setSubject("Your Request Has Been Approved");
+                    message.setText("Hello,\n\nCongratulations! Your request has been approved. You can now login and manage tasks and classes!\n\nBest regards,\nUnimate Team");
+                } else {
+                    message.setSubject("Your Request Has Been Rejected");
+                    message.setText("Hello,\n\nWe are sorry, but your request has been rejected.\n\nBest regards,\nUnimate Team");
+                }
+
+                Transport.send(message);
+
+                // Optional: UI feedback for Admin
+                runOnUiThread(() ->
+                        Toast.makeText(AdminHomePage.this,
+                                "Email sent to " + recipientEmail,
+                                Toast.LENGTH_SHORT).show()
+                );
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() ->
+                        Toast.makeText(AdminHomePage.this,
+                                "Failed to send email to " + recipientEmail,
+                                Toast.LENGTH_SHORT).show()
+                );
+            }
+        }).start();
+    }
+
+
 
 
 }

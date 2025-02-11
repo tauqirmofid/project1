@@ -2,6 +2,7 @@ package com.example.unimate;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
@@ -363,7 +364,7 @@ public class OthersRoutine extends AppCompatActivity {
         int currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
         int currentSlotIndex = -1;
 
-        // Figure out which slot is current
+        // Find if we are currently within a timeslot
         for (int i = 0; i < timeSlotStart.length; i++) {
             int startMins = parseTimeToMinutes(timeSlotStart[i]);
             int endMins = parseTimeToMinutes(timeSlotEnd[i]);
@@ -374,60 +375,82 @@ public class OthersRoutine extends AppCompatActivity {
         }
 
         if (currentSlotIndex >= 0) {
-            // We are within a slot
-            tvCurrentClass.setText(
-                    buildClassDisplay(daysOfWeek[todayIndex],
-                            0, // 0-day offset (today)
-                            currentSlotIndex,
-                            getClassInfoByIndex(todayModel, currentSlotIndex))
-            );
+            // We are inside some slot
+            tvCurrentClass.setText(buildClassDisplay(
+                    daysOfWeek[todayIndex],
+                    0,
+                    currentSlotIndex,
+                    getClassInfoByIndex(todayModel, currentSlotIndex)));
 
             // Next
             int nextSlot = findNextNonEmptySlot(todayModel, currentSlotIndex + 1);
             if (nextSlot != -1) {
-                tvNextClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
-                        0, nextSlot, getClassInfoByIndex(todayModel, nextSlot)));
+                tvNextClass.setText(buildClassDisplay(
+                        daysOfWeek[todayIndex],
+                        0,
+                        nextSlot,
+                        getClassInfoByIndex(todayModel, nextSlot)));
             } else {
+
+
                 checkNextDaysForClass(todayIndex);
+                Log.d("TAUQIR", "checkNextDaysForClass: " + todayIndex);
             }
 
             // Previous
             int prevSlot = findPreviousNonEmptySlot(todayModel, currentSlotIndex - 1);
             if (prevSlot != -1) {
-                tvPreviousClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
-                        0, prevSlot, getClassInfoByIndex(todayModel, prevSlot)));
+                tvPreviousClass.setText(buildClassDisplay(
+                        daysOfWeek[todayIndex],
+                        0,
+                        prevSlot,
+                        getClassInfoByIndex(todayModel, prevSlot)));
             } else {
                 checkPreviousDaysForClass(todayIndex);
             }
 
         } else {
-            // No ongoing class
+            // No ongoing class right now
+            Log.d("TAUQIR", "No ongoing class: " + todayIndex);
+
             tvCurrentClass.setText("No ongoing class");
 
+            // If it's before the first slot
             if (currentMinutes < parseTimeToMinutes(timeSlotStart[0])) {
-                // All future slots
+                // Next slot
                 int nextSlot = findNextNonEmptySlot(todayModel, 0);
                 if (nextSlot != -1) {
-                    tvNextClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
-                            0, nextSlot, getClassInfoByIndex(todayModel, nextSlot)));
+                    tvNextClass.setText(buildClassDisplay(
+                            daysOfWeek[todayIndex],
+                            0,
+                            nextSlot,
+                            getClassInfoByIndex(todayModel, nextSlot)));
                 } else {
+                    Log.d("TAUQIR", "checkNextDaysForClass: " + todayIndex);
+
                     checkNextDaysForClass(todayIndex);
                 }
                 checkPreviousDaysForClass(todayIndex);
 
-            } else if (currentMinutes >= parseTimeToMinutes(timeSlotEnd[timeSlotEnd.length - 1])) {
-                // We are past the last slot
+            }
+            // If it's after the last slot
+            else if (currentMinutes >= parseTimeToMinutes(timeSlotEnd[timeSlotEnd.length - 1])) {
                 int prevSlot = findPreviousNonEmptySlot(todayModel, timeSlotEnd.length - 1);
                 if (prevSlot != -1) {
-                    tvPreviousClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
-                            0, prevSlot, getClassInfoByIndex(todayModel, prevSlot)));
+                    tvPreviousClass.setText(buildClassDisplay(
+                            daysOfWeek[todayIndex],
+                            0,
+                            prevSlot,
+                            getClassInfoByIndex(todayModel, prevSlot)));
                 } else {
                     checkPreviousDaysForClass(todayIndex);
                 }
-                tvNextClass.setText("None");
-
-            } else {
-                // Between two slots
+                // Check for the next class in subsequent days
+                checkNextDaysForClass(todayIndex);
+            }
+            // Otherwise, we are between two slots
+            else {
+                // Find the upcoming slot
                 int nextSlot = -1;
                 for (int i = 0; i < timeSlotStart.length; i++) {
                     int sMins = parseTimeToMinutes(timeSlotStart[i]);
@@ -439,23 +462,31 @@ public class OthersRoutine extends AppCompatActivity {
                 if (nextSlot != -1) {
                     int actualNextSlot = findNextNonEmptySlot(todayModel, nextSlot);
                     if (actualNextSlot != -1) {
-                        tvNextClass.setText(buildClassDisplay(daysOfWeek[todayIndex],
-                                0, actualNextSlot,
+                        tvNextClass.setText(buildClassDisplay(
+                                daysOfWeek[todayIndex],
+                                0,
+                                actualNextSlot,
                                 getClassInfoByIndex(todayModel, actualNextSlot)));
                     } else {
+                        Log.d("TAUQIR", "checkNextDaysForClass: " + todayIndex);
+
                         checkNextDaysForClass(todayIndex);
                     }
                 } else {
+
                     tvNextClass.setText("None");
                 }
 
-                // For previous day
+                // For previous class, look at the previous day or same day
                 int prevDayIndex = (todayIndex - 1 + 7) % 7;
                 DayModel prevDay = dayList.get(prevDayIndex);
                 int prevSlot = findPreviousNonEmptySlot(prevDay, timeSlotEnd.length - 1);
                 if (prevSlot != -1) {
-                    tvPreviousClass.setText(buildClassDisplay(daysOfWeek[prevDayIndex],
-                            -1, prevSlot, getClassInfoByIndex(prevDay, prevSlot)));
+                    tvPreviousClass.setText(buildClassDisplay(
+                            daysOfWeek[prevDayIndex],
+                            -1,
+                            prevSlot,
+                            getClassInfoByIndex(prevDay, prevSlot)));
                 } else {
                     checkPreviousDaysForClass(todayIndex);
                 }
