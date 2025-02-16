@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.unimate"
+    namespace = "com.demo.unimate"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.unimate"
+        applicationId = "com.demo.unimate"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
@@ -24,12 +24,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -68,9 +69,12 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation (libs.firebase.firestore.v2491)
     implementation (libs.play.services.auth)
-    implementation ("androidx.viewpager2:viewpager2:1.0.0'")
+    implementation (libs.viewpager2)
     implementation ("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
+
+
+    implementation ("androidx.recyclerview:recyclerview:1.3.2")
 
     implementation (libs.play.services.base)
 

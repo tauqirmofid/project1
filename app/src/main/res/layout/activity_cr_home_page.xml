@@ -824,6 +824,9 @@
                     android:paddingVertical="30dp"
                     android:foregroundGravity="center"
                     android:textAlignment="center"
+
+                    android:layerType="hardware"
+                    android:elevation="4dp"
                     android:nestedScrollingEnabled="false"
                     app:layout_constraintTop_toBottomOf="@id/nextPrevContainer"
                     app:layout_constraintStart_toStartOf="parent" />

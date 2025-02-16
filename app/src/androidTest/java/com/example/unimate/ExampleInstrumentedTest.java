@@ -1,4 +1,4 @@
-package com.example.unimate;
+package com.demo.unimate;
 
 import android.content.Context;
 

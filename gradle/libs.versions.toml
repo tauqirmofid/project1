@@ -19,12 +19,14 @@ opencsv = "5.7.1"
 playServicesAuth = "21.3.0"
 playServicesBase = "18.5.0"
 prolificinteractiveMaterialCalendarview = "2.0.1"
+recyclerview = "1.4.0"
 subsamplingScaleImageView = "3.10.0"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.1.0"
 firebaseDatabase = "21.0.0"
 sunAndroidMail = "1.6.7"
 firebaseFirestore = "25.1.1"
+viewpager2 = "1.1.0"
 volley = "1.2.1"
 
 [libraries]
@@ -48,11 +50,13 @@ lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-view
 opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServicesBase" }
+recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 subsampling-scale-image-view = { module = "com.github.davemorrissey.labs:subsampling-scale-image-view", version.ref = "subsamplingScaleImageView" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 sun-android-mail = { module = "com.sun.mail:android-mail", version.ref = "sunAndroidMail" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 
 [plugins]

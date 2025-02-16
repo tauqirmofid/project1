@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:414467805920:android:4d07ff7a66673f8e45b685",
+        "mobilesdk_app_id": "1:414467805920:android:2547995b9a69166245b685",
         "android_client_info": {
-          "package_name": "com.example.unimate"
+          "package_name": "com.demo.unimate"
         }
       },
       "oauth_client": [],
