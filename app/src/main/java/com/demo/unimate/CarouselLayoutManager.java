@@ -1,6 +1,7 @@
 package com.demo.unimate;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -50,7 +51,13 @@ public class CarouselLayoutManager extends LinearLayoutManager {
         LinearSmoothScroller smoothScroller = new LinearSmoothScroller(recyclerView.getContext()) {
             @Override
             public int calculateDtToFit(int viewStart, int viewEnd, int boxStart, int boxEnd, int snapPreference) {
+                // Center the item in the RecyclerView
                 return (boxStart + (boxEnd - boxStart) / 2) - (viewStart + (viewEnd - viewStart) / 2);
+            }
+
+            @Override
+            protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+                return 150f / displayMetrics.densityDpi; // Adjust scroll speed
             }
         };
         smoothScroller.setTargetPosition(position);

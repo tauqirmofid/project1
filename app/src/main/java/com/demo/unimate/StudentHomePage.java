@@ -1,8 +1,12 @@
 package com.demo.unimate;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +21,10 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.Source;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,6 +50,8 @@ public class StudentHomePage extends AppCompatActivity {
     private TextView st_today,st_class,st_task;
     // Firebase
     private FirebaseFirestore db;
+
+
 
     // Days of the week (in the same order as in OthersRoutine)
     private final String[] daysOfWeek = {
@@ -73,6 +82,11 @@ public class StudentHomePage extends AppCompatActivity {
 
         // Initialize Firebase
         db = FirebaseFirestore.getInstance();
+        // Enable Firestore offline data
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build();
+        db.setFirestoreSettings(settings);
 
         // Find views
         carouselRecyclerView = findViewById(R.id.carouselRecyclerView);
@@ -224,8 +238,19 @@ public class StudentHomePage extends AppCompatActivity {
         CarouselSnapHelper snapHelper = new CarouselSnapHelper();
         snapHelper.attachToRecyclerView(carouselRecyclerView);
 
-        OverlapDecoration decoration = new OverlapDecoration(300);
-        carouselRecyclerView.addItemDecoration(decoration);
+        // In StudentHomePage's onCreate()
+// Remove existing decorations first
+        if (carouselRecyclerView.getItemDecorationCount() > 0) {
+            carouselRecyclerView.removeItemDecorationAt(0);
+        }
+
+// Calculate overlap based on screen width
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels;
+        int overlap = (int) (screenWidth * 0.3); // 30% of screen width
+
+        carouselRecyclerView.addItemDecoration(new OverlapDecoration(overlap));
 
         // Finally, fetch the schedule based on this student's batch/section
         //fetchAllDays(stdBatch, stdSection);
@@ -242,6 +267,17 @@ public class StudentHomePage extends AppCompatActivity {
         // The dayList is built, then we call fetchAllDays(...)
         fetchAllDays(firestoreBatch, firestoreSection);
     }
+
+    private boolean isConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            return (netInfo != null && netInfo.isConnected());
+        }
+        return false;
+    }
+
+
 
     // --- Convert batch string to "batch_59" etc. ---
     private String convertBatchToFirestoreFormat(String batch) {
@@ -289,84 +325,120 @@ public class StudentHomePage extends AppCompatActivity {
 
     // --- Recursively fetch each day's schedule from Firestore ---
     private void fetchDay(int dayIndex, String batch, String section) {
+        // If we've fetched all days, finish up
         if (dayIndex >= daysOfWeek.length) {
-            // All days fetched, update adapter
             dayAdapter = new DayAdapter(dayList);
             carouselRecyclerView.setAdapter(dayAdapter);
 
-
-            // 2) Center on current day
+            // Center on current day
             int todayIndex = getCurrentDayIndex();
             centerCarouselOn(todayIndex);
 
-            // 3) Display current/next/prev
+            // Show current/next/previous classes
             displayCurrentNextPrev(todayIndex);
 
-            // 4) Show how many classes are available today
+            // Show how many classes are available today
             showClassesToday(todayIndex);
 
-            // 5) Fetch the student’s tasks for *today* and show the count
-            //String todayStr = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+            // Show how many tasks are for today
             fetchTasksForToday(batch, section);
-
             return;
         }
 
-        // -- otherwise, normal Firestore fetching for each day --
-        String dayName = daysOfWeek[dayIndex].toLowerCase();// e.g. "monday", "tuesday"
+        // The day name (lowercase in Firestore)
+        String dayName = daysOfWeek[dayIndex].toLowerCase();
 
+        // 1) Try to get from CACHE first
         db.collection("schedules").document(dayName)
-                .get()
+                .get(Source.CACHE)
                 .addOnSuccessListener(docSnapshot -> {
-                    DayModel dayModel = dayList.get(dayIndex);
+                    // Fill the dayModel from cache if it exists
+                    fillDayModel(docSnapshot, dayIndex, batch, section);
 
-                    // Initialize timeslots to "No Class"
-                    for (int i = 0; i < timeKeys.length; i++) {
-                        setClassInfo(dayModel, i, "No Class");
+                    // If we have internet, also fetch from SERVER to refresh
+                    if (isConnected()) {
+                        db.collection("schedules").document(dayName)
+                                .get(Source.SERVER)
+                                .addOnSuccessListener(serverDoc -> {
+                                    fillDayModel(serverDoc, dayIndex, batch, section);
+                                    fetchDay(dayIndex + 1, batch, section);
+                                })
+                                .addOnFailureListener(err -> {
+                                    // If server fetch fails, just move on
+                                    fetchDay(dayIndex + 1, batch, section);
+                                });
+                    } else {
+                        // No internet => show Toast, use cached data
+                        Toast.makeText(this, "No Internet. Showing cached data.", Toast.LENGTH_SHORT).show();
+                        fetchDay(dayIndex + 1, batch, section);
                     }
+                })
+                .addOnFailureListener(e -> {
+                    // CACHE fetch failed (maybe no cached data)
+                    if (isConnected()) {
+                        // Try SERVER if connected
+                        db.collection("schedules").document(dayName)
+                                .get(Source.SERVER)
+                                .addOnSuccessListener(serverDoc -> {
+                                    fillDayModel(serverDoc, dayIndex, batch, section);
+                                    fetchDay(dayIndex + 1, batch, section);
+                                })
+                                .addOnFailureListener(err -> {
+                                    // Server also failed
+                                    fetchDay(dayIndex + 1, batch, section);
+                                });
+                    } else {
+                        // No cache AND no internet
+                        Toast.makeText(this, "No data in cache and no Internet!", Toast.LENGTH_SHORT).show();
+                        fetchDay(dayIndex + 1, batch, section);
+                    }
+                });
+    }
 
-                    if (docSnapshot.exists() && docSnapshot.getData() != null) {
-                        Map<String, Object> topLevel = docSnapshot.getData();
 
-                        if (topLevel.containsKey(batch)) {
-                            Object batchVal = topLevel.get(batch);
-                            if (batchVal instanceof Map) {
-                                Map<String, Object> sectionsMap = (Map<String, Object>) batchVal;
-                                if (sectionsMap.containsKey(section)) {
-                                    Object sectionVal = sectionsMap.get(section);
-                                    if (sectionVal instanceof Map) {
-                                        Map<String, Object> timeslotMap = (Map<String, Object>) sectionVal;
+    private void fillDayModel(DocumentSnapshot docSnapshot, int dayIndex, String batch, String section) {
+        DayModel dayModel = dayList.get(dayIndex);
 
-                                        // Fill each timeslot
-                                        for (int i = 0; i < timeKeys.length; i++) {
-                                            String tKey = timeKeys[i];
-                                            String classInfo = "No Class";
-                                            if (timeslotMap.containsKey(tKey)) {
-                                                Object slotVal = timeslotMap.get(tKey);
-                                                if (slotVal instanceof Map) {
-                                                    Map<String, Object> cMap = (Map<String, Object>) slotVal;
-                                                    String course = safeGetString(cMap, "course");
-                                                    String instructor = safeGetString(cMap, "instructor");
-                                                    String room = safeGetString(cMap, "room");
-                                                    classInfo = course + "\n" + instructor + "\n" + room;
-                                                }
-                                            }
-                                            setClassInfo(dayModel, i, classInfo);
-                                        }
+        // Always reset timeslots to "No Class" first
+        for (int i = 0; i < timeKeys.length; i++) {
+            setClassInfo(dayModel, i, "No Class");
+        }
+
+        if (docSnapshot.exists() && docSnapshot.getData() != null) {
+            Map<String, Object> topLevel = docSnapshot.getData();
+
+            if (topLevel.containsKey(batch)) {
+                Object batchVal = topLevel.get(batch);
+                if (batchVal instanceof Map) {
+                    Map<String, Object> sectionsMap = (Map<String, Object>) batchVal;
+                    if (sectionsMap.containsKey(section)) {
+                        Object sectionVal = sectionsMap.get(section);
+                        if (sectionVal instanceof Map) {
+                            Map<String, Object> timeslotMap = (Map<String, Object>) sectionVal;
+
+                            // Fill each timeslot
+                            for (int i = 0; i < timeKeys.length; i++) {
+                                String tKey = timeKeys[i];
+                                String classInfo = "No Class";
+                                if (timeslotMap.containsKey(tKey)) {
+                                    Object slotVal = timeslotMap.get(tKey);
+                                    if (slotVal instanceof Map) {
+                                        Map<String, Object> cMap = (Map<String, Object>) slotVal;
+                                        String course = safeGetString(cMap, "course");
+                                        String instructor = safeGetString(cMap, "instructor");
+                                        String room = safeGetString(cMap, "room");
+                                        classInfo = course + "\n" + instructor + "\n" + room;
                                     }
                                 }
+                                setClassInfo(dayModel, i, classInfo);
                             }
                         }
                     }
-
-                    // Move on to the next day
-                    fetchDay(dayIndex + 1, batch, section);
-                })
-                .addOnFailureListener(e -> {
-                    // Even if fail, move on
-                    fetchDay(dayIndex + 1, batch, section);
-                });
+                }
+            }
+        }
     }
+
 
 
     private void showClassesToday(int dayIndex) {
@@ -529,22 +601,12 @@ public class StudentHomePage extends AppCompatActivity {
      * Center the carousel on the given index by adjusting
      * the position to a spot near the middle of Integer range.
      */
+    // In StudentHomePage class
     private void centerCarouselOn(int dayIndex) {
-
-        // Safety check for nuris phone: If dayIndex is out of range or something is off, skip or default to 0
         if (dayIndex < 0 || dayIndex >= dayList.size()) {
-
-
-            // ...Or default to 0 (Monday):
-            dayIndex = 0;
+            dayIndex = 0; // Default to first item if invalid
         }
-
-        int halfMaxValue = Integer.MAX_VALUE / 2;
-        int midPos = halfMaxValue - (halfMaxValue % dayList.size());
-        int targetPos = midPos + dayIndex;
-
-        carouselRecyclerView.scrollToPosition(targetPos);
-        carouselRecyclerView.post(() -> carouselRecyclerView.smoothScrollToPosition(targetPos));
+        carouselRecyclerView.smoothScrollToPosition(dayIndex);
     }
 
     /**

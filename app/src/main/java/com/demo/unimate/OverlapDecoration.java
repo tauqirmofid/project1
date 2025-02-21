@@ -18,17 +18,11 @@ public class OverlapDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    public void getItemOffsets(@NonNull Rect outRect,
-                               @NonNull View view,
-                               @NonNull RecyclerView parent,
-                               @NonNull RecyclerView.State state) {
-        // Position of the item in the adapter
+    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
+                               @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         int itemPosition = parent.getChildAdapterPosition(view);
-
-        // If it's not the first item, move it left by overlapWidth.
-        // A negative left offset means it overlaps the previous card.
         if (itemPosition != 0) {
-            outRect.set(-overlapWidth, 50, 0, 0);
+            outRect.set(-overlapWidth, 0, 0, 0); // Adjust horizontal overlap
         }
     }
 }

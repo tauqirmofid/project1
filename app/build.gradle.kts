@@ -11,8 +11,8 @@ android {
         applicationId = "com.demo.unimate"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -75,6 +75,9 @@ dependencies {
 
 
     implementation ("androidx.recyclerview:recyclerview:1.3.2")
+    implementation (libs.gson)
+
+
 
     implementation (libs.play.services.base)
 
