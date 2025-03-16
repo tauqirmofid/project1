@@ -40,7 +40,7 @@
         android:id="@+id/navHomeCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+
         app:cardCornerRadius="12dp"
         app:cardElevation="6dp"
         app:cardBackgroundColor="#006A00"
@@ -55,6 +55,53 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:backgroundTint="#006A00"
+            android:padding="12dp" />
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/navAddRetakeButtoncrd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="@color/Theme_green"
+
+        app:cardUseCompatPadding="true">
+
+        <Button
+            android:id="@+id/navAddRetakeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Retake Courses"
+            android:textColor="@color/Layout_Background"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/Theme_green"
+            android:padding="12dp" />
+    </androidx.cardview.widget.CardView>
+
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/navViewPersonalizedButtoncrd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="@color/taskOrange"
+
+        app:cardUseCompatPadding="true">
+
+        <Button
+            android:id="@+id/navViewPersonalizedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View/Delete Retake Courses"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/taskOrange"
             android:padding="12dp" />
     </androidx.cardview.widget.CardView>
 

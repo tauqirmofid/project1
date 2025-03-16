@@ -92,11 +92,18 @@
 
         </com.google.android.material.card.MaterialCardView>
         <!-- Top card view Ends -->
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp">
+
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="40dp"
+
             android:fillViewport="true"
             >
 
@@ -794,6 +801,8 @@
 
         </androidx.core.widget.NestedScrollView>
         <!-- END of your existing layout -->
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </FrameLayout>
 

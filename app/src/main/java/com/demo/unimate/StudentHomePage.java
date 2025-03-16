@@ -20,6 +20,7 @@ import androidx.core.widget.NestedScrollView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -51,6 +52,7 @@ public class StudentHomePage extends AppCompatActivity {
     // Firebase
     private FirebaseFirestore db;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     // Days of the week (in the same order as in OthersRoutine)
@@ -266,6 +268,22 @@ public class StudentHomePage extends AppCompatActivity {
 
         // The dayList is built, then we call fetchAllDays(...)
         fetchAllDays(firestoreBatch, firestoreSection);
+
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            // This method is called when user does the "pull down" gesture
+
+            // Reload everything - just like when the app first loads
+            // For example:
+            String stdBatchg = convertBatchToFirestoreFormat(studentBatchText.getText().toString());
+            String stdSectiong = convertSectionToFirestoreFormat(studentSectionText.getText().toString());
+
+            // Clear old data or re-init dayList if you wish
+            // Then call fetchAllDays again:
+            fetchAllDays(stdBatchg, stdSectiong);
+        });
     }
 
     private boolean isConnected() {
@@ -342,6 +360,7 @@ public class StudentHomePage extends AppCompatActivity {
 
             // Show how many tasks are for today
             fetchTasksForToday(batch, section);
+            swipeRefreshLayout.setRefreshing(false);
             return;
         }
 
@@ -399,44 +418,126 @@ public class StudentHomePage extends AppCompatActivity {
     private void fillDayModel(DocumentSnapshot docSnapshot, int dayIndex, String batch, String section) {
         DayModel dayModel = dayList.get(dayIndex);
 
-        // Always reset timeslots to "No Class" first
+        // Reset all timeslots first
         for (int i = 0; i < timeKeys.length; i++) {
             setClassInfo(dayModel, i, "No Class");
         }
 
+        // 1. Load default schedule
         if (docSnapshot.exists() && docSnapshot.getData() != null) {
             Map<String, Object> topLevel = docSnapshot.getData();
-
-            if (topLevel.containsKey(batch)) {
-                Object batchVal = topLevel.get(batch);
-                if (batchVal instanceof Map) {
-                    Map<String, Object> sectionsMap = (Map<String, Object>) batchVal;
-                    if (sectionsMap.containsKey(section)) {
-                        Object sectionVal = sectionsMap.get(section);
-                        if (sectionVal instanceof Map) {
-                            Map<String, Object> timeslotMap = (Map<String, Object>) sectionVal;
-
-                            // Fill each timeslot
-                            for (int i = 0; i < timeKeys.length; i++) {
-                                String tKey = timeKeys[i];
-                                String classInfo = "No Class";
-                                if (timeslotMap.containsKey(tKey)) {
-                                    Object slotVal = timeslotMap.get(tKey);
-                                    if (slotVal instanceof Map) {
-                                        Map<String, Object> cMap = (Map<String, Object>) slotVal;
-                                        String course = safeGetString(cMap, "course");
-                                        String instructor = safeGetString(cMap, "instructor");
-                                        String room = safeGetString(cMap, "room");
-                                        classInfo = course + "\n" + instructor + "\n" + room;
-                                    }
-                                }
+            try {
+                Map<String, Object> batchData = (Map<String, Object>) topLevel.get(batch);
+                if (batchData != null) {
+                    Map<String, Object> sectionData = (Map<String, Object>) batchData.get(section);
+                    if (sectionData != null) {
+                        for (int i = 0; i < timeKeys.length; i++) {
+                            String tKey = timeKeys[i];
+                            if (sectionData.containsKey(tKey)) {
+                                Map<String, Object> slotData = (Map<String, Object>) sectionData.get(tKey);
+                                String classInfo = formatClassInfo(slotData);
                                 setClassInfo(dayModel, i, classInfo);
                             }
                         }
                     }
                 }
+            } catch (ClassCastException e) {
+                Log.e("Schedule", "Data format error in default schedule", e);
             }
         }
+
+        // 2. Load personalized schedule
+        String userId = getSharedPreferences("UnimatePrefs", MODE_PRIVATE)
+                .getString("studentEmail", "");
+
+        if (!userId.isEmpty()) {
+            // Get personalized data using same structure as default schedules
+            db.collection("personalized_schedules").document(userId)
+                    .collection("schedules").document(docSnapshot.getId())
+                    .collection(batch).document(section)
+                    .get()
+                    .addOnSuccessListener(personalizedDoc -> {
+                        if (personalizedDoc.exists()) {
+                            Map<String, Object> personalizedData = personalizedDoc.getData();
+                            if (personalizedData != null) {
+                                // Merge personalized data with default
+                                for (int i = 0; i < timeKeys.length; i++) {
+                                    String tKey = timeKeys[i];
+                                    if (personalizedData.containsKey(tKey)) {
+                                        Map<String, Object> slotData = (Map<String, Object>) personalizedData.get(tKey);
+                                        String classInfo = formatClassInfo(slotData);
+                                        setClassInfo(dayModel, i, classInfo);
+                                    }
+                                }
+                                // Update UI after merging
+                                runOnUiThread(() -> {
+                                    dayAdapter.notifyItemChanged(dayIndex);
+                                    displayCurrentNextPrev(getCurrentDayIndex());
+                                });
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e("Schedule", "Error loading personalized data", e));
+        }
+    }
+
+    private void loadPersonalizedSchedule(DayModel dayModel, int dayIndex) {
+        SharedPreferences prefs = getSharedPreferences("UnimatePrefs", MODE_PRIVATE);
+        String userId = prefs.getString("studentEmail", null);
+        if (userId == null) return;
+
+        String dayName = daysOfWeek[dayIndex].toLowerCase();
+
+        db.collection("personalized_schedules").document(userId)
+                .collection("days").document(dayName)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot personalizedDoc = task.getResult();
+                        if (personalizedDoc.exists()) {
+                            Map<String, Object> personalizedData = personalizedDoc.getData();
+                            if (personalizedData != null) {
+                                for (int i = 0; i < timeKeys.length; i++) {
+                                    String tKey = timeKeys[i];
+                                    if (personalizedData.containsKey(tKey)) {
+                                        try {
+                                            Map<String, Object> slotData = (Map<String, Object>) personalizedData.get(tKey);
+                                            String classInfo = formatClassInfo(slotData);
+                                            setClassInfo(dayModel, i, classInfo);
+                                        } catch (ClassCastException e) {
+                                            Log.e("Schedule", "Invalid personalized data format", e);
+                                        }
+                                    }
+                                }
+                                // Update UI
+                                runOnUiThread(() -> dayAdapter.notifyItemChanged(dayIndex));
+                            }
+                        }
+                    }
+                });
+    }
+
+    private String formatClassInfo(Map<String, Object> slotData) {
+        String course = safeGetString(slotData, "course");
+        String instructor = safeGetString(slotData, "instructor");
+        String room = safeGetString(slotData, "room");
+        return String.format("%s\n%s\n%s", course, instructor, room);
+    }
+
+    private String safeGetString(Map<String, Object> map, String key) {
+        // Handle null map case first
+        if (map == null) {
+            return "N/A";
+        }
+
+        // Handle missing key case
+        Object value = map.get(key);
+        if (value == null) {
+            return "N/A";
+        }
+
+        // Handle potential null value.toString()
+        return value.toString() != null ? value.toString() : "N/A";
     }
 
 
@@ -545,16 +646,17 @@ public class StudentHomePage extends AppCompatActivity {
     }
 
     // --- Read string safely from a Map ---
-    private String safeGetString(Map<String, Object> map, String key) {
-        Object val = map.get(key);
-        return (val == null) ? "N/A" : val.toString();
-    }
+//    private String safeGetString(Map<String, Object> map, String key) {
+//        Object val = map.get(key);
+//        return (val == null) ? "N/A" : val.toString();
+//    }
 
     // --- Navigation drawer buttons ---
     private void setUpNavigationButtons() {
         Button navHomeButton = findViewById(R.id.navHomeButton);
         Button navLogoutButton = findViewById(R.id.navLogoutButton);
         Button contacUs = findViewById(R.id.contacUs);
+        Button navAddRetakeButton = findViewById(R.id.navAddRetakeButton);
 
         if (navHomeButton != null) {
             navHomeButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
@@ -580,6 +682,19 @@ public class StudentHomePage extends AppCompatActivity {
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
         }
+
+
+        navAddRetakeButton.setOnClickListener(v -> {
+            startActivity(new Intent(StudentHomePage.this, AddRetakeActivity.class));
+            drawerLayout.closeDrawer(GravityCompat.START);
+        });
+
+        Button navViewPersonalizedButton = findViewById(R.id.navViewPersonalizedButton);
+        navViewPersonalizedButton.setOnClickListener(v -> {
+            startActivity(new Intent(this, ViewRetakesActivity.class));
+            drawerLayout.closeDrawer(GravityCompat.START);
+        });
+
     }
 
     // ------------------------------------------------------

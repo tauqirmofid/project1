@@ -34,4 +34,8 @@
         <color name="surfaceColor">#FFFFFF</color>
         <color name="backgroundColor">#F5F5F5</color>
 
+
+    <color name="themeGreen">#4CAF50</color>
+
+
 </resources>

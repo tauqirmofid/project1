@@ -29,6 +29,7 @@ sunAndroidMail = "1.6.7"
 firebaseFirestore = "25.1.1"
 viewpager2 = "1.1.0"
 volley = "1.2.1"
+swiperefreshlayout = "1.1.0"
 
 [libraries]
 android-activation = { module = "com.sun.mail:android-activation", version.ref = "sunAndroidMail" }
@@ -60,6 +61,7 @@ sun-android-mail = { module = "com.sun.mail:android-mail", version.ref = "sunAnd
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
+swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
