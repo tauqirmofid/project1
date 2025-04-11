@@ -63,18 +63,33 @@ public class StudentHomePage extends AppCompatActivity {
 
     // Time keys as stored in Firestore
     private final String[] timeKeys = {
-            "09:00-10:20AM", "10:20-11:40AM", "11:40-1:00PM",
-            "1:00-1:30PM", "1:30-2:50PM", "2:50-4:10PM", "7:00-8:20PM"
+            "09:00-10:20AM",
+            "10:20-11:40AM",
+            "11:40-1:00PM",
+            "1:00-1:30PM",
+            "1:30-2:50PM",
+            "2:50-4:10PM",
+            "7:00-8:20PM"
     };
 
-    // Parallel arrays used to figure out if we are “within” a timeslot
+    // For easily parsing start/end times, define them in parallel arrays:
     private final String[] timeSlotStart = {
-            "09:00AM", "10:20AM", "11:40AM",
-            "01:00PM", "01:30PM", "02:50PM", "07:00PM"
+            "09:05AM",
+            "10:30AM",
+            "11:55AM",
+            "01:15PM",
+            "02:00PM",
+            "03:25PM",
+            "07:00PM"
     };
     private final String[] timeSlotEnd = {
-            "10:20AM", "11:40AM", "01:00PM",
-            "01:30PM", "02:50PM", "04:10PM", "08:20PM"
+            "10:25AM",
+            "11:50AM",
+            "01:15PM",
+            "02:00PM",
+            "03:20PM",
+            "04:45PM",
+            "08:20PM"
     };
 
     @Override
@@ -957,7 +972,7 @@ public class StudentHomePage extends AppCompatActivity {
     private String buildClassDisplay(String dayName, int dayOffset, int slotIndex, String classInfo) {
         String dateStr = getDateWithOffset(dayOffset);
         return dayName + ", " + dateStr
-                + "\n" + timeKeys[slotIndex]
+                + "\n" + timeSlotStart[slotIndex] + " - " + timeSlotEnd[slotIndex]
                 + "\n" + classInfo;
     }
 

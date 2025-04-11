@@ -61,21 +61,21 @@ public class OthersRoutine extends AppCompatActivity {
 
     // For easily parsing start/end times, define them in parallel arrays:
     private final String[] timeSlotStart = {
-            "09:00AM",
-            "10:20AM",
-            "11:40AM",
-            "01:00PM",
-            "01:30PM",
-            "02:50PM",
+            "09:05AM",
+            "10:30AM",
+            "11:55AM",
+            "01:15PM",
+            "02:00PM",
+            "03:25PM",
             "07:00PM"
     };
     private final String[] timeSlotEnd = {
-            "10:20AM",
-            "11:40AM",
-            "01:00PM",
-            "01:30PM",
-            "02:50PM",
-            "04:10PM",
+            "10:25AM",
+            "11:50AM",
+            "01:15PM",
+            "02:00PM",
+            "03:20PM",
+            "04:45PM",
             "08:20PM"
     };
 
@@ -579,7 +579,7 @@ public class OthersRoutine extends AppCompatActivity {
 
         // e.g. "Monday, 02 Feb 2025\n09:00-10:20AM\nCourse...\nInstructor..."
         return dayName + ", " + dateStr
-                + "\n" + timeKeys[slotIndex]
+                + "\n" + timeSlotStart[slotIndex] + " - " + timeSlotEnd[slotIndex]
                 + "\n" + classInfo;
     }
 
